@@ -1,0 +1,14 @@
+numpy
+torch
+opencv_python
+loguru
+scikit-image
+tqdm
+torchvision
+Pillow
+thop
+ninja
+tabulate
+tensorboard
+onnxruntime
+yolox
