@@ -1,6 +1,6 @@
 # YOLOX-ROS
 
-[YOLOX]((https://github.com/Megvii-BaseDetection/YOLOX)) + ROS2 Foxy (cuda 10.2)
+[YOLOX](https://github.com/Megvii-BaseDetection/YOLOX) + ROS2 Foxy (cuda 10.2)
 
 ![yolox_s_result](images_for_readme/yolox_s_result.png)
 
