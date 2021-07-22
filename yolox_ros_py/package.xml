@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
-  <name>yolox_ros</name>
+  <name>yolox_ros_py</name>
   <version>1.0.0</version>
-  <description>The yolox_ros package</description>
+  <description>The yolox_ros_py package</description>
   <maintainer email="ray255ar@gmail.com">ubuntu</maintainer>
   <license>Apache License, Version 2.0</license>
   <author email="ray255ar@gmail.com">Ar-Ray-code</author>

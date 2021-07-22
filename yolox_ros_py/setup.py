@@ -1,6 +1,8 @@
+import os
+from glob import glob
 from setuptools import setup
 
-package_name = 'yolox_ros'
+package_name = 'yolox_ros_py'    
 
 setup(
     name=package_name,
@@ -22,12 +24,16 @@ setup(
         'Programming Language :: Python',
         'Topic :: Software Development',
     ],
-    description='Service server for finding the ip address of a computer.',
+    description='YOLOX + ROS2 Foxy',
     license='Apache License, Version 2.0',
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
             'yolox_ros = scripts.yolox_ros:ros_main',
         ],
-    }
+    },
+    data_files=[
+        (os.path.join('share', package_name), glob('launch/*.launch.py')),
+        (os.path.join('share', package_name), glob('../weights/*')),
+    ],
 )

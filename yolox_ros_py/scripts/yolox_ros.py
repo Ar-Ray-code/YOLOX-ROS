@@ -4,12 +4,12 @@
 
 # ROS2 rclpy -- Ar-Ray-code 2021
 
-import argparse
 import os
 import time
 from loguru import logger
 
 import cv2
+from numpy import empty
 
 import torch
 import torch.backends.cudnn as cudnn
@@ -18,11 +18,13 @@ from yolox.data.data_augment import preproc
 from yolox.data.datasets import COCO_CLASSES
 from yolox.exp import get_exp
 from yolox.utils import fuse_model, get_model_info, postprocess, setup_logger, vis
+import cv_bridge
 
 import rclpy
 from rclpy.node import Node
 from rclpy.qos import QoSHistoryPolicy, QoSProfile
 
+from std_msgs.msg import Header
 from cv_bridge import CvBridge
 from sensor_msgs.msg import Image
 
@@ -95,39 +97,67 @@ class Predictor(object):
         scores = output[:, 4] * output[:, 5]
 
         vis_res = vis(img, bboxes, scores, cls, cls_conf, self.cls_names)
-        return vis_res ,bboxes
+        return vis_res, bboxes, scores, cls, self.cls_names
 
 class yolox_ros(Node):
-
     def __init__(self) -> None:
 
         # ROS2 init
         super().__init__('yolox_ros')
 
-        cv2.namedWindow("window")
-
         self.setting_yolox_exp()
+
+        if (self.imshow_isshow):
+            cv2.namedWindow("YOLOX")
+        
         self.bridge = CvBridge()
         
-        self.pub = self.create_publisher(BoundingBoxes,"yololx/bounding_boxes", 10)
+        self.pub = self.create_publisher(BoundingBoxes,"yolox/bounding_boxes", 10)
+        self.pub_image = self.create_publisher(Image,"yolox/image_raw", 10)
         self.sub = self.create_subscription(Image,"image_raw",self.imageflow_callback, 10)
 
-    def setting_yolox_exp(self):
+    def setting_yolox_exp(self) -> None:
         # set environment variables for distributed training
-        yolo_type = 'yolox-s'
+        
+        # ==============================================================
+
+        WEIGHTS_PATH = '../../weights/yolox_s.pth.tar'
+
+        self.declare_parameter('imshow_isshow',True)
+
+        self.declare_parameter('yolo_type','yolox-s')
+        self.declare_parameter('fuse',False)
+        self.declare_parameter('trt', False)
+        self.declare_parameter('rank', 0)
+        self.declare_parameter('ckpt_file', WEIGHTS_PATH)
+        self.declare_parameter('conf', 0.3)
+        self.declare_parameter('nmsthre', 0.65)
+        self.declare_parameter('img_size', 640)
+        self.declare_parameter('image_size/width', 640)
+        self.declare_parameter('image_size/height', 480)
+
+        # =============================================================
+        self.imshow_isshow = self.get_parameter('imshow_isshow').value
+
+        yolo_type = self.get_parameter('yolo_type').value
+        fuse = self.get_parameter('fuse').value
+        trt = self.get_parameter('trt').value
+        rank = self.get_parameter('rank').value
+        ckpt_file = self.get_parameter('ckpt_file').value
+        conf = self.get_parameter('conf').value
+        nmsthre = self.get_parameter('nmsthre').value
+        img_size = self.get_parameter('img_size').value
+        self.input_width = self.get_parameter('image_size/width').value
+        self.input_height = self.get_parameter('image_size/height').value
+
+        # ==============================================================
+
         cudnn.benchmark = True
-        fuse = False
-        trt=False
-        rank = 0
-        ckpt_file = '/home/ubuntu/ros2_ws/src/yolox_ros/weights/yolox_s.pth.tar'
-        conf = 0.3
-        nmsthre = 0.65
-        img_size = 640
 
         exp = get_exp(None, yolo_type)
 
         file_name = os.path.join(exp.output_dir, "./")
-        os.makedirs(file_name, exist_ok=True)
+        # os.makedirs(file_name, exist_ok=True)
 
         exp.test_conf = conf # test conf
         exp.nmsthre = nmsthre # nms threshold
@@ -168,24 +198,51 @@ class yolox_ros(Node):
             decoder = None
 
         self.predictor = Predictor(model, exp, COCO_CLASSES, trt_file, decoder)
-        
 
-    def imageflow_callback(self,msg:Image):
+    def yolox2bboxes_msgs(self, bboxes, scores, cls, cls_names, img_header:Header):
+        bboxes_msg = BoundingBoxes()
+        bboxes_msg.header = img_header
+        i = 0
+        for bbox in bboxes:
+            one_box = BoundingBox()
+            one_box.xmin = int(bbox[0])
+            one_box.ymin = int(bbox[1])
+            one_box.xmax = int(bbox[2])
+            one_box.ymax = int(bbox[3])
+            one_box.probability = float(scores[i])
+            one_box.class_id = str(cls_names[int(cls[i])])
+            bboxes_msg.bounding_boxes.append(one_box)
+            i = i+1
+        
+        return bboxes_msg
+
+    def imageflow_callback(self,msg:Image) -> None:
         try:
             img_rgb = self.bridge.imgmsg_to_cv2(msg,"bgr8")
+            img_rgb = cv2.resize(img_rgb,(self.input_width,self.input_height))
 
             outputs, img_info = self.predictor.inference(img_rgb)
-            # print(outputs)
-            result_img_rgb, bboxes = self.predictor.visual(outputs[0], img_info)
-            print(bboxes)
-            cv2.imshow("window",result_img_rgb)
-            cv2.waitKey(1)
-            # output_img = self.bridge
-        except Exception as e:
-            print(e)
 
+            try:
+                result_img_rgb, bboxes, scores, cls, cls_names = self.predictor.visual(outputs[0], img_info)
+                bboxes = self.yolox2bboxes_msgs(bboxes, scores, cls, cls_names, msg.header)
 
-def ros_main(args = None):
+                self.pub.publish(bboxes)
+                self.pub_image.publish(self.bridge.cv2_to_imgmsg(img_rgb,"bgr8"))
+
+                if (self.imshow_isshow):
+                    cv2.imshow("YOLOX",result_img_rgb)
+                    cv2.waitKey(1)
+                
+            except:
+                if (self.imshow_isshow):
+                    cv2.imshow("YOLOX",img_rgb)
+                    cv2.waitKey(1)
+
+        except:
+            pass
+
+def ros_main(args = None) -> None:
     rclpy.init(args=args)
 
     yolox_ros_class = yolox_ros()
