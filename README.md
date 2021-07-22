@@ -14,6 +14,7 @@ Japanese Reference (Plan to post)：[Qiita](https://qiita.com/Ar-Ray)
 - Python 3.8 (Ubuntu 20.04 Default)
 - Torch '1.9.0+cu102 (Install with pytorch)
 - cuDNN 7.6.5 (Install with pytorch)
+- [YOLOX](https://github.com/Megvii-BaseDetection/YOLOX)
 - TensorRT : is not supported
 - WebCamera : v4l2_camera
 
