@@ -26,8 +26,23 @@ Japanese Reference (Plan to post)：[Qiita](https://qiita.com/Ar-Ray)
 
 Install the dependent packages based on all tutorials.
 
+### STEP 1 : CUDA Installation 
+
 - [CUDA-10.2-toolkit](https://developer.nvidia.com/cuda-10.2-download-archive)
-- [YOLOX Quick-start (Python)](https://github.com/Megvii-BaseDetection/YOLOX#quick-start)
+
+### STEP 2 : YOLOX Quick-start
+
+[YOLOX Quick-start (Python)](https://github.com/Megvii-BaseDetection/YOLOX#quick-start)
+
+```
+git clone https://github.com/Megvii-BaseDetection/YOLOX.git
+cd YOLOX
+pip3 install -U pip && pip3 install -r requirements.txt
+pip3 install -v -e .  # or  python3 setup.py develop
+pip3 install cython; pip3 install 'git+https://github.com/cocodataset/cocoapi.git#subdirectory=PythonAPI'
+```
+
+### STEP 3 : Install YOLOX-ROS
 
 ```bash
 source /opt/ros/foxy/setup.bash
@@ -36,8 +51,6 @@ git clone --recursive https://github.com/Ar-Ray-code/yolox_ros.git ~/ros2_ws/src
 cd ~/ros2_ws
 colcon build --symlink-install # weights files will be installed automatically.
 ```
-
-
 
 ## Demo
 
