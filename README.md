@@ -45,7 +45,10 @@ Connect your web camera.
 
 ```bash
 source ~/ros2_ws/install/setup.bash
+# Example 1 : YOLOX-s demo
 ros2 launch yolox_ros_py demo_yolox_s.launch.py
+# Example 2 : YOLOX-l demo
+ros2 launch yolox_ros_py demo_yolox_l.launch.py
 ```
 
 

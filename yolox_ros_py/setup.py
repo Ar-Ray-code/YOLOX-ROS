@@ -38,8 +38,8 @@ if not os.path.exists(YOLOX_S_WEIGHTS_PATH):
 # if not os.path.exists(YOLOX_M_WEIGHTS_PATH):
 #     urlretrieve(YOLOX_M_WEIGHTS_URL, YOLOX_M_WEIGHTS_PATH)
     
-# if not os.path.exists(YOLOX_L_WEIGHTS_PATH):
-#     urlretrieve(YOLOX_L_WEIGHTS_URL, YOLOX_L_WEIGHTS_PATH)
+if not os.path.exists(YOLOX_L_WEIGHTS_PATH):
+    urlretrieve(YOLOX_L_WEIGHTS_URL, YOLOX_L_WEIGHTS_PATH)
 
 # if not os.path.exists(YOLOX_X_WEIGHTS_PATH):
 #     urlretrieve(YOLOX_X_WEIGHTS_URL, YOLOX_X_WEIGHTS_PATH)
