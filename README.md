@@ -34,7 +34,18 @@ source /opt/ros/foxy/setup.bash
 sudo apt install ros-foxy-v4l2-camera
 git clone --recursive https://github.com/Ar-Ray-code/yolox_ros.git ~/ros2_ws/src/yolox_ros/
 cd ~/ros2_ws
-colcon build --symlink-install
+colcon build --symlink-install # weights files will be installed automatically.
+```
+
+
+
+## Demo
+
+Connect your web camera.
+
+```bash
+source ~/ros2_ws/install/setup.bash
+ros2 launch yolox_ros_py demo_yolox_s.launch.py
 ```
 
 
