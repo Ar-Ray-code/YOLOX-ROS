@@ -121,7 +121,7 @@ class yolox_ros(Node):
         
         # ==============================================================
 
-        WEIGHTS_PATH = '../../weights/yolox_s.pth.tar'
+        WEIGHTS_PATH = '../../weights/yolox_s.pth'
 
         self.declare_parameter('imshow_isshow',True)
 

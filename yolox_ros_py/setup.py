@@ -83,6 +83,6 @@ setup(
     },
     data_files=[
         (os.path.join('share', package_name), glob('launch/*.launch.py')),
-        (os.path.join('share', package_name), glob('../weights/*')),
+        (os.path.join('share', package_name), glob('../weights/*.pth')),
     ],
 )

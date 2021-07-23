@@ -5,10 +5,7 @@ from ament_index_python.packages import get_package_share_directory
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 
 def generate_launch_description():
-
     yolox_ros_share_dir = get_package_share_directory('yolox_ros_py')
-
-    print(yolox_ros_share_dir)
 
     webcam = launch_ros.actions.Node(
         package="v4l2_camera", executable="v4l2_camera_node",
@@ -26,7 +23,7 @@ def generate_launch_description():
             {"fuse" : False},
             {"trt" : False},
             {"rank" : 0},
-            {"ckpt_file" : yolox_ros_share_dir+"/yolox_s.pth.tar"},
+            {"ckpt_file" : yolox_ros_share_dir+"/yolox_s.pth"},
             {"conf" : 0.3},
             {"nmsthre" : 0.65},
             {"img_size" : 640},
