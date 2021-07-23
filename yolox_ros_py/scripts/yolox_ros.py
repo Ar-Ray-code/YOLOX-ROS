@@ -18,11 +18,9 @@ from yolox.data.data_augment import preproc
 from yolox.data.datasets import COCO_CLASSES
 from yolox.exp import get_exp
 from yolox.utils import fuse_model, get_model_info, postprocess, setup_logger, vis
-import cv_bridge
 
 import rclpy
 from rclpy.node import Node
-from rclpy.qos import QoSHistoryPolicy, QoSProfile
 
 from std_msgs.msg import Header
 from cv_bridge import CvBridge
@@ -156,7 +154,8 @@ class yolox_ros(Node):
 
         exp = get_exp(None, yolo_type)
 
-        file_name = os.path.join(exp.output_dir, "./")
+        BASE_PATH = os.getcwd()
+        file_name = os.path.join(BASE_PATH, "YOLOX_PATH/")
         # os.makedirs(file_name, exist_ok=True)
 
         exp.test_conf = conf # test conf
