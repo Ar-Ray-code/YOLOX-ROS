@@ -28,17 +28,16 @@ Install the dependent packages based on all tutorials.
 
 - [CUDA-10.2-toolkit](https://developer.nvidia.com/cuda-10.2-download-archive)
 - [YOLOX Quick-start (Python)](https://github.com/Megvii-BaseDetection/YOLOX#quick-start)
-- Download weights file from [URL (yolox_s)](https://megvii-my.sharepoint.cn/personal/gezheng_megvii_com/_layouts/15/onedrive.aspx?id=%2Fpersonal%2Fgezheng%5Fmegvii%5Fcom%2FDocuments%2Fmodel%5Fcheckpoints%2FYOLOX%2Fyolox%5Fs%2Fyolox%5Fs%2Epth%2Etar&parent=%2Fpersonal%2Fgezheng%5Fmegvii%5Fcom%2FDocuments%2Fmodel%5Fcheckpoints%2FYOLOX%2Fyolox%5Fs&originalPath=aHR0cHM6Ly9tZWd2aWktbXkuc2hhcmVwb2ludC5jbi86dTovZy9wZXJzb25hbC9nZXpoZW5nX21lZ3ZpaV9jb20vRVc2MmdtTzJ2bk5OczVucHhqenVuVndCOXAzMDdxcXlnYUNrWGRUTzg4QkxVZz9ydGltZT1tb0N0T3VOTTJVZw) and place it in this file.
-
-after, run these commands
 
 ```bash
 source /opt/ros/foxy/setup.bash
 sudo apt install ros-foxy-v4l2-camera
-git clone https://github.com/Ar-Ray-code/yolox_ros.git ~/ros2_ws/src/yolox_ros/
+git clone --recursive https://github.com/Ar-Ray-code/yolox_ros.git ~/ros2_ws/src/yolox_ros/
 cd ~/ros2_ws
 colcon build --symlink-install
 ```
+
+
 
 ---
 

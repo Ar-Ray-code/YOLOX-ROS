@@ -1,0 +1,1 @@
+https://github.com/Megvii-BaseDetection/YOLOX#benchmark
