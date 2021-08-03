@@ -2,6 +2,9 @@
 
 [YOLOX](https://github.com/Megvii-BaseDetection/YOLOX) + ROS2 Foxy (cuda 10.2)
 
+__NVIDIA Graphics is required ❗❗❗__
+
+
 ![yolox_s_result](images_for_readme/yolox_s_result.png)
 
 Japanese Reference (Plan to post)：[Qiita](https://qiita.com/Ar-Ray)
