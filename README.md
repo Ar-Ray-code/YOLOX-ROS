@@ -1,6 +1,6 @@
 # YOLOX-ROS
 
-[YOLOX](https://github.com/Megvii-BaseDetection/YOLOX) + ROS2 Foxy (cuda 10.2)
+[YOLOX](https://github.com/Megvii-BaseDetection/YOLOX) + ROS1 Noetic (cuda 10.2)
 
 __NVIDIA Graphics is required ❗❗❗__
 
@@ -48,11 +48,11 @@ pip3 install cython; pip3 install 'git+https://github.com/cocodataset/cocoapi.gi
 ### STEP 3 : Install YOLOX-ROS
 
 ```bash
-source /opt/ros/foxy/setup.bash
-sudo apt install ros-foxy-v4l2-camera
-git clone --recursive https://github.com/Ar-Ray-code/yolox_ros.git ~/ros2_ws/src/yolox_ros/
-cd ~/ros2_ws
-colcon build --symlink-install # weights files will be installed automatically.
+source /opt/ros/noetic/setup.bash
+sudo apt install ros-noetic-usb-cam
+git clone --recursive https://github.com/Ar-Ray-code/yolox_ros.git ~/ros1_ws/src/yolox_ros/
+cd ~/ros1_ws
+catkin_make # weights files will be installed automatically.
 ```
 
 ## Demo
@@ -60,11 +60,12 @@ colcon build --symlink-install # weights files will be installed automatically.
 Connect your web camera.
 
 ```bash
-source ~/ros2_ws/install/setup.bash
+source /opt/ros/noetic/setup.bash
+source ~/ros1_ws/devel/setup.bash
 # Example 1 : YOLOX-s demo
-ros2 launch yolox_ros_py demo_yolox_s.launch.py
+roslaunch yolox_ros_py demo_yolox_s.launch
 # Example 2 : YOLOX-l demo
-ros2 launch yolox_ros_py demo_yolox_l.launch.py
+roslaunch yolox_ros_py demo_yolox_l.launch
 ```
 
 
