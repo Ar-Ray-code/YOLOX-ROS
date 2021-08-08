@@ -11,7 +11,7 @@ Japanese Reference (Plan to post)：[Qiita](https://qiita.com/Ar-Ray)
 
 ## Requirements (Python)
 
-- ROS2 Foxy
+- ROS1 Noetic
 - CUDA 10.2
 - OpenCV 4.5.1
 - Python 3.8 (Ubuntu 20.04 Default)
