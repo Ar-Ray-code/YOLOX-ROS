@@ -4,13 +4,22 @@
   <name>yolox_ros_py</name>
   <version>1.0.0</version>
   <description>The yolox_ros_py package</description>
-  <maintainer email="ray255ar@gmail.com">ubuntu</maintainer>
+  <maintainer email="ray255ar@gmail.com">Ar-Ray-code</maintainer>
   <license>Apache License, Version 2.0</license>
   <author email="ray255ar@gmail.com">Ar-Ray-code</author>
 
-  <exec_depend>rclpy</exec_depend>
+  <buildtool_depend>catkin</buildtool_depend>
+  
+  <build_depend>rospy</build_depend>
+  <build_export_depend>rospy</build_export_depend>
+  <exec_depend>rospy</exec_depend>
 
-  <export>
-    <build_type>ament_python</build_type>
-  </export>
+  <build_depend>sensor_msgs</build_depend>
+  <build_export_depend>sensor_msgs</build_export_depend>
+  <exec_depend>sensor_msgs</exec_depend>
+  
+  <build_depend>cv_bridge</build_depend>
+  <build_export_depend>cv_bridge</build_export_depend>
+  <exec_depend>cv_bridge</exec_depend>
+
 </package>

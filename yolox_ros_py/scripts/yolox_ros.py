@@ -19,8 +19,7 @@ from yolox.data.datasets import COCO_CLASSES
 from yolox.exp import get_exp
 from yolox.utils import fuse_model, get_model_info, postprocess, setup_logger, vis
 
-import rclpy
-from rclpy.node import Node
+import rospy
 
 from std_msgs.msg import Header
 from cv_bridge import CvBridge
@@ -97,22 +96,20 @@ class Predictor(object):
         vis_res = vis(img, bboxes, scores, cls, cls_conf, self.cls_names)
         return vis_res, bboxes, scores, cls, self.cls_names
 
-class yolox_ros(Node):
+class yolox_ros():
     def __init__(self) -> None:
 
-        # ROS2 init
-        super().__init__('yolox_ros')
+        # ROS1 init
 
         self.setting_yolox_exp()
 
-        if (self.imshow_isshow):
-            cv2.namedWindow("YOLOX")
-        
         self.bridge = CvBridge()
         
-        self.pub = self.create_publisher(BoundingBoxes,"yolox/bounding_boxes", 10)
-        self.pub_image = self.create_publisher(Image,"yolox/image_raw", 10)
-        self.sub = self.create_subscription(Image,"image_raw",self.imageflow_callback, 10)
+        self.pub = rospy.Publisher('yolox/bounding_boxes', BoundingBoxes)
+        self.pub_image = rospy.Publisher("yolox/image_raw",Image)
+        rospy.Subscriber("image_raw",Image,self.imageflow_callback)
+
+        rospy.spin()
 
     def setting_yolox_exp(self) -> None:
         # set environment variables for distributed training
@@ -121,32 +118,19 @@ class yolox_ros(Node):
 
         WEIGHTS_PATH = '../../weights/yolox_s.pth'
 
-        self.declare_parameter('imshow_isshow',True)
-
-        self.declare_parameter('yolo_type','yolox-s')
-        self.declare_parameter('fuse',False)
-        self.declare_parameter('trt', False)
-        self.declare_parameter('rank', 0)
-        self.declare_parameter('ckpt_file', WEIGHTS_PATH)
-        self.declare_parameter('conf', 0.3)
-        self.declare_parameter('nmsthre', 0.65)
-        self.declare_parameter('img_size', 640)
-        self.declare_parameter('image_size/width', 640)
-        self.declare_parameter('image_size/height', 480)
-
         # =============================================================
-        self.imshow_isshow = self.get_parameter('imshow_isshow').value
+        self.imshow_isshow = rospy.get_param('imshow_isshow', True)
 
-        yolo_type = self.get_parameter('yolo_type').value
-        fuse = self.get_parameter('fuse').value
-        trt = self.get_parameter('trt').value
-        rank = self.get_parameter('rank').value
-        ckpt_file = self.get_parameter('ckpt_file').value
-        conf = self.get_parameter('conf').value
-        nmsthre = self.get_parameter('nmsthre').value
-        img_size = self.get_parameter('img_size').value
-        self.input_width = self.get_parameter('image_size/width').value
-        self.input_height = self.get_parameter('image_size/height').value
+        yolo_type = rospy.get_param('~yolo_type', 'yolox-s')
+        fuse = rospy.get_param('~fuse', False)
+        trt = rospy.get_param('~trt', False)
+        rank = rospy.get_param('~rank', 0)
+        ckpt_file = rospy.get_param('~ckpt_file', WEIGHTS_PATH)
+        conf = rospy.get_param('~conf', 0.3)
+        nmsthre = rospy.get_param('~nmsthre', 0.65)
+        img_size = rospy.get_param('~img_size', 640)
+        self.input_width = rospy.get_param('~image_size/width', 360)
+        self.input_height = rospy.get_param('~image_size/height', 240)
 
         # ==============================================================
 
@@ -230,26 +214,20 @@ class yolox_ros(Node):
                 self.pub_image.publish(self.bridge.cv2_to_imgmsg(img_rgb,"bgr8"))
 
                 if (self.imshow_isshow):
-                    cv2.imshow("YOLOX",result_img_rgb)
-                    cv2.waitKey(1)
-                
+                    cv2.imshow("YOLOX", result_img_rgb)
+                    cv2.waitKey(10)
             except:
                 if (self.imshow_isshow):
                     cv2.imshow("YOLOX",img_rgb)
-                    cv2.waitKey(1)
+                    cv2.waitKey(10)
 
         except:
             pass
 
 def ros_main(args = None) -> None:
-    rclpy.init(args=args)
-
-    yolox_ros_class = yolox_ros()
-    rclpy.spin(yolox_ros_class)
-
-    yolox_ros_class.destroy_node()
+    rospy.init_node("yolox_ros",argv=args)
+    yolox_ros()
     cv2.destroyAllWindows()
-    rclpy.shutdown()
 
 if __name__ == "__main__":
     ros_main()

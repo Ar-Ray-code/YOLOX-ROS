@@ -1,0 +1,30 @@
+<launch>
+  <!-- Image source (Camera) -->
+  <node pkg="usb_cam" name="camera" type="usb_cam_node">
+    <param name="video_device" value="/dev/video0" />
+    <param name="image_width" value="640" />
+    <param name="image_height" value="480" />
+    <remap from="~image_raw" to="/image_raw" />
+  </node>
+
+  <!-- weights-path -->>
+  <arg name="weights_path" default="$(find yolox_ros_py)/../weights/yolox_l.pth"/>
+
+  <!-- yolox-ros -->>
+  <node pkg="yolox_ros_py" name="yolox_ros" type="yolox_ros.py" output="screen">
+    <param name="image_size/width" value="640"/>
+    <param name="image_size/height" value="480"/>
+    <param name="yolo_type" value="yolox-l"/>
+    <param name="fuse" value="False"/>
+    <param name="trt" value="False"/>
+    <param name="rank" value="0"/>
+    <param name="ckpt_file" value="$(arg weights_path)"/>
+    <param name="conf" value="0.3"/>
+    <param name="nmsthre" value="0.65"/>
+    <param name="img_size" value="640"/>
+  </node>
+
+  <!-- Rqt_graph -->
+  <node pkg="rqt_graph" name="rqt_graph" type="rqt_graph"/>
+
+</launch>
