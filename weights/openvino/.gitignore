@@ -1,0 +1,4 @@
+*.bin
+*.xml
+*.onnx
+*.mapping

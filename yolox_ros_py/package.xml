@@ -4,10 +4,14 @@
   <name>yolox_ros_py</name>
   <version>1.0.0</version>
   <description>The yolox_ros_py package</description>
-  <maintainer email="ray255ar@gmail.com">ubuntu</maintainer>
+  <maintainer email="ray255ar@gmail.com">Ar-Ray-code</maintainer>
   <license>Apache License, Version 2.0</license>
   <author email="ray255ar@gmail.com">Ar-Ray-code</author>
 
+  <test_depend>ament_copyright</test_depend>
+  <test_depend>ament_flake8</test_depend>
+  <test_depend>ament_pep257</test_depend>
+  <test_depend>python3-pytest</test_depend>
   <exec_depend>rclpy</exec_depend>
 
   <export>

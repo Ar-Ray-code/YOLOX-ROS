@@ -1,9 +1,11 @@
+from setuptools import setup
+
 import os
 from glob import glob
-from setuptools import setup
 from urllib.request import urlretrieve
 
 package_name = 'yolox_ros_py'
+
 
 YOLOX_S_WEIGHTS = 'yolox_s.pth'
 YOLOX_M_WEIGHTS = 'yolox_m.pth'
@@ -53,36 +55,36 @@ if not os.path.exists(YOLOX_L_WEIGHTS_PATH):
 # if not os.path.exists(YOLOX_TINY_WEIGHTS_PATH):
 #     urlretrieve(YOLOX_TINY_WEIGHTS_URL, YOLOX_TINY_WEIGHTS_PATH)
 
+
 setup(
     name=package_name,
     version='1.0.0',
-    packages=[],
-    py_modules= [
-        'scripts.yolox_ros',
+    packages=[package_name],
+    data_files=[
+        ('share/ament_index/resource_index/packages',
+            ['resource/' + package_name]),
+        ('share/' + package_name, ['package.xml']),
+        (os.path.join('share', package_name), glob('./launch/*.launch.py')),
+        (os.path.join('share', package_name), glob('../weights/*.pth')),
+        (os.path.join('share', package_name), glob('../weights/openvino/*')),
     ],
+    # py_modules= [
+    #     'scripts.yolox_ros',
+    #     'scripts.yolox_openvino',
+    # ],
     install_requires=['setuptools'],
     zip_safe=True,
     author='Ar-Ray-code',
     author_email="ray255ar@gmail.com",
-    maintainer='user',
+    maintainer='Ar-Ray-code',
     maintainer_email="ray255ar@gmail.com",
-    keywords=['ROS', 'ROS2'],
-    classifiers=[
-        'Intended Audience :: Developers',
-        'License :: OSI Approved :: Apache Software License',
-        'Programming Language :: Python',
-        'Topic :: Software Development',
-    ],
     description='YOLOX + ROS2 Foxy',
     license='Apache License, Version 2.0',
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'yolox_ros = scripts.yolox_ros:ros_main',
+            'yolox_ros = yolox_ros_py.yolox_ros:ros_main',
+            'yolox_openvino = yolox_ros_py.yolox_openvino:ros_main',
         ],
     },
-    data_files=[
-        (os.path.join('share', package_name), glob('launch/*.launch.py')),
-        (os.path.join('share', package_name), glob('../weights/*.pth')),
-    ],
 )
