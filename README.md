@@ -14,11 +14,10 @@ Japanese Reference (Plan to post)：[Qiita](https://qiita.com/Ar-Ray)
 | Base        | ROS1 C++ | ROS1 Python | ROS2 C++ | ROS2 Python |
 | ----------- | -------- | ----------- | -------- | ---------- |
 | MegEngine   |          |             |          |            |
-| ONNXRuntime |          |             |          |            |
 | TensorRT    |          |             |          |            |
 | CUDA        |          | ✅           |          | ✅          |
 | ncnn        |          |             |          |            |
-| OpenVINO    |          |             |          |            |
+| OpenVINO    |          |             |          | ✅ |
 | Others(?)   |          |             |          |            |
 
 ## Requirements (Python)

@@ -70,9 +70,9 @@ class yolox_ros(Node):
         # =============================================================
         self.imshow_isshow = self.get_parameter('imshow_isshow').value
 
-        model_path = self.get_parameter('model_path').value
+        self.model_path = self.get_parameter('model_path').value
         self.conf = self.get_parameter('conf').value
-        device = self.get_parameter('device').value
+        self.device = self.get_parameter('device').value
 
         self.input_width = self.get_parameter('image_size/width').value
         self.input_height = self.get_parameter('image_size/height').value
@@ -81,10 +81,10 @@ class yolox_ros(Node):
 
         print('Creating Inference Engine')
         ie = IECore()
-        print(f'Reading the self.network: {model_path}')
+        print(f'Reading the self.network: {self.model_path}')
         # (.xml and .bin files) or (.onnx file)
 
-        self.net = ie.read_network(model=model_path)
+        self.net = ie.read_network(model=self.model_path)
         print('Configuring input and output blobs')
         # Get names of input and output blobs
         self.input_blob = next(iter(self.net.input_info))
@@ -94,11 +94,8 @@ class yolox_ros(Node):
         self.net.input_info[self.input_blob].precision = 'FP32'
         self.net.outputs[self.out_blob].precision = 'FP16'
 
-        # Get a number of classes recognized by a model
-        num_of_classes = max(self.net.outputs[self.out_blob].shape)
-
         print('Loading the model to the plugin')
-        self.exec_net = ie.load_network(network=self.net, device_name=device)
+        self.exec_net = ie.load_network(network=self.net, device_name=self.device)
 
 
     def yolox2bboxes_msgs(self, bboxes, scores, cls, cls_names, img_header:Header):
@@ -139,6 +136,7 @@ class yolox_ros(Node):
 
             boxes = predictions[:, :4]
             scores = predictions[:, 4, None] * predictions[:, 5:]
+            print(scores)
 
             boxes_xyxy = np.ones_like(boxes)
             boxes_xyxy[:, 0] = boxes[:, 0] - boxes[:, 2]/2.
@@ -148,22 +146,23 @@ class yolox_ros(Node):
             boxes_xyxy /= ratio
             dets = multiclass_nms(boxes_xyxy, scores, nms_thr=0.45, score_thr=0.1)
 
+            print(dets)
             if dets is not None:
                 final_boxes = dets[:, :4]
                 final_scores, final_cls_inds = dets[:, 4], dets[:, 5]
                 origin_img = vis(origin_img, final_boxes, final_scores, final_cls_inds,
                                  conf=self.conf, class_names=COCO_CLASSES)
+                
                 # ==============================================================
             end_time = cv2.getTickCount()
             time_took = (end_time - start_time) / cv2.getTickFrequency()
                 
             # rclpy log FPS
             self.get_logger().info(f'FPS: {1 / time_took}')
-            bboxes = self.yolox2bboxes_msgs(dets[:, :4], final_scores, final_cls_inds, COCO_CLASSES, msg.header)
-            self.get_logger().info(f'bboxes: {bboxes}')
+            
             try:
                 bboxes = self.yolox2bboxes_msgs(dets[:, :4], final_scores, final_cls_inds, COCO_CLASSES, msg.header)
-
+                self.get_logger().info(f'bboxes: {bboxes}')
                 if (self.imshow_isshow):
                     cv2.imshow("YOLOX",origin_img)
                     cv2.waitKey(1)
@@ -177,7 +176,8 @@ class yolox_ros(Node):
             self.pub.publish(bboxes)
             self.pub_image.publish(self.bridge.cv2_to_imgmsg(img_rgb,"bgr8"))
 
-        except:
+        except Exception as e:
+            self.get_logger().info(f'Error: {e}')
             pass
 
     # origin_img is output

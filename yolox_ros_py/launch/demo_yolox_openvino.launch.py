@@ -19,7 +19,7 @@ def generate_launch_description():
             {"image_size/width": 640},
             {"image_size/height": 480},
             {"device" : 'CPU'},
-            {"model_path" : yolox_ros_share_dir+"/yolox_m.xml"},
+            {"model_path" : yolox_ros_share_dir+"/yolox_s.xml"},
             {"conf" : 0.3},
         ],
     )
