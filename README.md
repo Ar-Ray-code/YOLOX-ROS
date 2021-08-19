@@ -50,7 +50,8 @@ pip3 install cython; pip3 install 'git+https://github.com/cocodataset/cocoapi.gi
 ```bash
 source /opt/ros/noetic/setup.bash
 sudo apt install ros-noetic-usb-cam
-git clone --recursive https://github.com/Ar-Ray-code/yolox_ros.git ~/ros1_ws/src/yolox_ros/
+mkdir -p ~/ros1_ws/src/ && cd ~/ros1_ws/src/
+git clone https://github.com/Ar-Ray-code/YOLOX-ROS.git -b noetic --recursive
 cd ~/ros1_ws
 catkin_make # weights files will be installed automatically.
 ```
