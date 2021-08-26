@@ -1,6 +1,6 @@
 # YOLOX-ROS
 
-[YOLOX](https://github.com/Megvii-BaseDetection/YOLOX) + ROS2 Foxy (cuda 10.2)
++ [YOLOX 0.1.0](https://github.com/Megvii-BaseDetection/YOLOX/releases/tag/0.1.0)+ROS2 Foxy (cuda 10.2)
 
 __NVIDIA Graphics is required ❗❗❗__
 
@@ -20,19 +20,20 @@ Japanese Reference (Plan to post)：[Qiita](https://qiita.com/Ar-Ray)
 | OpenVINO    |          |             |          | ✅ |
 | Others(?)   |          |             |          |            |
 
-## Requirements (Python)
+## Requirements (Python+CUDA)
 
 - ROS2 Foxy
 - CUDA 10.2
 - OpenCV 4.5.1
 - Python 3.8 (Ubuntu 20.04 Default)
+- pycupa：1.9.73
 - Torch '1.9.0+cu102 (Install with pytorch)
 - cuDNN 7.6.5 (Install with pytorch)
-- [YOLOX](https://github.com/Megvii-BaseDetection/YOLOX)
+- [YOLOX 0.1.0 version](https://github.com/Megvii-BaseDetection/YOLOX/releases/tag/0.1.0)
 - TensorRT : is not supported
 - WebCamera : v4l2_camera
 
-## Requirements (C++)
+## Requirements (CPP+CDUA)
 
 - C++ is not supported
 
@@ -40,7 +41,7 @@ Japanese Reference (Plan to post)：[Qiita](https://qiita.com/Ar-Ray)
 
 Install the dependent packages based on all tutorials.
 
-### STEP 1 : CUDA Installation 
+### STEP 1 : CUDA Installation ?
 
 - [CUDA-10.2-toolkit](https://developer.nvidia.com/cuda-10.2-download-archive)
 
@@ -48,8 +49,8 @@ Install the dependent packages based on all tutorials.
 
 [YOLOX Quick-start (Python)](https://github.com/Megvii-BaseDetection/YOLOX#quick-start)
 
-```
-git clone https://github.com/Megvii-BaseDetection/YOLOX.git
+```bash
+git clone https://github.com/Megvii-BaseDetection/YOLOX -b 0.1.0
 cd YOLOX
 pip3 install -U pip && pip3 install -r requirements.txt
 pip3 install -v -e .  # or  python3 setup.py develop
@@ -73,9 +74,9 @@ Connect your web camera.
 ```bash
 source ~/ros2_ws/install/setup.bash
 # Example 1 : YOLOX-s demo
-ros2 launch yolox_ros_py demo_yolox_s.launch.py
+ros2 launch yolox_ros_py yolox_s.launch.py
 # Example 2 : YOLOX-l demo
-ros2 launch yolox_ros_py demo_yolox_l.launch.py
+ros2 launch yolox_ros_py yolox_l.launch.py
 ```
 
 
@@ -105,7 +106,7 @@ ros2 launch yolox_ros_py demo_yolox_l.launch.py
 - fuse : False
 - trt : False
 - rank : 0
-- ckpt_file : `/home/ubuntu/ros2_ws/src/yolox_ros/weights/yolox_s.pth.tar`
+- ckpt_file : `../../weights/yolox_s.pth`
 - conf : 0.3
 - nmsthre : 0.65
 - img_size : 640
