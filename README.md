@@ -1,5 +1,9 @@
 # YOLOX-ROS
 
+:warning: YOLOX has LICENSE Probrem ! Check this [issue](https://github.com/Megvii-BaseDetection/YOLOX/issues/765) and [Japanese Blog](https://ar-ray.hatenablog.com/entry/2021/10/06/160340) :warning:
+
+---
+
 + [YOLOX 0.1.0](https://github.com/Megvii-BaseDetection/YOLOX/releases/tag/0.1.0)+ROS2 Foxy (cuda 10.2)
 
 __NVIDIA Graphics is required ❗❗❗__
