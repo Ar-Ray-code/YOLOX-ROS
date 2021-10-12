@@ -20,13 +20,14 @@ def generate_launch_description():
             {"image_size/width": 640},
             {"image_size/height": 480},
             {"yolo_type" : 'yolox-s'},
+            {"device" : 'gpu'},
+            {"fp16" : True},
             {"fuse" : False},
             {"trt" : False},
-            {"rank" : 0},
-            {"ckpt_file" : yolox_ros_share_dir+"/yolox_s.pth"},
+            {"ckpt" : yolox_ros_share_dir+"/yolox_s.pth"},
             {"conf" : 0.3},
-            {"nmsthre" : 0.65},
-            {"img_size" : 640},
+            {"threshold" : 0.65},
+            {"resize" : 640},
         ],
     )
 
@@ -37,5 +38,5 @@ def generate_launch_description():
     return launch.LaunchDescription([
         webcam,
         yolox_ros,
-        rqt_graph
+        # rqt_graph
     ])
