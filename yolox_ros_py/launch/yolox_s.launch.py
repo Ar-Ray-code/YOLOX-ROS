@@ -23,6 +23,7 @@ def generate_launch_description():
             {"device" : 'gpu'},
             {"fp16" : True},
             {"fuse" : False},
+            {"legacy" : False},
             {"trt" : False},
             {"ckpt" : yolox_ros_share_dir+"/yolox_s.pth"},
             {"conf" : 0.3},

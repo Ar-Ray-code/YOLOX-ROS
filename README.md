@@ -1,43 +1,37 @@
 # YOLOX-ROS
 
-:warning: YOLOX has LICENSE Probrem ! Check this [issue](https://github.com/Megvii-BaseDetection/YOLOX/issues/765) and [Japanese Blog](https://ar-ray.hatenablog.com/entry/2021/10/06/160340) :warning:
-
 ---
 
-+ [YOLOX 0.1.0](https://github.com/Megvii-BaseDetection/YOLOX/releases/tag/0.1.0)+ROS2 Foxy (cuda 10.2)
++ [YOLOX 0.2.0](https://github.com/Megvii-BaseDetection/YOLOX/releases/tag/0.2.0)+ROS2 Foxy
 
-__NVIDIA Graphics is required ❗❗❗__
+<!-- __NVIDIA Graphics is required ❗❗❗__ -->
 
 
 ![yolox_s_result](images_for_readme/yolox_s_result.png)
 
-Japanese Reference (Plan to post)：[Qiita](https://qiita.com/Ar-Ray)
+<!-- Japanese Reference (Plan to post)：[Qiita](https://qiita.com/Ar-Ray) -->
 
 ## Supported List
 
 | Base        | ROS1 C++ | ROS1 Python | ROS2 C++ | ROS2 Python |
 | ----------- | -------- | ----------- | -------- | ---------- |
+| CPU        |          |            |          | ✅          |
+| CUDA        |          |           |          | ✅          |
+| CUDA (FP16) |          |           |          | ✅          |
+| TensorRT    |          |             |          |   ❓     |
+| OpenVINO    |          |             |          |            |
 | MegEngine   |          |             |          |            |
-| TensorRT    |          |             |          |            |
-| CUDA        |          | ✅           |          | ✅          |
 | ncnn        |          |             |          |            |
-| OpenVINO    |          |             |          | ✅ |
-| Others(?)   |          |             |          |            |
 
-## Requirements (Python+CUDA)
+
+## Requirements of simple demo (Python)
 
 - ROS2 Foxy
-- CUDA 10.2
-- OpenCV 4.5.1
+- OpenCV 4
 - Python 3.8 (Ubuntu 20.04 Default)
-- pycupa：1.9.73
-- Torch '1.9.0+cu102 (Install with pytorch)
-- cuDNN 7.6.5 (Install with pytorch)
-- [YOLOX 0.1.0 version](https://github.com/Megvii-BaseDetection/YOLOX/releases/tag/0.1.0)
-- TensorRT : is not supported
-- WebCamera : v4l2_camera
+- [YOLOX-Standard and Depends](https://github.com/Megvii-BaseDetection/YOLOX)
 
-## Requirements (CPP+CDUA)
+## Requirements of simple demo (C++)
 
 - C++ is not supported
 
@@ -45,23 +39,19 @@ Japanese Reference (Plan to post)：[Qiita](https://qiita.com/Ar-Ray)
 
 Install the dependent packages based on all tutorials.
 
-### STEP 1 : CUDA Installation ?
-
-- [CUDA-10.2-toolkit](https://developer.nvidia.com/cuda-10.2-download-archive)
-
-### STEP 2 : YOLOX Quick-start
+### STEP 1 : YOLOX Quick-start
 
 [YOLOX Quick-start (Python)](https://github.com/Megvii-BaseDetection/YOLOX#quick-start)
 
 ```bash
-git clone https://github.com/Megvii-BaseDetection/YOLOX -b 0.1.0
+git clone https://github.com/Megvii-BaseDetection/YOLOX
 cd YOLOX
 pip3 install -U pip && pip3 install -r requirements.txt
 pip3 install -v -e .  # or  python3 setup.py develop
 pip3 install cython; pip3 install 'git+https://github.com/cocodataset/cocoapi.git#subdirectory=PythonAPI'
 ```
 
-### STEP 3 : Install YOLOX-ROS
+### STEP 2 : Install YOLOX-ROS
 
 ```bash
 source /opt/ros/foxy/setup.bash
@@ -71,6 +61,16 @@ cd ~/ros2_ws
 colcon build --symlink-install # weights files will be installed automatically.
 ```
 
+### Using CUDA
+
+If you have NVIDIA Graphics, you can run this on GPU.
+
+**Additional installing lists**
+
+- NVIDIA Graphics Driver
+- CUDA toolkit (11.0)
+- torch+cuda
+
 ## Demo
 
 Connect your web camera.
@@ -79,11 +79,7 @@ Connect your web camera.
 source ~/ros2_ws/install/setup.bash
 # Example 1 : YOLOX-s demo
 ros2 launch yolox_ros_py yolox_s.launch.py
-# Example 2 : YOLOX-l demo
-ros2 launch yolox_ros_py yolox_l.launch.py
 ```
-
-
 
 ---
 
