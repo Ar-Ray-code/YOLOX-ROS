@@ -2,6 +2,8 @@
 
 :warning: YOLOX has LICENSE Probrem ! Check this [issue](https://github.com/Megvii-BaseDetection/YOLOX/issues/765) and [Japanese Blog](https://ar-ray.hatenablog.com/entry/2021/10/06/160340) :warning:
 
+:warning: I'll publish future release. Check this [branch.](https://github.com/Ar-Ray-code/YOLOX-ROS/tree/yolox-v0.2.0) :​tanabata_tree: :warning:
+
 ---
 
 + [YOLOX 0.1.0](https://github.com/Megvii-BaseDetection/YOLOX/releases/tag/0.1.0)+ROS2 Foxy (cuda 10.2)
