@@ -1,9 +1,9 @@
-#ifndef _CORE_HPP
-#define _CORE_HPP
+#ifndef _YOLOX_OPENVINO_CORE_HPP
+#define _YOLOX_OPENVINO_CORE_HPP
 
-#include <opencv2/opencv.hpp>
+#include <opencv2/core/types.hpp>
 
-namespace yolox_ros_cpp{
+namespace yolox_openvino{
     /**
      * @brief Define names based depends on Unicode path support
      */

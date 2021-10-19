@@ -1,4 +1,4 @@
-#include "yolox_ros_cpp/yolox_node.hpp"
+#include "yolox_ros_cpp/yolox_ros_cpp.hpp"
 
 namespace yolox_ros_cpp{
 
@@ -58,6 +58,9 @@ namespace yolox_ros_cpp{
         if(this->imshow_){
             cv::imshow(this->WINDOW_NAME_, frame);
             auto key = cv::waitKey(1);
+            if(key == 27){
+                rclcpp::shutdown();
+            }
         }
 
         auto boxes = objects_to_bboxes(frame, objects, img->header);

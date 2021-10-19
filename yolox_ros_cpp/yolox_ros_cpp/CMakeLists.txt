@@ -24,17 +24,11 @@ find_package(sensor_msgs REQUIRED)
 find_package(cv_bridge REQUIRED)
 find_package(image_transport REQUIRED)
 find_package(OpenCV REQUIRED)
-find_package(InferenceEngine REQUIRED)
-find_package(ngraph REQUIRED)
+find_package(yolox_openvino REQUIRED)
 find_package(bboxes_ex_msgs REQUIRED)
 
-# add_executable(yolox_ros_cpp
-#   src/yolox_ros_cpp.cpp
-#   src/yolox_openvino.cpp
-# )
 add_library(yolox_ros_cpp SHARED
-  src/yolox_node.cpp
-  src/yolox_openvino.cpp
+  src/yolox_ros_cpp.cpp
 )
 rclcpp_components_register_nodes(yolox_ros_cpp
  "yolox_ros_cpp::YoloXNode")
@@ -57,21 +51,22 @@ ament_target_dependencies(yolox_ros_cpp
   std_msgs
   sensor_msgs
   OpenCV
-  InferenceEngine
-  ngraph
   bboxes_ex_msgs
+  yolox_openvino
 )
 
+
 install(TARGETS yolox_ros_cpp
-  DESTINATION lib)
-# install(TARGETS yolox_ros_cpp
-#   DESTINATION lib/${PROJECT_NAME})
+  EXPORT export_${PROJECT_NAME}
+  DESTINATION lib
+)
 
 install(DIRECTORY
-    launch
-    param
-    DESTINATION share/${PROJECT_NAME})
-    
+  launch
+  param
+  DESTINATION share/${PROJECT_NAME}
+)
+
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   # the following line skips the linter which checks for copyrights

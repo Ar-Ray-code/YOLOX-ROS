@@ -1,5 +1,5 @@
-#ifndef _YOLOX_NODE_HPP
-#define _YOLOX_NODE_HPP
+#ifndef _YOLOX_ROS_CPP_YOLOX_ROS_CPP_HPP
+#define _YOLOX_ROS_CPP_YOLOX_ROS_CPP_HPP
 #include <math.h>
 #include <chrono>
 
@@ -7,22 +7,17 @@
 #include <rclcpp_components/register_node_macro.hpp>
 // #include <ament_index_cpp/get_package_share_directory.hpp>
 
-#include <std_msgs/msg/header.hpp>
-#include <std_msgs/msg/string.hpp>
-#include <std_msgs/msg/float32.hpp>
-#include <std_msgs/msg/u_int8.hpp>
 #include <cv_bridge/cv_bridge.h>
 #include <image_transport/image_transport.hpp>
 
 #include "bboxes_ex_msgs/msg/bounding_box.hpp"
 #include "bboxes_ex_msgs/msg/bounding_boxes.hpp"
 
-#include "yolox_ros_cpp/yolox_openvino.hpp"
-#include "yolox_ros_cpp/utils.hpp"
+#include "yolox_openvino/yolox_openvino.hpp"
+#include "yolox_openvino/utils.hpp"
 
-using namespace yolox_ros_cpp;
-using namespace yolox_ros_cpp::utils;
-using namespace yolox_ros_cpp::openvino;
+using namespace yolox_openvino;
+using namespace yolox_openvino::utils;
 
 namespace yolox_ros_cpp{
 
@@ -51,7 +46,7 @@ namespace yolox_ros_cpp{
         bboxes_ex_msgs::msg::BoundingBoxes objects_to_bboxes(cv::Mat frame, std::vector<Object> objects,std_msgs::msg::Header header);
 
         const std::string WINDOW_NAME_ = "YOLOX";
-        bool imshow_ = false;
+        bool imshow_ = true;
     };
 }
 #endif

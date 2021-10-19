@@ -36,12 +36,8 @@ def generate_launch_description():
     rqt_graph = launch_ros.actions.Node(
         package="rqt_graph", executable="rqt_graph",
     )
-    rqt_image_view = launch_ros.actions.Node(
-        package="rqt_image_view", executable="rqt_image_view",
-    )
 
     return launch.LaunchDescription([
         container,
         rqt_graph,
-        rqt_image_view,
     ])
