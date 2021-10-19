@@ -1,13 +1,18 @@
 # YOLOX-ROS-CPP
+
 ## Usage
+
 ### Requirements
 - OpenVINO 2021
 - ROS2 Foxy
 
-* YOLOX is not require.
+※ YOLOX install is not required.
 
-### Install YOLOX-CPP
+### Install YOLOX-ROS-CPP
 ```bash
+source /opt/ros/foxy/setup.bash
+sudo apt install ros-foxy-v4l2-camera
+
 source /opt/intel/openvino_2021/bin/setupvars.sh
 cd ~/ros2_ws/src
 git clone https://github.com/fateshelled/YOLOX-ROS -b dev_cpp
@@ -17,7 +22,7 @@ git clone https://github.com/fateshelled/YOLOX-ROS -b dev_cpp
 
 ### DEMO
 ```bash
-
+ros2 launch yolox_ros_cpp yolox_openvino.launch.py
 ```
 
 ### Parameter: default
