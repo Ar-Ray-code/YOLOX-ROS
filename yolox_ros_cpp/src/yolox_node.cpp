@@ -20,17 +20,10 @@ namespace yolox_ros_cpp{
                                                this->nms_th_, this->conf_th_, 
                                                this->image_width_, this->image_height_);
 
-        auto qos_img = rclcpp::QoS(
-            rclcpp::QoSInitialization(
-                rmw_qos_profile_default.history, //rmw_qos_profile_default.reliability
-                rmw_qos_profile_default.depth
-        ));
-        qos_img.reliability(rmw_qos_profile_default.reliability);
-        this->sub_image_ = this->create_subscription<sensor_msgs::msg::Image>(
-            "image_raw",
-            qos_img, 
-            std::bind(&YoloXNode::colorImageCallback, this, std::placeholders::_1)
-        );
+        this->sub_image_ = image_transport::create_subscription(
+            this, "image_raw", 
+            std::bind(&YoloXNode::colorImageCallback, this, std::placeholders::_1), 
+            "raw");
         this->pub_bboxes_ = this->create_publisher<bboxes_ex_msgs::msg::BoundingBoxes>(
             "yolox/bounding_boxes",
             10
@@ -56,7 +49,7 @@ namespace yolox_ros_cpp{
         this->get_parameter("image_size/height", this->image_height_);
 
     }
-    void YoloXNode::colorImageCallback(const sensor_msgs::msg::Image::SharedPtr ptr){
+    void YoloXNode::colorImageCallback(const sensor_msgs::msg::Image::ConstSharedPtr& ptr){
         auto img = cv_bridge::toCvCopy(ptr, "bgr8");
         cv::Mat frame = img->image;
 

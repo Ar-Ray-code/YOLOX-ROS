@@ -42,8 +42,8 @@ namespace yolox_ros_cpp{
         int image_width_;
         int image_height_;
 
-        rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr sub_image_;
-        void colorImageCallback(const sensor_msgs::msg::Image::SharedPtr ptr);
+        image_transport::Subscriber sub_image_;
+        void colorImageCallback(const sensor_msgs::msg::Image::ConstSharedPtr& ptr);
 
         rclcpp::Publisher<bboxes_ex_msgs::msg::BoundingBoxes>::SharedPtr pub_bboxes_;
         image_transport::Publisher pub_image_;
