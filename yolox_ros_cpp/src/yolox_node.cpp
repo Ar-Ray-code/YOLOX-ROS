@@ -1,0 +1,87 @@
+#include "yolox_ros_cpp/yolox_node.hpp"
+
+namespace yolox_ros_cpp{
+
+    YoloXNode::YoloXNode(const rclcpp::NodeOptions& options)
+    : YoloXNode::YoloXNode("", options)
+    {}
+
+    YoloXNode::YoloXNode(const std::string &node_name, const rclcpp::NodeOptions& options)
+    : rclcpp::Node("yolox_ros_cpp", node_name, options){
+        
+        RCLCPP_INFO(this->get_logger(), "initialize");
+        this->initializeParameter();
+
+        if(this->imshow_){
+            cv::namedWindow(this->WINDOW_NAME_, cv::WINDOW_AUTOSIZE);
+        }
+
+        this->yolox_ = std::make_unique<YoloX>(this->model_path_, this->device_,
+                                               this->nms_th_, this->conf_th_, 
+                                               this->image_width_, this->image_height_);
+
+        auto qos_img = rclcpp::QoS(
+            rclcpp::QoSInitialization(
+                rmw_qos_profile_default.history, //rmw_qos_profile_default.reliability
+                rmw_qos_profile_default.depth
+        ));
+        qos_img.reliability(rmw_qos_profile_default.reliability);
+        this->sub_image_ = this->create_subscription<sensor_msgs::msg::Image>(
+            "image_raw",
+            qos_img, 
+            std::bind(&YoloXNode::colorImageCallback, this, std::placeholders::_1)
+        );
+        this->pub_bboxes_ = this->create_publisher<bboxes_ex_msgs::msg::BoundingBoxes>(
+            "yolox/bounding_boxes",
+            10
+        );
+        this->pub_image_ = this->create_publisher<sensor_msgs::msg::Image>(
+            "yolox/image_raw",
+            10
+        );
+
+    }
+
+    void YoloXNode::initializeParameter(){
+        this->declare_parameter("imshow_isshow", true);
+        this->declare_parameter("model_path", "/home/ubuntu/ros2_ws/build/weights/openvino/yolox_nano.xml");
+        this->declare_parameter("conf", 0.3f);
+        this->declare_parameter("nms", 0.45f);
+        this->declare_parameter("device", "CPU");
+        this->declare_parameter("image_size/width", 416);
+        this->declare_parameter("image_size/height", 416);
+        this->get_parameter("imshow_isshow", this->imshow_);
+        this->get_parameter("model_path", this->model_path_);
+        this->get_parameter("conf", this->conf_th_);
+        this->get_parameter("nms", this->nms_th_);
+        this->get_parameter("device", this->device_);
+        this->get_parameter("image_size/width", this->image_width_);
+        this->get_parameter("image_size/height", this->image_height_);
+
+    }
+    void YoloXNode::colorImageCallback(const sensor_msgs::msg::Image::SharedPtr ptr){
+        auto img = cv_bridge::toCvCopy(ptr, "bgr8");
+        cv::Mat frame = img->image;
+
+        auto objects = this->yolox_->inference(frame);
+        draw_objects(frame, objects);
+        if(this->imshow_){
+            cv::imshow(this->WINDOW_NAME_, frame);
+            auto key = cv::waitKey(1);
+        }
+
+    }
+}
+
+// int main(int argc, char* argv[]) {
+//     rclcpp::init(argc, argv);
+//     auto exec = std::make_shared<rclcpp::executors::SingleThreadedExecutor>();
+//     auto node = std::make_shared<yolox_ros_cpp::YoloXNode>();
+//     exec->add_node(node);
+//     exec->spin();
+//     rclcpp::shutdown();
+//   return 0;
+// }
+
+RCLCPP_COMPONENTS_REGISTER_NODE(yolox_ros_cpp::YoloXNode)
+
