@@ -35,10 +35,7 @@ namespace yolox_ros_cpp{
             "yolox/bounding_boxes",
             10
         );
-        this->pub_image_ = this->create_publisher<sensor_msgs::msg::Image>(
-            "yolox/image_raw",
-            10
-        );
+        this->pub_image_ = image_transport::create_publisher(this, "yolox/image_raw");
 
     }
 
@@ -70,18 +67,35 @@ namespace yolox_ros_cpp{
             auto key = cv::waitKey(1);
         }
 
+        auto boxes = objects_to_bboxes(frame, objects, img->header);
+        this->pub_bboxes_->publish(boxes);
+
+        sensor_msgs::msg::Image::SharedPtr pub_img;
+        pub_img = cv_bridge::CvImage(img->header, "bgr8", frame).toImageMsg();
+        this->pub_image_.publish(pub_img);
+    }
+    bboxes_ex_msgs::msg::BoundingBoxes YoloXNode::objects_to_bboxes(cv::Mat frame, std::vector<Object> objects,std_msgs::msg::Header header){
+        bboxes_ex_msgs::msg::BoundingBoxes boxes;
+        boxes.header = header;
+        for(auto obj: objects){
+            bboxes_ex_msgs::msg::BoundingBox box;
+            box.probability = obj.prob;
+            box.class_id = COCO_CLASSES[obj.label];
+            box.xmin = obj.rect.x;
+            box.ymin = obj.rect.y;
+            box.xmax = (obj.rect.x + obj.rect.width);
+            box.ymax = (obj.rect.y + obj.rect.height);
+            box.img_width = frame.cols;
+            box.img_height = frame.rows;
+            // tracking id
+            // box.id = 0;
+            // depth
+            // box.center_dist = 0;
+            boxes.bounding_boxes.emplace_back(box);
+        }
+        return boxes;
     }
 }
-
-// int main(int argc, char* argv[]) {
-//     rclcpp::init(argc, argv);
-//     auto exec = std::make_shared<rclcpp::executors::SingleThreadedExecutor>();
-//     auto node = std::make_shared<yolox_ros_cpp::YoloXNode>();
-//     exec->add_node(node);
-//     exec->spin();
-//     rclcpp::shutdown();
-//   return 0;
-// }
 
 RCLCPP_COMPONENTS_REGISTER_NODE(yolox_ros_cpp::YoloXNode)
 

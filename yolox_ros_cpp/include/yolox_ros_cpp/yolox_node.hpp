@@ -12,6 +12,7 @@
 #include <std_msgs/msg/float32.hpp>
 #include <std_msgs/msg/u_int8.hpp>
 #include <cv_bridge/cv_bridge.h>
+#include <image_transport/image_transport.hpp>
 
 #include "bboxes_ex_msgs/msg/bounding_box.hpp"
 #include "bboxes_ex_msgs/msg/bounding_boxes.hpp"
@@ -45,7 +46,9 @@ namespace yolox_ros_cpp{
         void colorImageCallback(const sensor_msgs::msg::Image::SharedPtr ptr);
 
         rclcpp::Publisher<bboxes_ex_msgs::msg::BoundingBoxes>::SharedPtr pub_bboxes_;
-        rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr pub_image_;
+        image_transport::Publisher pub_image_;
+
+        bboxes_ex_msgs::msg::BoundingBoxes objects_to_bboxes(cv::Mat frame, std::vector<Object> objects,std_msgs::msg::Header header);
 
         const std::string WINDOW_NAME_ = "YOLOX";
         bool imshow_ = false;

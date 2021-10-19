@@ -22,6 +22,7 @@ find_package(rclcpp_components REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(cv_bridge REQUIRED)
+find_package(image_transport REQUIRED)
 find_package(OpenCV REQUIRED)
 find_package(InferenceEngine REQUIRED)
 find_package(ngraph REQUIRED)
@@ -51,6 +52,7 @@ ament_target_dependencies(yolox_ros_cpp
   rclcpp
   rclcpp_components
   cv_bridge
+  image_transport
   builtin_interfaces
   std_msgs
   sensor_msgs
