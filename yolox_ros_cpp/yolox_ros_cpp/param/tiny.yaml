@@ -1,0 +1,8 @@
+conf: 0.30
+device: CPU
+image_size/height: 416
+image_size/width: 416
+imshow_isshow: true
+model_path: /home/ubuntu/ros2_ws/build/weights/openvino/yolox_tiny.xml
+nms: 0.45
+use_sim_time: false

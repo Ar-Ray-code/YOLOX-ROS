@@ -20,7 +20,7 @@ def generate_launch_description():
             {"image_size/width": 640},
             {"image_size/height": 480},
             {"yolo_type" : 'yolox-s'},
-            {"device" : 'gpu'},
+            {"device" : 'cpu'},
             {"fp16" : True},
             {"fuse" : False},
             {"legacy" : False},

@@ -14,7 +14,7 @@ from numpy import empty
 import torch
 import torch.backends.cudnn as cudnn
 
-from yolox.data.data_augment import preproc
+from yolox.data.data_augment import ValTransform
 from yolox.data.datasets import COCO_CLASSES
 from yolox.exp import get_exp
 from yolox.utils import fuse_model, get_model_info, postprocess, setup_logger, vis
@@ -33,41 +33,50 @@ from bboxes_ex_msgs.msg import BoundingBox
 # from darknet_ros_msgs.msg import BoundingBox
 
 class Predictor(object):
-    def __init__(self, model, exp, cls_names=COCO_CLASSES, trt_file=None, decoder=None):
+    def __init__(self, model, exp, cls_names=COCO_CLASSES, trt_file=None, decoder=None, device="cpu", fp16=False, legacy=False):
         self.model = model
         self.cls_names = cls_names
         self.decoder = decoder
         self.num_classes = exp.num_classes
         self.confthre = exp.test_conf
-        self.nmsthre = exp.nmsthre
+        self.threshold = exp.threshold
         self.test_size = exp.test_size
+        self.device = device
+        self.fp16 = fp16
+        self.preproc = ValTransform(legacy=legacy)
         if trt_file is not None:
             from torch2trt import TRTModule
+
             model_trt = TRTModule()
             model_trt.load_state_dict(torch.load(trt_file))
 
             x = torch.ones(1, 3, exp.test_size[0], exp.test_size[1]).cuda()
             self.model(x)
             self.model = model_trt
-        self.rgb_means = (0.485, 0.456, 0.406)
-        self.std = (0.229, 0.224, 0.225)
 
     def inference(self, img):
-        img_info = {'id': 0}
+        img_info = {"id": 0}
         if isinstance(img, str):
-            img_info['file_name'] = os.path.basename(img)
+            img_info["file_name"] = os.path.basename(img)
             img = cv2.imread(img)
         else:
-            img_info['file_name'] = None
+            img_info["file_name"] = None
 
         height, width = img.shape[:2]
-        img_info['height'] = height
-        img_info['width'] = width
-        img_info['raw_img'] = img
+        img_info["height"] = height
+        img_info["width"] = width
+        img_info["raw_img"] = img
 
-        img, ratio = preproc(img, self.test_size, self.rgb_means, self.std)
-        img_info['ratio'] = ratio
-        img = torch.from_numpy(img).unsqueeze(0).cuda()
+        ratio = min(self.test_size[0] / img.shape[0], self.test_size[1] / img.shape[1])
+        img_info["ratio"] = ratio
+
+        img, _ = self.preproc(img, None, self.test_size)
+        img = torch.from_numpy(img).unsqueeze(0)
+        img = img.float()
+        if self.device == "gpu":
+            img = img.cuda()
+            if self.fp16:
+                img = img.half()  # to FP16
 
         with torch.no_grad():
             t0 = time.time()
@@ -75,13 +84,16 @@ class Predictor(object):
             if self.decoder is not None:
                 outputs = self.decoder(outputs, dtype=outputs.type())
             outputs = postprocess(
-                        outputs, self.num_classes, self.confthre, self.nmsthre
-                    )
+                outputs, self.num_classes, self.confthre,
+                self.threshold, class_agnostic=True
+            )
+            fps = int(1/(time.time() - t0))
+            logger.info("{}fps".format(fps))
         return outputs, img_info
 
     def visual(self, output, img_info, cls_conf=0.35):
-        ratio = img_info['ratio']
-        img = img_info['raw_img']
+        ratio = img_info["ratio"]
+        img = img_info["raw_img"]
         if output is None:
             return img
         output = output.cpu()
@@ -95,7 +107,7 @@ class Predictor(object):
         scores = output[:, 4] * output[:, 5]
 
         vis_res = vis(img, bboxes, scores, cls, cls_conf, self.cls_names)
-        return vis_res, bboxes, scores, cls, self.cls_names
+        return vis_res
 
 class yolox_ros(Node):
     def __init__(self) -> None:
@@ -105,8 +117,8 @@ class yolox_ros(Node):
 
         self.setting_yolox_exp()
 
-        if (self.imshow_isshow):
-            cv2.namedWindow("YOLOX")
+        # if (self.imshow_isshow):
+        #     cv2.namedWindow("YOLOX")
         
         self.bridge = CvBridge()
         
@@ -126,11 +138,17 @@ class yolox_ros(Node):
         self.declare_parameter('yolo_type','yolox-s')
         self.declare_parameter('fuse',False)
         self.declare_parameter('trt', False)
-        self.declare_parameter('rank', 0)
-        self.declare_parameter('ckpt_file', WEIGHTS_PATH)
+        self.declare_parameter('fp16', False)
+        self.declare_parameter('legacy', False)
+        self.declare_parameter('device', "cpu")
+        # self.declare_parameter('', 0)
+        self.declare_parameter('ckpt', WEIGHTS_PATH)
         self.declare_parameter('conf', 0.3)
-        self.declare_parameter('nmsthre', 0.65)
-        self.declare_parameter('img_size', 640)
+
+        # nmsthre -> threshold
+        self.declare_parameter('threshold', 0.65)
+        # --tsize -> resize
+        self.declare_parameter('resize', 640)
         self.declare_parameter('image_size/width', 640)
         self.declare_parameter('image_size/height', 480)
 
@@ -140,11 +158,16 @@ class yolox_ros(Node):
         yolo_type = self.get_parameter('yolo_type').value
         fuse = self.get_parameter('fuse').value
         trt = self.get_parameter('trt').value
-        rank = self.get_parameter('rank').value
-        ckpt_file = self.get_parameter('ckpt_file').value
+        fp16 = self.get_parameter('fp16').value
+        fp16 = self.get_parameter('fp16').value
+        device = self.get_parameter('device').value
+        #  = self.get_parameter('').value
+        ckpt = self.get_parameter('ckpt').value
         conf = self.get_parameter('conf').value
-        nmsthre = self.get_parameter('nmsthre').value
-        img_size = self.get_parameter('img_size').value
+        legacy = self.get_parameter('legacy').value
+        threshold = self.get_parameter('threshold').value
+        
+        resize = self.get_parameter('resize').value
         self.input_width = self.get_parameter('image_size/width').value
         self.input_height = self.get_parameter('image_size/height').value
 
@@ -159,44 +182,52 @@ class yolox_ros(Node):
         # os.makedirs(file_name, exist_ok=True)
 
         exp.test_conf = conf # test conf
-        exp.nmsthre = nmsthre # nms threshold
-        exp.test_size = (img_size, img_size) # Resize size
+        exp.threshold = threshold # nms threshold
+        exp.test_size = (resize, resize) # Resize size
 
         model = exp.get_model()
         logger.info("Model Summary: {}".format(get_model_info(model, exp.test_size)))
 
-        torch.cuda.set_device(rank)
-        model.cuda(rank)
+        if device == "gpu":
+            model.cuda()
+            if fp16:
+                model.half() 
+        # torch.cuda.set_device()
+        # model.cuda()
         model.eval()
 
+        # about not trt
         if not trt:
+            if ckpt is None:
+                ckpt_file = os.path.join(file_name, "best_ckpt.pth")
+            else:
+                ckpt_file = ckpt
             logger.info("loading checkpoint")
-            loc = "cuda:{}".format(rank)
-            ckpt = torch.load(ckpt_file, map_location=loc)
+            ckpt = torch.load(ckpt_file, map_location="cpu")
             # load the model state dict
             model.load_state_dict(ckpt["model"])
             logger.info("loaded checkpoint done.")
 
+        # about fuse
         if fuse:
             logger.info("\tFusing model...")
             model = fuse_model(model)
 
         # TensorRT
         if trt:
-            assert (not fuse),\
-                "TensorRT model is not support model fusing!"
+            assert not fuse, "TensorRT model is not support model fusing!"
             trt_file = os.path.join(file_name, "model_trt.pth")
-            assert os.path.exists(trt_file), (
-                "TensorRT model is not found!\n Run python3 tools/trt.py first!"
-            )
+            assert os.path.exists(
+                trt_file
+            ), "TensorRT model is not found!\n Run python3 tools/trt.py first!"
             model.head.decode_in_inference = False
             decoder = model.head.decode_outputs
             logger.info("Using TensorRT to inference")
         else:
             trt_file = None
             decoder = None
-
-        self.predictor = Predictor(model, exp, COCO_CLASSES, trt_file, decoder)
+        
+        self.predictor = Predictor(model, exp, COCO_CLASSES, trt_file, decoder, device, fp16, legacy)
 
     def yolox2bboxes_msgs(self, bboxes, scores, cls, cls_names, img_header:Header):
         bboxes_msg = BoundingBoxes()
@@ -237,7 +268,6 @@ class yolox_ros(Node):
                 if (self.imshow_isshow):
                     cv2.imshow("YOLOX",img_rgb)
                     cv2.waitKey(1)
-
         except:
             pass
 
