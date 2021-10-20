@@ -15,7 +15,7 @@ YOLOX_DARKNET53_WEIGHTS = 'yolox_darknet53.pth'
 YOLOX_NANO_WEIGHTS = 'yolox_nano.pth'
 YOLOX_TINY_WEIGHTS = 'yolox_tiny.pth'
 
-BASE_LINK = 'https://github.com/Megvii-BaseDetection/storage/releases/download/0.0.1/'
+BASE_LINK = 'https://github.com/Megvii-BaseDetection/YOLOX/releases/download/0.1.1rc0/'
 YOLOX_S_WEIGHTS_URL = BASE_LINK + YOLOX_S_WEIGHTS
 YOLOX_M_WEIGHTS_URL = BASE_LINK + YOLOX_M_WEIGHTS
 YOLOX_L_WEIGHTS_URL = BASE_LINK + YOLOX_L_WEIGHTS
@@ -34,14 +34,15 @@ YOLOX_DARKNET53_WEIGHTS_PATH = BASE_PATH + YOLOX_DARKNET53_WEIGHTS
 YOLOX_NANO_WEIGHTS_PATH = BASE_PATH + YOLOX_NANO_WEIGHTS
 YOLOX_TINY_WEIGHTS_PATH = BASE_PATH + YOLOX_TINY_WEIGHTS
 
+# Download YOLOX-S Weights
 if not os.path.exists(YOLOX_S_WEIGHTS_PATH):
     urlretrieve(YOLOX_S_WEIGHTS_URL, YOLOX_S_WEIGHTS_PATH)
 
 # if not os.path.exists(YOLOX_M_WEIGHTS_PATH):
 #     urlretrieve(YOLOX_M_WEIGHTS_URL, YOLOX_M_WEIGHTS_PATH)
     
-if not os.path.exists(YOLOX_L_WEIGHTS_PATH):
-    urlretrieve(YOLOX_L_WEIGHTS_URL, YOLOX_L_WEIGHTS_PATH)
+# if not os.path.exists(YOLOX_L_WEIGHTS_PATH):
+#     urlretrieve(YOLOX_L_WEIGHTS_URL, YOLOX_L_WEIGHTS_PATH)
 
 # if not os.path.exists(YOLOX_X_WEIGHTS_PATH):
 #     urlretrieve(YOLOX_X_WEIGHTS_URL, YOLOX_X_WEIGHTS_PATH)
@@ -68,10 +69,6 @@ setup(
         (os.path.join('share', package_name), glob('../weights/*.pth')),
         (os.path.join('share', package_name), glob('../weights/openvino/*')),
     ],
-    # py_modules= [
-    #     'scripts.yolox_ros',
-    #     'scripts.yolox_openvino',
-    # ],
     install_requires=['setuptools'],
     zip_safe=True,
     author='Ar-Ray-code',
