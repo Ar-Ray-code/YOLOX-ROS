@@ -29,6 +29,7 @@
 - OpenCV 4
 - Python 3.8 (Ubuntu 20.04 Default)
 - [YOLOX Depends](https://github.com/Megvii-BaseDetection/YOLOX)
+- [bbox_ex_msgs](https://github.com/Ar-Ray-code/bbox_ex_msgs)
 
 ## Installation
 
@@ -87,6 +88,7 @@ ros2 launch yolox_ros_py yolox_s_cpu.launch.py
 - ROS2 Foxy
 - OpenCV 4
 - OpenVINO
+- [bbox_ex_msgs](https://github.com/Ar-Ray-code/bbox_ex_msgs)
 
 ### Step1 :  Installation
 
