@@ -6,7 +6,6 @@
 ![yolox_s_result](images_for_readme/yolox_s_result.png)
 
 
-
 ## Supported List
 
 | Base        | ROS1 C++ | ROS1 Python | ROS2 C++ | ROS2 Python |
