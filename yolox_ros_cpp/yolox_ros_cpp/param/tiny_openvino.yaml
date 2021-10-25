@@ -1,4 +1,4 @@
-model_path: ./build/weights/openvino/yolox_tiny.xml
+model_path: ./install/yolox_ros_cpp/share/yolox_ros_cpp/weights/openvino/yolox_tiny.xml
 model_type: openvino
 device: CPU
 image_size/height: 416

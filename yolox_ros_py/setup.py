@@ -68,7 +68,6 @@ setup(
         (os.path.join('share', package_name), glob('./launch/*.launch.py')),
         (os.path.join('share', package_name), glob('../weights/*.pth')),
         (os.path.join('share', package_name), glob('../weights/openvino/*')),
-        (os.path.join('share', package_name), [f for f in glob('../weights/tensorrt/**', recursive=True) if os.path.isfile(f)]),
     ],
     install_requires=['setuptools'],
     zip_safe=True,

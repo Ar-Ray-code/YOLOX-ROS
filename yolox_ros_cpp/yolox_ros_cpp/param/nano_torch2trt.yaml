@@ -1,4 +1,4 @@
-model_path: ./build/weights/tensorrt/YOLOX_outputs/nano/model_trt.engine
+model_path: ./install/yolox_ros_cpp/share/yolox_ros_cpp/weights/tensorrt/YOLOX_outputs/nano/model_trt.engine
 model_type: "tensorrt"
 device: "0"
 input_blob_name: input_0

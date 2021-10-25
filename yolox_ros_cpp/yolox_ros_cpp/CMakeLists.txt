@@ -70,6 +70,7 @@ install(TARGETS yolox_ros_cpp
 install(DIRECTORY
   launch
   param
+  ../../weights
   DESTINATION share/${PROJECT_NAME}
 )
 
