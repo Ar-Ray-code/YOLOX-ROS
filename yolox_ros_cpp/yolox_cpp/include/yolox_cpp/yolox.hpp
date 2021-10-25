@@ -3,11 +3,11 @@
 
 #include "config.h"
 
-#ifdef YOLOX_USE_OPENVINO
+#ifdef ENABLE_OPENVINO
     #include "yolox_openvino.hpp"
 #endif
 
-#ifdef YOLOX_USE_TENSORRT
+#ifdef ENABLE_TENSORRT
     #include "yolox_tensorrt.hpp"
 #endif
 

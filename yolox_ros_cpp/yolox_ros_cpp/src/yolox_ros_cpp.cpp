@@ -21,18 +21,17 @@ namespace yolox_ros_cpp{
         }
         
         if(this->model_type_ == "tensorrt"){
-            #ifdef YOLOX_USE_TENSORRT
+            #ifdef ENABLE_TENSORRT
                 RCLCPP_INFO(this->get_logger(), "Model Type is TensorRT");
                 this->yolox_ = std::make_unique<yolox_cpp::YoloXTensorRT>(this->model_path_, std::stoi(this->device_),
                                                                           this->nms_th_, this->conf_th_, 
-                                                                          this->image_width_, this->image_height_,
-                                                                          this->INPUT_BLOB_NAME_, this->OUTPUT_BLOB_NAME_);
+                                                                          this->image_width_, this->image_height_);
             #else
                 RCLCPP_ERROR(this->get_logger(), "yolox_cpp is not built with TensorRT");
                 rclcpp::shutdown();
             #endif
         }else if(this->model_type_ == "openvino"){
-            #ifdef YOLOX_USE_OPENVINO
+            #ifdef ENABLE_OPENVINO
                 RCLCPP_INFO(this->get_logger(), "Model Type is OpenVINO");
                 this->yolox_ = std::make_unique<yolox_cpp::YoloXOpenVINO>(this->model_path_, this->device_,
                                                                           this->nms_th_, this->conf_th_,
@@ -64,8 +63,6 @@ namespace yolox_ros_cpp{
         this->declare_parameter<int>("image_size/width", 416);
         this->declare_parameter<int>("image_size/height", 416);
         this->declare_parameter<std::string>("model_type", "tensorrt");
-        this->declare_parameter<std::string>("input_blob_name", "input_0");
-        this->declare_parameter<std::string>("output_blob_name", "output_0");
         this->declare_parameter<std::string>("src_image_topic_name", "image_raw");
         this->declare_parameter<std::string>("publish_image_topic_name", "yolox/image_raw");        
         this->declare_parameter<std::string>("publish_boundingbox_topic_name", "yolox/bounding_boxes");        
@@ -78,8 +75,6 @@ namespace yolox_ros_cpp{
         this->get_parameter("image_size/width", this->image_width_);
         this->get_parameter("image_size/height", this->image_height_);
         this->get_parameter("model_type", this->model_type_);
-        this->get_parameter("input_blob_name", this->INPUT_BLOB_NAME_);
-        this->get_parameter("output_blob_name", this->OUTPUT_BLOB_NAME_);
         this->get_parameter("src_image_topic_name", this->src_image_topic_name_);
         this->get_parameter("publish_image_topic_name", this->publish_image_topic_name_);
         this->get_parameter("publish_boundingbox_topic_name", this->publish_boundingbox_topic_name_);
@@ -92,8 +87,6 @@ namespace yolox_ros_cpp{
         RCLCPP_INFO(this->get_logger(), "Set parameter image_size/width: %i", this->image_width_);
         RCLCPP_INFO(this->get_logger(), "Set parameter image_size/height: %i", this->image_height_);
         RCLCPP_INFO(this->get_logger(), "Set parameter model_type: '%s'", this->model_type_.c_str());
-        RCLCPP_INFO(this->get_logger(), "Set parameter input_blob_name: '%s'", this->INPUT_BLOB_NAME_.c_str());
-        RCLCPP_INFO(this->get_logger(), "Set parameter output_blob_name: '%s'", this->OUTPUT_BLOB_NAME_.c_str());
         RCLCPP_INFO(this->get_logger(), "Set parameter src_image_topic_name: '%s'", this->src_image_topic_name_.c_str());
         RCLCPP_INFO(this->get_logger(), "Set parameter publish_image_topic_name: '%s'", this->publish_image_topic_name_.c_str());
 

@@ -16,40 +16,54 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif()
 
 # build option
-option(YOLOX_USE_OPENVINO  "Enable OpenVINO"  OFF)
-option(YOLOX_USE_TENSORRT  "Enable TensorRT"  OFF)
-message("------------------------------------------------------------------")
-message(" YOLOX_USE_OPENVINO: ${YOLOX_USE_OPENVINO}")
-message(" YOLOX_USE_TENSORRT: ${YOLOX_USE_TENSORRT}")
-message("------------------------------------------------------------------")
+option(YOLOX_USE_OPENVINO  "Use OpenVINO"  ON)
+option(YOLOX_USE_TENSORRT  "Use TensorRT"  ON)
 
-configure_file(
-  "${PROJECT_SOURCE_DIR}/include/yolox_cpp/config.h.in"
-  "${PROJECT_SOURCE_DIR}/include/yolox_cpp/config.h"
-)
+set(ENABLE_OPENVINO OFF)
+set(ENABLE_TENSORRT OFF)
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
 find_package(OpenCV REQUIRED)
 
 if(YOLOX_USE_OPENVINO)
-  find_package(InferenceEngine REQUIRED)
-  find_package(ngraph REQUIRED)
-  set(SRC ${SRC} src/yolox_openvino.cpp)
+  find_package(InferenceEngine QUIET)
+  find_package(ngraph QUIET)
+  if( InferenceEngine_FOUND AND ngraph_FOUND )
+    set(ENABLE_OPENVINO ON)
+    set(SRC ${SRC} src/yolox_openvino.cpp)
+  endif()
 endif()
 if(YOLOX_USE_TENSORRT)
-  find_package(CUDA REQUIRED)
+  find_package(CUDA QUIET)
   find_library(NVINFER  NAMES nvinfer)
   find_library(NVINFERPLUGIN NAMES nvinfer_plugin)
   find_library(NVPARSERS NAMES nvparsers)
   find_library(NVONNXPARSER NAMES nvonnxparser)
   find_library(NVONNXPARSERRUNTIME NAMES nvonnxparser_runtime)
-  set(SRC ${SRC} src/yolox_tensorrt.cpp)
+  if( CUDA_FOUND AND NVINFER AND NVINFERPLUGIN AND NVPARSERS AND NVONNXPARSER )
+    set(ENABLE_TENSORRT ON)
+    set(SRC ${SRC} src/yolox_tensorrt.cpp)
+  endif()
 endif()
+
+message(STATUS " ENABLE_OPENVINO: ${ENABLE_OPENVINO}")
+message(STATUS " ENABLE_TENSORRT: ${ENABLE_TENSORRT}")
+
+if(NOT ENABLE_OPENVINO AND NOT ENABLE_TENSORRT)
+  message(WARNING "OpenVINO and TensorRT are not found.\n skip building yolox_cpp.")
+  return()
+endif()
+
+configure_file(
+  "${PROJECT_SOURCE_DIR}/include/yolox_cpp/config.h.in"
+  "${PROJECT_SOURCE_DIR}/include/yolox_cpp/config.h"
+)
+
+
 add_library(yolox_cpp SHARED
   ${SRC}
 )
-
 
 target_compile_definitions(yolox_cpp
   PRIVATE "MY_LIBRARY_BUILDING_LIBRARY"
@@ -64,13 +78,13 @@ target_include_directories(yolox_cpp PUBLIC
 ament_target_dependencies(yolox_cpp
   OpenCV
 )
-if(YOLOX_USE_OPENVINO)
+if(ENABLE_OPENVINO)
   ament_target_dependencies(yolox_cpp
     InferenceEngine
     ngraph
   )
 endif()
-if(YOLOX_USE_TENSORRT)
+if(ENABLE_TENSORRT)
   target_link_libraries(yolox_cpp
     nvinfer
     nvinfer_plugin
@@ -93,13 +107,13 @@ ament_export_targets(export_${PROJECT_NAME} HAS_LIBRARY_TARGET)
 ament_export_dependencies(
   OpenCV
 )
-if(YOLOX_USE_OPENVINO)
+if(ENABLE_OPENVINO)
   ament_export_dependencies(
     InferenceEngine
     ngraph
   )
 endif()
-if(YOLOX_USE_TENSORRT)
+if(ENABLE_TENSORRT)
   ament_export_dependencies(
     CUDA
   )

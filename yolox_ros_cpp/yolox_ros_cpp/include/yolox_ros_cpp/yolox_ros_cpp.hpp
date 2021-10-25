@@ -34,8 +34,6 @@ namespace yolox_ros_cpp{
         float nms_th_;
         int image_width_;
         int image_height_;
-        std::string INPUT_BLOB_NAME_;
-        std::string OUTPUT_BLOB_NAME_;
 
         std::string src_image_topic_name_;
         std::string publish_image_topic_name_;

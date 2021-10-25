@@ -15,12 +15,6 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
-# option(YOLOX_USE_OPENVINO "YOLOX_USE_OPENVINO" OFF)
-# option(YOLOX_USE_TENSORRT "YOLOX_USE_TENSORRT" OFF)
-# configure_file(
-#   "${PROJECT_SOURCE_DIR}/include/yolox_ros_cpp/config.h.in"
-#   "${PROJECT_SOURCE_DIR}/include/yolox_ros_cpp/config.h")
-
 # find dependencies
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
@@ -31,7 +25,12 @@ find_package(cv_bridge REQUIRED)
 find_package(image_transport REQUIRED)
 find_package(OpenCV REQUIRED)
 find_package(bboxes_ex_msgs REQUIRED)
-find_package(yolox_cpp REQUIRED)
+find_package(yolox_cpp QUIET)
+
+if(NOT yolox_cpp_FOUND)
+  message(WARNING "yolox_cpp is not found.\n skip building yolox_ros_cpp.")
+  return()
+endif()
 
 add_library(yolox_ros_cpp SHARED
   src/yolox_ros_cpp.cpp

@@ -34,22 +34,20 @@ namespace yolox_cpp{
         public:
             YoloXTensorRT(file_name_t path_to_engine, int device=0,
                           float nms_th=0.45, float conf_th=0.3,
-                          int input_width=416, int input_height=416,
-                          std::string input_blob_name="input_0",
-                          std::string output_blob_name="output_0");
+                          int input_width=416, int input_height=416);
             ~YoloXTensorRT();
             std::vector<Object> inference(cv::Mat frame) override;
 
         private:
             int DEVICE_ = 0;
-            std::string INPUT_BLOB_NAME_;
-            std::string OUTPUT_BLOB_NAME_;
-            
+
             Logger gLogger_;
             std::unique_ptr<IRuntime> runtime_;
             std::unique_ptr<ICudaEngine> engine_;
             std::unique_ptr<IExecutionContext> context_;
             int output_size_;
+            const int inputIndex_ = 0;
+            const int outputIndex_ = 1;
 
             // cv::Mat static_resize(cv::Mat& img);
             // void generate_grids_and_stride(std::vector<int>& strides, std::vector<GridAndStride>& grid_strides);

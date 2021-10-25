@@ -228,7 +228,7 @@ namespace yolox_cpp{
         }
 
         void doInference(IExecutionContext& context, float* input, float* output, const int output_size, 
-                         cv::Size input_shape, const char* input_blob_name, const char* output_blob_name) {
+                         cv::Size input_shape, const int inputIndex = 0, const int outputIndex = 1) {
             const ICudaEngine& engine = context.getEngine();
 
             // Pointers to input and output device buffers to pass to engine.
@@ -237,8 +237,8 @@ namespace yolox_cpp{
 
             // In order to bind the buffers, we need to know the names of the input and output tensors.
             // Note that indices are guaranteed to be less than IEngine::getNbBindings()
-            const int inputIndex = engine.getBindingIndex(input_blob_name);
-            const int outputIndex = engine.getBindingIndex(output_blob_name);
+            // const int inputIndex = engine.getBindingIndex(input_blob_name);
+            // const int outputIndex = engine.getBindingIndex(output_blob_name);
 
             // Create GPU buffers on device
             CHECK(cudaMalloc(&buffers[inputIndex], 3 * input_shape.height * input_shape.width * sizeof(float)));
@@ -264,11 +264,8 @@ namespace yolox_cpp{
 
     YoloXTensorRT::YoloXTensorRT(file_name_t path_to_engine, int device,
                                  float nms_th, float conf_th,
-                                 int input_width, int input_height,
-                                 std::string input_blob_name, std::string output_blob_name)
+                                 int input_width, int input_height)
     :AbsYoloX(nms_th, conf_th, input_width, input_height),
-     INPUT_BLOB_NAME_(input_blob_name),
-     OUTPUT_BLOB_NAME_(output_blob_name),
      DEVICE_(device)
     {
         cudaSetDevice(this->DEVICE_);
@@ -316,10 +313,10 @@ namespace yolox_cpp{
         assert(this->engine_->getNbBindings() == 2);
         // In order to bind the buffers, we need to know the names of the input and output tensors.
         // Note that indices are guaranteed to be less than IEngine::getNbBindings()
-        int inputIndex = this->engine_->getBindingIndex(this->INPUT_BLOB_NAME_.c_str());
-        assert(this->engine_->getBindingDataType(inputIndex) == nvinfer1::DataType::kFLOAT);
-        int outputIndex = this->engine_->getBindingIndex(this->OUTPUT_BLOB_NAME_.c_str());
-        assert(this->engine_->getBindingDataType(outputIndex) == nvinfer1::DataType::kFLOAT);
+        assert(this->engine_->getBindingDataType(this->inputIndex_) == nvinfer1::DataType::kFLOAT);
+        assert(this->engine_->getBindingDataType(this->outputIndex_) == nvinfer1::DataType::kFLOAT);
+        // this->engine_->getBindingIndex(this->OUTPUT_BLOB_NAME_.c_str());
+        // this->engine_->getBindingIndex(this->INPUT_BLOB_NAME_.c_str());
     }
     YoloXTensorRT::~YoloXTensorRT(){
     }
@@ -330,7 +327,7 @@ namespace yolox_cpp{
         blob = blobFromImage(pr_img);
         float* prob = new float[this->output_size_];
         doInference(*this->context_, blob, prob, this->output_size_, pr_img.size(), 
-                    this->INPUT_BLOB_NAME_.c_str(), this->OUTPUT_BLOB_NAME_.c_str());
+                    this->inputIndex_, this->outputIndex_);
         
         float scale = std::min(this->input_w_ / (frame.cols*1.0), this->input_h_ / (frame.rows*1.0));
         

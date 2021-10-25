@@ -1,8 +1,6 @@
 model_path: ./install/yolox_ros_cpp/share/yolox_ros_cpp/weights/tensorrt/YOLOX_outputs/nano/model_trt.engine
 model_type: "tensorrt"
 device: "0"
-input_blob_name: input_0
-output_blob_name: output_0
 image_size/height: 416
 image_size/width: 416
 imshow_isshow: true

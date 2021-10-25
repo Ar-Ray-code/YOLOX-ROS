@@ -58,39 +58,41 @@ cd ~/ros2_ws/src
 git clone https://github.com/fateshelled/YOLOX-ROS -b dev_cpp_trt
 ```
 
-#### build with OpenVINO
+#### build
 ```bash
 source /opt/ros/foxy/setup.bash
-source /opt/intel/openvino_2021/bin/setupvars.sh
+# # If use openvino
+# source /opt/intel/openvino_2021/bin/setupvars.sh
 
 cd ~/ros2_ws
+colcon build --symlink-install
+# build option
 colcon build --symlink-install \
              --cmake-args -DYOLOX_USE_TENSORRT=OFF \
                           -DYOLOX_USE_OPENVINO=ON
-# Download onnx file and Convert to IR format.
-./src/YOLOX-ROS/weights/openvino/install.bash yolox_nano
-
 source ./install/setup.bash
 ```
 
-#### build with TensorRT
-```bash
-source /opt/ros/foxy/setup.bash
 
+### Model Convert
+#### OpenVINO
+```bash
 cd ~/ros2_ws
+
+# Download onnx file and Convert to IR format.
+./src/YOLOX-ROS/weights/openvino/install.bash yolox_nano
+```
+
+#### TensorRT
+```bash
+cd ~/ros2_ws
+
 # Download onnx file and Convert to TensorRT engine via trtexec.
 ./src/YOLOX-ROS/weights/tensorrt/trtexec/convert yolox_nano
 
-# # If in docker container, you can convert via torch2trt.
+# # If in docker container, you can convert via torch2trt using YOLOX tools.
 # ./src/YOLOX-ROS/weights/tensorrt/convert.bash yolox_nano
-
-colcon build --symlink-install \
-             --cmake-args -DYOLOX_USE_TENSORRT=ON \
-                          -DYOLOX_USE_OPENVINO=OFF
-
-source ./install/setup.bash
 ```
-※ Input/Output layer name of TRT Engine via `trtexec` is `inputs`/`outputs`, via `torch2trt` is `input_0`/`output_0`.
 
 ### DEMO
 #### OpenVINO
@@ -101,13 +103,11 @@ ros2 launch yolox_ros_cpp yolox_openvino.launch.py
 
 #### TensorRT
 ```bash
-# run YOLOX_nano
+# run YOLOX_nano (trtexec)
 ros2 launch yolox_ros_cpp yolox_tensorrt.launch.py
 
-# If converted engine with torch2trt, rewrite yolox_tensorrt.launch.py.
-# yolox_param_yaml = os.path.join(yolox_ros_share_dir, "param", "nano_trtexec.yaml")
-#  ↓
-# yolox_param_yaml = os.path.join(yolox_ros_share_dir, "param", "nano_torch2trt.yaml")
+# run YOLOX_nano (torch2trt)
+ros2 launch yolox_ros_cpp yolox_tensorrt_torch2trt.launch.py
 ```
 
 ### Parameter
@@ -124,7 +124,6 @@ ros2 launch yolox_ros_cpp yolox_tensorrt.launch.py
 - `publish_image_topic_name`: yolox/image_raw
 - `publish_boundingbox_topic_name`: yolox/bounding_boxes
 
-`input_blob_name` and `output_blob_name` are not use with OpenVINO.
 
 #### TensorRT example. convert via trtexec.
 - `model_path`: /home/ubuntu/ros2_ws/src/YOLOX-ROS/weights/tensorrt/trtexec/yolox_nano.trt
@@ -132,8 +131,6 @@ ros2 launch yolox_ros_cpp yolox_tensorrt.launch.py
 - `device`: "0"
 - `image_size/width`: 416
 - `image_size/height`: 416
-- `input_blob_name`: inputs
-- `output_blob_name`: outputs
 - `conf`: 0.3
 - `nms`: 0.45
 - `imshow_isshow`: true
@@ -149,8 +146,6 @@ ros2 launch yolox_ros_cpp yolox_tensorrt.launch.py
 - `device`: "0"
 - `image_size/width`: 416
 - `image_size/height`: 416
-- `input_blob_name`: input_0
-- `output_blob_name`: output_0
 - `conf`: 0.3
 - `nms`: 0.45
 - `imshow_isshow`: true
