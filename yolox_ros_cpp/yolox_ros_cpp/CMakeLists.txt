@@ -24,8 +24,15 @@ find_package(sensor_msgs REQUIRED)
 find_package(cv_bridge REQUIRED)
 find_package(image_transport REQUIRED)
 find_package(OpenCV REQUIRED)
-find_package(yolox_openvino REQUIRED)
+find_package(yolox_openvino QUIET)
 find_package(bboxes_ex_msgs REQUIRED)
+
+if(NOT yolox_openvino_FOUND)
+  message(INFO "skip building yolox_openvino")
+  return()
+endif()
+
+
 
 add_library(yolox_ros_cpp SHARED
   src/yolox_ros_cpp.cpp

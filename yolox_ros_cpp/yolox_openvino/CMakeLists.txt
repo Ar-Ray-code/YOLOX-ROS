@@ -18,8 +18,18 @@ endif()
 # find dependencies
 find_package(ament_cmake REQUIRED)
 find_package(OpenCV REQUIRED)
-find_package(InferenceEngine REQUIRED)
-find_package(ngraph REQUIRED)
+find_package(InferenceEngine)
+find_package(ngraph)
+
+if(NOT InferenceEngine_FOUND)
+  message(INFO "skip building yolox_openvino")
+  return()
+endif()
+
+if(NOT ngraph_FOUND)
+  message(INFO "skip building yolox_openvino")
+  return()
+endif()
 
 add_library(yolox_openvino SHARED
   src/yolox_openvino.cpp
