@@ -37,6 +37,10 @@ namespace yolox_ros_cpp{
         std::string INPUT_BLOB_NAME_;
         std::string OUTPUT_BLOB_NAME_;
 
+        std::string src_image_topic_name_;
+        std::string publish_image_topic_name_;
+        std::string publish_boundingbox_topic_name_;
+
         image_transport::Subscriber sub_image_;
         void colorImageCallback(const sensor_msgs::msg::Image::ConstSharedPtr& ptr);
 

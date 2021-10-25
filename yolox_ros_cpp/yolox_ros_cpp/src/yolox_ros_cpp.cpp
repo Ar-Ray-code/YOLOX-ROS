@@ -44,28 +44,31 @@ namespace yolox_ros_cpp{
         }
 
         this->sub_image_ = image_transport::create_subscription(
-            this, "image_raw", 
+            this, this->src_image_topic_name_, 
             std::bind(&YoloXNode::colorImageCallback, this, std::placeholders::_1), 
             "raw");
         this->pub_bboxes_ = this->create_publisher<bboxes_ex_msgs::msg::BoundingBoxes>(
-            "yolox/bounding_boxes",
+            this->publish_boundingbox_topic_name_,
             10
         );
-        this->pub_image_ = image_transport::create_publisher(this, "yolox/image_raw");
+        this->pub_image_ = image_transport::create_publisher(this, this->publish_image_topic_name_);
 
     }
 
     void YoloXNode::initializeParameter(){
-        this->declare_parameter("imshow_isshow", true);
-        this->declare_parameter("model_path", "/root/ros2_ws/src/YOLOX-ROS/weights/tensorrt/YOLOX_outputs/nano/model_trt.engine");
-        this->declare_parameter("conf", 0.3f);
-        this->declare_parameter("nms", 0.45f);
-        this->declare_parameter("device", "0");
-        this->declare_parameter("image_size/width", 416);
-        this->declare_parameter("image_size/height", 416);
-        this->declare_parameter("model_type", "tensorrt");
-        this->declare_parameter("input_blob_name", "input_0");
-        this->declare_parameter("output_blob_name", "output_0");
+        this->declare_parameter<bool>("imshow_isshow", true);
+        this->declare_parameter<std::string>("model_path", "/root/ros2_ws/src/YOLOX-ROS/weights/tensorrt/YOLOX_outputs/nano/model_trt.engine");
+        this->declare_parameter<float>("conf", 0.3f);
+        this->declare_parameter<float>("nms", 0.45f);
+        this->declare_parameter<std::string>("device", "0");
+        this->declare_parameter<int>("image_size/width", 416);
+        this->declare_parameter<int>("image_size/height", 416);
+        this->declare_parameter<std::string>("model_type", "tensorrt");
+        this->declare_parameter<std::string>("input_blob_name", "input_0");
+        this->declare_parameter<std::string>("output_blob_name", "output_0");
+        this->declare_parameter<std::string>("src_image_topic_name", "image_raw");
+        this->declare_parameter<std::string>("publish_image_topic_name", "yolox/image_raw");        
+        this->declare_parameter<std::string>("publish_boundingbox_topic_name", "yolox/bounding_boxes");        
 
         this->get_parameter("imshow_isshow", this->imshow_);
         this->get_parameter("model_path", this->model_path_);
@@ -77,6 +80,9 @@ namespace yolox_ros_cpp{
         this->get_parameter("model_type", this->model_type_);
         this->get_parameter("input_blob_name", this->INPUT_BLOB_NAME_);
         this->get_parameter("output_blob_name", this->OUTPUT_BLOB_NAME_);
+        this->get_parameter("src_image_topic_name", this->src_image_topic_name_);
+        this->get_parameter("publish_image_topic_name", this->publish_image_topic_name_);
+        this->get_parameter("publish_boundingbox_topic_name", this->publish_boundingbox_topic_name_);
 
         RCLCPP_INFO(this->get_logger(), "Set parameter imshow_isshow: %i", this->imshow_);
         RCLCPP_INFO(this->get_logger(), "Set parameter model_path: '%s'", this->model_path_.c_str());
@@ -88,6 +94,8 @@ namespace yolox_ros_cpp{
         RCLCPP_INFO(this->get_logger(), "Set parameter model_type: '%s'", this->model_type_.c_str());
         RCLCPP_INFO(this->get_logger(), "Set parameter input_blob_name: '%s'", this->INPUT_BLOB_NAME_.c_str());
         RCLCPP_INFO(this->get_logger(), "Set parameter output_blob_name: '%s'", this->OUTPUT_BLOB_NAME_.c_str());
+        RCLCPP_INFO(this->get_logger(), "Set parameter src_image_topic_name: '%s'", this->src_image_topic_name_.c_str());
+        RCLCPP_INFO(this->get_logger(), "Set parameter publish_image_topic_name: '%s'", this->publish_image_topic_name_.c_str());
 
     }
     void YoloXNode::colorImageCallback(const sensor_msgs::msg::Image::ConstSharedPtr& ptr){

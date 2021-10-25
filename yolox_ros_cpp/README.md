@@ -120,6 +120,9 @@ ros2 launch yolox_ros_cpp yolox_tensorrt.launch.py
 - `conf`: 0.3
 - `nms`: 0.45
 - `imshow_isshow`: true
+- `src_image_topic_name`: image_raw
+- `publish_image_topic_name`: yolox/image_raw
+- `publish_boundingbox_topic_name`: yolox/bounding_boxes
 
 `input_blob_name` and `output_blob_name` are not use with OpenVINO.
 
@@ -134,6 +137,9 @@ ros2 launch yolox_ros_cpp yolox_tensorrt.launch.py
 - `conf`: 0.3
 - `nms`: 0.45
 - `imshow_isshow`: true
+- `src_image_topic_name`: image_raw
+- `publish_image_topic_name`: yolox/image_raw
+- `publish_boundingbox_topic_name`: yolox/bounding_boxes
 
 `device` is GPU id. Must be specified as a `string` type.
 
@@ -148,6 +154,9 @@ ros2 launch yolox_ros_cpp yolox_tensorrt.launch.py
 - `conf`: 0.3
 - `nms`: 0.45
 - `imshow_isshow`: true
+- `src_image_topic_name`: image_raw
+- `publish_image_topic_name`: yolox/image_raw
+- `publish_boundingbox_topic_name`: yolox/bounding_boxes
 
 `device` is GPU id. Must be specified as a `string` type.
 
