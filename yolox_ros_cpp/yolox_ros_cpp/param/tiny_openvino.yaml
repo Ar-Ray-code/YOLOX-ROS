@@ -1,0 +1,8 @@
+model_path: ./build/weights/openvino/yolox_tiny.xml
+model_type: openvino
+device: CPU
+image_size/height: 416
+image_size/width: 416
+conf: 0.30
+nms: 0.45
+imshow_isshow: true

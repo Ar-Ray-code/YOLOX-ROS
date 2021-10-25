@@ -4,3 +4,5 @@ weights/*.pth
 YOLOX_outputs/
 *.pth
 *.onnx
+*.trt
+*.engine

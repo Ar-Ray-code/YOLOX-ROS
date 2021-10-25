@@ -1,11 +1,12 @@
-#include "yolox_openvino/yolox_openvino.hpp"
+#include "yolox_cpp/yolox_openvino.hpp"
 
-namespace yolox_openvino{
+namespace yolox_cpp{
     using namespace InferenceEngine;
 
-    YoloX::YoloX(file_name_t path_to_model, std::string device_name, 
-                float nms_th, float conf_th, int input_width, int input_height)
-        :input_w_(input_width), input_h_(input_height), nms_thresh_(nms_th), bbox_conf_thresh_(conf_th){
+    YoloXOpenVINO::YoloXOpenVINO(file_name_t path_to_model, std::string device_name, 
+                                 float nms_th, float conf_th, int input_width, int input_height)
+    :AbsYoloX(nms_th, conf_th, input_width, input_height)
+    {        
         // Step 1. Initialize inference engine core
         std::cout << "Initialize Inference engine core" << std::endl;
         Core ie;
@@ -53,7 +54,7 @@ namespace yolox_openvino{
         infer_request_ = executable_network_.CreateInferRequest();
             
     }
-    std::vector<Object> YoloX::inference(cv::Mat frame){
+    std::vector<Object> YoloXOpenVINO::inference(cv::Mat frame){
         // preprocess
         cv::Mat pr_img = static_resize(frame);
         InferenceEngine::Blob::Ptr imgBlob = infer_request_.GetBlob(input_name_);     // just wrap Mat data by Blob::Ptr
@@ -91,7 +92,7 @@ namespace yolox_openvino{
         return objects;
     }
 
-    cv::Mat YoloX::static_resize(cv::Mat& img) {
+    cv::Mat YoloXOpenVINO::static_resize(cv::Mat& img) {
         float r = std::min(input_w_ / (img.cols*1.0), input_h_ / (img.rows*1.0));
         // r = std::min(r, 1.0f);
         int unpad_w = r * img.cols;
@@ -104,7 +105,7 @@ namespace yolox_openvino{
         return out;
     }
 
-    void YoloX::blobFromImage(cv::Mat& img, InferenceEngine::Blob::Ptr& blob){
+    void YoloXOpenVINO::blobFromImage(cv::Mat& img, InferenceEngine::Blob::Ptr& blob){
         int channels = 3;
         int img_h = img.rows;
         int img_w = img.cols;
@@ -131,7 +132,7 @@ namespace yolox_openvino{
             }
         }
     }
-    void YoloX::generate_grids_and_stride(const int target_w, const int target_h, std::vector<int>& strides, std::vector<GridAndStride>& grid_strides)
+    void YoloXOpenVINO::generate_grids_and_stride(const int target_w, const int target_h, std::vector<int>& strides, std::vector<GridAndStride>& grid_strides)
     {
         for (auto stride : strides)
         {
@@ -148,7 +149,7 @@ namespace yolox_openvino{
     }
 
 
-    void YoloX::generate_yolox_proposals(std::vector<GridAndStride> grid_strides, const float* feat_ptr, float prob_threshold, std::vector<Object>& objects)
+    void YoloXOpenVINO::generate_yolox_proposals(std::vector<GridAndStride> grid_strides, const float* feat_ptr, float prob_threshold, std::vector<Object>& objects)
     {
 
         const int num_anchors = grid_strides.size();
@@ -159,7 +160,7 @@ namespace yolox_openvino{
             const int grid1 = grid_strides[anchor_idx].grid1;
             const int stride = grid_strides[anchor_idx].stride;
 
-        const int basic_pos = anchor_idx * (num_classes_ + 5);
+            const int basic_pos = anchor_idx * (num_classes_ + 5);
 
             // yolox/models/yolo_head.py decode logic
             //  outputs[..., :2] = (outputs[..., :2] + grids) * strides
@@ -194,13 +195,13 @@ namespace yolox_openvino{
         } // point anchor loop
     }
 
-    float YoloX::intersection_area(const Object& a, const Object& b)
+    float YoloXOpenVINO::intersection_area(const Object& a, const Object& b)
     {
         cv::Rect_<float> inter = a.rect & b.rect;
         return inter.area();
     }
 
-    void YoloX::qsort_descent_inplace(std::vector<Object>& faceobjects, int left, int right)
+    void YoloXOpenVINO::qsort_descent_inplace(std::vector<Object>& faceobjects, int left, int right)
     {
         int i = left;
         int j = right;
@@ -238,7 +239,7 @@ namespace yolox_openvino{
     }
 
 
-    void YoloX::qsort_descent_inplace(std::vector<Object>& objects)
+    void YoloXOpenVINO::qsort_descent_inplace(std::vector<Object>& objects)
     {
         if (objects.empty())
             return;
@@ -246,7 +247,7 @@ namespace yolox_openvino{
         qsort_descent_inplace(objects, 0, objects.size() - 1);
     }
 
-    void YoloX::nms_sorted_bboxes(const std::vector<Object>& faceobjects, std::vector<int>& picked, float nms_threshold)
+    void YoloXOpenVINO::nms_sorted_bboxes(const std::vector<Object>& faceobjects, std::vector<int>& picked, float nms_threshold)
     {
         picked.clear();
 
@@ -281,7 +282,7 @@ namespace yolox_openvino{
     }
 
 
-    void YoloX::decode_outputs(const float* prob, std::vector<Object>& objects, float scale, const int img_w, const int img_h) {
+    void YoloXOpenVINO::decode_outputs(const float* prob, std::vector<Object>& objects, float scale, const int img_w, const int img_h) {
             std::vector<Object> proposals;
             std::vector<int> strides = {8, 16, 32};
             std::vector<GridAndStride> grid_strides;

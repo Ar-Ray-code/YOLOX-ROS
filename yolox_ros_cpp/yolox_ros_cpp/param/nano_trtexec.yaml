@@ -1,0 +1,10 @@
+model_path: ./build/weights/tensorrt/trtexec/yolox_nano.trt
+model_type: "tensorrt"
+device: "0"
+input_blob_name: inputs
+output_blob_name: outputs
+image_size/height: 416
+image_size/width: 416
+imshow_isshow: true
+nms: 0.45
+conf: 0.30

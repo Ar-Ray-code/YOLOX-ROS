@@ -1,11 +1,11 @@
-#ifndef _YOLOX_OPENVINO_UTILS_HPP
-#define _YOLOX_OPENVINO_UTILS_HPP
+#ifndef _YOLOX_CPP_UTILS_HPP
+#define _YOLOX_CPP_UTILS_HPP
 
 #include <opencv2/opencv.hpp>
 #include "core.hpp"
 #include "coco_names.hpp"
 
-namespace yolox_openvino{
+namespace yolox_cpp{
     namespace utils{
 
         static void draw_objects(cv::Mat bgr, const std::vector<Object>& objects)
