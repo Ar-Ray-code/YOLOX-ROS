@@ -2,266 +2,6 @@
 
 namespace yolox_cpp{
 
-    namespace{
-        cv::Mat static_resize(cv::Mat& img, int height, int width) {
-            float r = std::min(width / (img.cols*1.0), height / (img.rows*1.0));
-            // r = std::min(r, 1.0f);
-            int unpad_w = r * img.cols;
-            int unpad_h = r * img.rows;
-            cv::Mat re(unpad_h, unpad_w, CV_8UC3);
-            cv::resize(img, re, re.size());
-            cv::Mat out(width, height, CV_8UC3, cv::Scalar(114, 114, 114));
-            re.copyTo(out(cv::Rect(0, 0, re.cols, re.rows)));
-            return out;
-        }
-
-        void generate_grids_and_stride(const int target_size, std::vector<int>& strides, std::vector<GridAndStride>& grid_strides)
-        {
-            for (auto stride : strides)
-            {
-                int num_grid = target_size / stride;
-                for (int g1 = 0; g1 < num_grid; g1++)
-                {
-                    for (int g0 = 0; g0 < num_grid; g0++)
-                    {
-                        grid_strides.push_back((GridAndStride){g0, g1, stride});
-                    }
-                }
-            }
-        }
-
-        inline float intersection_area(const Object& a, const Object& b)
-        {
-            cv::Rect_<float> inter = a.rect & b.rect;
-            return inter.area();
-        }
-
-        void qsort_descent_inplace(std::vector<Object>& faceobjects, int left, int right)
-        {
-            int i = left;
-            int j = right;
-            float p = faceobjects[(left + right) / 2].prob;
-
-            while (i <= j)
-            {
-                while (faceobjects[i].prob > p)
-                    i++;
-
-                while (faceobjects[j].prob < p)
-                    j--;
-
-                if (i <= j)
-                {
-                    // swap
-                    std::swap(faceobjects[i], faceobjects[j]);
-
-                    i++;
-                    j--;
-                }
-            }
-
-            #pragma omp parallel sections
-            {
-                #pragma omp section
-                {
-                    if (left < j) qsort_descent_inplace(faceobjects, left, j);
-                }
-                #pragma omp section
-                {
-                    if (i < right) qsort_descent_inplace(faceobjects, i, right);
-                }
-            }
-        }
-
-        void qsort_descent_inplace(std::vector<Object>& objects)
-        {
-            if (objects.empty())
-                return;
-
-            qsort_descent_inplace(objects, 0, objects.size() - 1);
-        }
-
-        void nms_sorted_bboxes(const std::vector<Object>& faceobjects, std::vector<int>& picked, float nms_threshold)
-        {
-            picked.clear();
-
-            const int n = faceobjects.size();
-
-            std::vector<float> areas(n);
-            for (int i = 0; i < n; i++)
-            {
-                areas[i] = faceobjects[i].rect.area();
-            }
-
-            for (int i = 0; i < n; i++)
-            {
-                const Object& a = faceobjects[i];
-
-                int keep = 1;
-                for (int j = 0; j < (int)picked.size(); j++)
-                {
-                    const Object& b = faceobjects[picked[j]];
-
-                    // intersection over union
-                    float inter_area = intersection_area(a, b);
-                    float union_area = areas[i] + areas[picked[j]] - inter_area;
-                    // float IoU = inter_area / union_area
-                    if (inter_area / union_area > nms_threshold)
-                        keep = 0;
-                }
-
-                if (keep)
-                    picked.push_back(i);
-            }
-        }
-
-    }
-    // OpenVINOとは異なる処理
-    namespace{
-        void generate_yolox_proposals(std::vector<GridAndStride> grid_strides, float* feat_blob, float prob_threshold, std::vector<Object>& objects)
-        {
-            const int num_class = 80;
-
-            const int num_anchors = grid_strides.size();
-
-            for (int anchor_idx = 0; anchor_idx < num_anchors; anchor_idx++)
-            {
-                const int grid0 = grid_strides[anchor_idx].grid0;
-                const int grid1 = grid_strides[anchor_idx].grid1;
-                const int stride = grid_strides[anchor_idx].stride;
-
-                const int basic_pos = anchor_idx * (num_class + 5);
-
-                // yolox/models/yolo_head.py decode logic
-                float x_center = (feat_blob[basic_pos+0] + grid0) * stride;
-                float y_center = (feat_blob[basic_pos+1] + grid1) * stride;
-                float w = exp(feat_blob[basic_pos+2]) * stride;
-                float h = exp(feat_blob[basic_pos+3]) * stride;
-                float x0 = x_center - w * 0.5f;
-                float y0 = y_center - h * 0.5f;
-
-                float box_objectness = feat_blob[basic_pos+4];
-                for (int class_idx = 0; class_idx < num_class; class_idx++)
-                {
-                    float box_cls_score = feat_blob[basic_pos + 5 + class_idx];
-                    float box_prob = box_objectness * box_cls_score;
-                    if (box_prob > prob_threshold)
-                    {
-                        Object obj;
-                        obj.rect.x = x0;
-                        obj.rect.y = y0;
-                        obj.rect.width = w;
-                        obj.rect.height = h;
-                        obj.label = class_idx;
-                        obj.prob = box_prob;
-
-                        objects.push_back(obj);
-                    }
-
-                } // class loop
-
-            } // point anchor loop
-        }
-
-        float* blobFromImage(cv::Mat& img){
-            cv::cvtColor(img, img, cv::COLOR_BGR2RGB);
-
-            float* blob = new float[img.total()*3];
-            int channels = 3;
-            int img_h = img.rows;
-            int img_w = img.cols;
-            std::vector<float> mean = {0.485, 0.456, 0.406};
-            std::vector<float> std = {0.229, 0.224, 0.225};
-            for (size_t c = 0; c < channels; c++) 
-            {
-                for (size_t  h = 0; h < img_h; h++) 
-                {
-                    for (size_t w = 0; w < img_w; w++) 
-                    {
-                        blob[c * img_w * img_h + h * img_w + w] =
-                            (((float)img.at<cv::Vec3b>(h, w)[c]) / 255.0f - mean[c]) / std[c];
-                    }
-                }
-            }
-            return blob;
-        }
-
-        void decode_outputs(float* prob, std::vector<Object>& objects, 
-                            float scale, const int img_w, const int img_h,
-                            const int input_w,
-                            const float conf_threshold, const float nms_threshold) {
-                std::vector<Object> proposals;
-                std::vector<int> strides = {8, 16, 32};
-                std::vector<GridAndStride> grid_strides;
-                generate_grids_and_stride(input_w, strides, grid_strides);
-                generate_yolox_proposals(grid_strides, prob,  conf_threshold, proposals);
-
-                qsort_descent_inplace(proposals);
-
-                std::vector<int> picked;
-                nms_sorted_bboxes(proposals, picked, nms_threshold);
-
-                int count = picked.size();
-
-                objects.resize(count);
-                for (int i = 0; i < count; i++)
-                {
-                    objects[i] = proposals[picked[i]];
-
-                    // adjust offset to original unpadded
-                    float x0 = (objects[i].rect.x) / scale;
-                    float y0 = (objects[i].rect.y) / scale;
-                    float x1 = (objects[i].rect.x + objects[i].rect.width) / scale;
-                    float y1 = (objects[i].rect.y + objects[i].rect.height) / scale;
-
-                    // clip
-                    x0 = std::max(std::min(x0, (float)(img_w - 1)), 0.f);
-                    y0 = std::max(std::min(y0, (float)(img_h - 1)), 0.f);
-                    x1 = std::max(std::min(x1, (float)(img_w - 1)), 0.f);
-                    y1 = std::max(std::min(y1, (float)(img_h - 1)), 0.f);
-
-                    objects[i].rect.x = x0;
-                    objects[i].rect.y = y0;
-                    objects[i].rect.width = x1 - x0;
-                    objects[i].rect.height = y1 - y0;
-                }
-        }
-
-        void doInference(IExecutionContext& context, float* input, float* output, const int output_size, 
-                         cv::Size input_shape, const int inputIndex = 0, const int outputIndex = 1) {
-            const ICudaEngine& engine = context.getEngine();
-
-            // Pointers to input and output device buffers to pass to engine.
-            // Engine requires exactly IEngine::getNbBindings() number of buffers.
-            void* buffers[2];
-
-            // In order to bind the buffers, we need to know the names of the input and output tensors.
-            // Note that indices are guaranteed to be less than IEngine::getNbBindings()
-            // const int inputIndex = engine.getBindingIndex(input_blob_name);
-            // const int outputIndex = engine.getBindingIndex(output_blob_name);
-
-            // Create GPU buffers on device
-            CHECK(cudaMalloc(&buffers[inputIndex], 3 * input_shape.height * input_shape.width * sizeof(float)));
-            CHECK(cudaMalloc(&buffers[outputIndex], output_size*sizeof(float)));
-
-            // Create stream
-            cudaStream_t stream;
-            CHECK(cudaStreamCreate(&stream));
-
-            // DMA input batch data to device, infer on the batch asynchronously, and DMA output back to host
-            CHECK(cudaMemcpyAsync(buffers[inputIndex], input, 3 * input_shape.height * input_shape.width * sizeof(float), cudaMemcpyHostToDevice, stream));
-            context.enqueue(1, buffers, stream, nullptr);
-            CHECK(cudaMemcpyAsync(output, buffers[outputIndex], output_size * sizeof(float), cudaMemcpyDeviceToHost, stream));
-            cudaStreamSynchronize(stream);
-
-            // Release stream and buffers
-            cudaStreamDestroy(stream);
-            CHECK(cudaFree(buffers[inputIndex]));
-            CHECK(cudaFree(buffers[outputIndex]));
-        }
-
-    }
-
     YoloXTensorRT::YoloXTensorRT(file_name_t path_to_engine, int device,
                                  float nms_th, float conf_th,
                                  int input_width, int input_height)
@@ -317,27 +57,263 @@ namespace yolox_cpp{
         assert(this->engine_->getBindingDataType(this->outputIndex_) == nvinfer1::DataType::kFLOAT);
         // this->engine_->getBindingIndex(this->OUTPUT_BLOB_NAME_.c_str());
         // this->engine_->getBindingIndex(this->INPUT_BLOB_NAME_.c_str());
+
+        this->prob_ = new float[this->output_size_];
     }
     YoloXTensorRT::~YoloXTensorRT(){
+        CHECK(cudaFree(buffers_[inputIndex_]));
+        CHECK(cudaFree(buffers_[outputIndex_]));
+        delete blob_;
+        delete prob_;
     }
     std::vector<Object> YoloXTensorRT::inference(cv::Mat frame){
-        cv::Mat pr_img = static_resize(frame, this->input_h_, this->input_w_);
+        this->pr_img_ = static_resize(frame);
 
-        float* blob;
-        blob = blobFromImage(pr_img);
-        float* prob = new float[this->output_size_];
-        doInference(*this->context_, blob, prob, this->output_size_, pr_img.size(), 
-                    this->inputIndex_, this->outputIndex_);
+        this->blob_ = blobFromImage(this->pr_img_);
+        this->doInference(this->blob_, this->prob_);
         
         float scale = std::min(this->input_w_ / (frame.cols*1.0), this->input_h_ / (frame.rows*1.0));
         
         std::vector<Object> objects;
-        decode_outputs(prob, objects, scale, frame.cols, frame.rows, 
-                       this->input_w_, this->bbox_conf_thresh_, this->nms_thresh_);
-
-        delete blob;
+        decode_outputs(prob_, objects, scale, frame.cols, frame.rows);
         return objects;
     }
+
+    cv::Mat YoloXTensorRT::static_resize(cv::Mat& img) {
+        float r = std::min(this->input_w_ / (img.cols*1.0), this->input_h_ / (img.rows*1.0));
+        // r = std::min(r, 1.0f);
+        int unpad_w = r * img.cols;
+        int unpad_h = r * img.rows;
+        this->re_ = cv::Mat(unpad_h, unpad_w, CV_8UC3);
+        cv::resize(img, this->re_, this->re_.size());
+        cv::Mat out(this->input_w_, this->input_h_, CV_8UC3, cv::Scalar(114, 114, 114));
+        this->re_.copyTo(out(cv::Rect(0, 0, this->re_.cols, this->re_.rows)));
+        return out;
+    }
+
+    void YoloXTensorRT::generate_grids_and_stride(std::vector<int>& strides, std::vector<GridAndStride>& grid_strides)
+    {
+        for (auto stride : strides)
+        {
+            int num_grid = this->input_w_ / stride;
+            for (int g1 = 0; g1 < num_grid; g1++)
+            {
+                for (int g0 = 0; g0 < num_grid; g0++)
+                {
+                    grid_strides.push_back((GridAndStride){g0, g1, stride});
+                }
+            }
+        }
+    }
+
+    float YoloXTensorRT::intersection_area(const Object& a, const Object& b)
+    {
+        cv::Rect_<float> inter = a.rect & b.rect;
+        return inter.area();
+    }
+
+    void YoloXTensorRT::qsort_descent_inplace(std::vector<Object>& faceobjects, int left, int right)
+    {
+        int i = left;
+        int j = right;
+        float p = faceobjects[(left + right) / 2].prob;
+
+        while (i <= j)
+        {
+            while (faceobjects[i].prob > p)
+                i++;
+
+            while (faceobjects[j].prob < p)
+                j--;
+
+            if (i <= j)
+            {
+                // swap
+                std::swap(faceobjects[i], faceobjects[j]);
+
+                i++;
+                j--;
+            }
+        }
+
+        #pragma omp parallel sections
+        {
+            #pragma omp section
+            {
+                if (left < j) qsort_descent_inplace(faceobjects, left, j);
+            }
+            #pragma omp section
+            {
+                if (i < right) qsort_descent_inplace(faceobjects, i, right);
+            }
+        }
+    }
+
+    void YoloXTensorRT::qsort_descent_inplace(std::vector<Object>& objects)
+    {
+        if (objects.empty())
+            return;
+
+        qsort_descent_inplace(objects, 0, objects.size() - 1);
+    }
+
+    void YoloXTensorRT::nms_sorted_bboxes(const std::vector<Object>& faceobjects, std::vector<int>& picked, float nms_threshold)
+    {
+        picked.clear();
+
+        const int n = faceobjects.size();
+
+        std::vector<float> areas(n);
+        for (int i = 0; i < n; i++)
+        {
+            areas[i] = faceobjects[i].rect.area();
+        }
+
+        for (int i = 0; i < n; i++)
+        {
+            const Object& a = faceobjects[i];
+
+            int keep = 1;
+            for (int j = 0; j < (int)picked.size(); j++)
+            {
+                const Object& b = faceobjects[picked[j]];
+
+                // intersection over union
+                float inter_area = intersection_area(a, b);
+                float union_area = areas[i] + areas[picked[j]] - inter_area;
+                // float IoU = inter_area / union_area
+                if (inter_area / union_area > nms_threshold)
+                    keep = 0;
+            }
+
+            if (keep)
+                picked.push_back(i);
+        }
+    }
+
+    void YoloXTensorRT::doInference(float* input, float* output) {
+
+            // Create GPU buffers on device
+            CHECK(cudaMalloc(&this->buffers_[this->inputIndex_], 3 * this->input_h_ * this->input_w_ * sizeof(float)));
+            CHECK(cudaMalloc(&this->buffers_[this->outputIndex_], this->output_size_ * sizeof(float)));
+
+            // Create stream
+            cudaStream_t stream;
+            CHECK(cudaStreamCreate(&stream));
+
+            // DMA input batch data to device, infer on the batch asynchronously, and DMA output back to host
+            CHECK(cudaMemcpyAsync(this->buffers_[this->inputIndex_], input, 3 * this->input_h_ * this->input_w_ * sizeof(float), cudaMemcpyHostToDevice, stream));
+            context_->enqueue(1, this->buffers_, stream, nullptr);
+            CHECK(cudaMemcpyAsync(output, this->buffers_[this->outputIndex_], this->output_size_ * sizeof(float), cudaMemcpyDeviceToHost, stream));
+            cudaStreamSynchronize(stream);
+
+            // Release stream and buffers
+            cudaStreamDestroy(stream);
+        }
+
+    void YoloXTensorRT::generate_yolox_proposals(std::vector<GridAndStride> grid_strides, float* feat_blob, float prob_threshold, std::vector<Object>& objects)
+    {
+        const int num_anchors = grid_strides.size();
+
+        for (int anchor_idx = 0; anchor_idx < num_anchors; anchor_idx++)
+        {
+            const int grid0 = grid_strides[anchor_idx].grid0;
+            const int grid1 = grid_strides[anchor_idx].grid1;
+            const int stride = grid_strides[anchor_idx].stride;
+
+            const int basic_pos = anchor_idx * (this->num_classes_ + 5);
+
+            // yolox/models/yolo_head.py decode logic
+            float x_center = (feat_blob[basic_pos+0] + grid0) * stride;
+            float y_center = (feat_blob[basic_pos+1] + grid1) * stride;
+            float w = exp(feat_blob[basic_pos+2]) * stride;
+            float h = exp(feat_blob[basic_pos+3]) * stride;
+            float x0 = x_center - w * 0.5f;
+            float y0 = y_center - h * 0.5f;
+
+            float box_objectness = feat_blob[basic_pos+4];
+            for (int class_idx = 0; class_idx < this->num_classes_; class_idx++)
+            {
+                float box_cls_score = feat_blob[basic_pos + 5 + class_idx];
+                float box_prob = box_objectness * box_cls_score;
+                if (box_prob > prob_threshold)
+                {
+                    Object obj;
+                    obj.rect.x = x0;
+                    obj.rect.y = y0;
+                    obj.rect.width = w;
+                    obj.rect.height = h;
+                    obj.label = class_idx;
+                    obj.prob = box_prob;
+
+                    objects.push_back(obj);
+                }
+
+            } // class loop
+
+        } // point anchor loop
+    }
+
+    float* YoloXTensorRT::blobFromImage(cv::Mat& img){
+        cv::cvtColor(img, img, cv::COLOR_BGR2RGB);
+
+        float* blob = new float[img.total()*3];
+        const int channels = 3;
+        const int img_h = img.rows;
+        const int img_w = img.cols;
+        for (size_t c = 0; c < channels; c++) 
+        {
+            for (size_t  h = 0; h < img_h; h++) 
+            {
+                for (size_t w = 0; w < img_w; w++) 
+                {
+                    blob[c * img_w * img_h + h * img_w + w] =
+                        (((float)img.at<cv::Vec3b>(h, w)[c]) / 255.0f - this->mean_[c]) / this->std_[c];
+                }
+            }
+        }
+        return blob;
+    }
+
+    void YoloXTensorRT::decode_outputs(float* prob, std::vector<Object>& objects, 
+                                       float scale, const int img_w, const int img_h) {
+            std::vector<Object> proposals;
+            std::vector<int> strides = {8, 16, 32};
+            std::vector<GridAndStride> grid_strides;
+            generate_grids_and_stride(strides, grid_strides);
+            generate_yolox_proposals(grid_strides, prob,  this->bbox_conf_thresh_, proposals);
+
+            qsort_descent_inplace(proposals);
+
+            std::vector<int> picked;
+            nms_sorted_bboxes(proposals, picked, this->nms_thresh_);
+
+            int count = picked.size();
+
+            objects.resize(count);
+            for (int i = 0; i < count; i++)
+            {
+                objects[i] = proposals[picked[i]];
+
+                // adjust offset to original unpadded
+                float x0 = (objects[i].rect.x) / scale;
+                float y0 = (objects[i].rect.y) / scale;
+                float x1 = (objects[i].rect.x + objects[i].rect.width) / scale;
+                float y1 = (objects[i].rect.y + objects[i].rect.height) / scale;
+
+                // clip
+                x0 = std::max(std::min(x0, (float)(img_w - 1)), 0.f);
+                y0 = std::max(std::min(y0, (float)(img_h - 1)), 0.f);
+                x1 = std::max(std::min(x1, (float)(img_w - 1)), 0.f);
+                y1 = std::max(std::min(y1, (float)(img_h - 1)), 0.f);
+
+                objects[i].rect.x = x0;
+                objects[i].rect.y = y0;
+                objects[i].rect.width = x1 - x0;
+                objects[i].rect.height = y1 - y0;
+            }
+    }
+
 
 } // namespace yolox_cpp
 
