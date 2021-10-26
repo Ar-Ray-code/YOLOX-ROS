@@ -21,13 +21,8 @@ find_package(OpenCV REQUIRED)
 find_package(InferenceEngine)
 find_package(ngraph)
 
-if(NOT InferenceEngine_FOUND)
-  message(INFO "skip building yolox_openvino")
-  return()
-endif()
-
-if(NOT ngraph_FOUND)
-  message(INFO "skip building yolox_openvino")
+if (NOT InferenceEngine_FOUND OR NOT ngraph_FOUND)
+  message(INFO "skipping yolox_openvino")
   return()
 endif()
 

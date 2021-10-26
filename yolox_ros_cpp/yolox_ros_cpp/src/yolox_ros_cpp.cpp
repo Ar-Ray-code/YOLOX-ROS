@@ -53,6 +53,9 @@ namespace yolox_ros_cpp{
         auto img = cv_bridge::toCvCopy(ptr, "bgr8");
         cv::Mat frame = img->image;
 
+        // fps
+        auto now = std::chrono::system_clock::now();
+
         auto objects = this->yolox_->inference(frame);
         draw_objects(frame, objects);
         if(this->imshow_){
@@ -69,6 +72,10 @@ namespace yolox_ros_cpp{
         sensor_msgs::msg::Image::SharedPtr pub_img;
         pub_img = cv_bridge::CvImage(img->header, "bgr8", frame).toImageMsg();
         this->pub_image_.publish(pub_img);
+
+        auto end = std::chrono::system_clock::now();
+        auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - now);
+        RCLCPP_INFO(this->get_logger(), "fps: %f", 1000.0f / elapsed.count());
     }
     bboxes_ex_msgs::msg::BoundingBoxes YoloXNode::objects_to_bboxes(cv::Mat frame, std::vector<Object> objects,std_msgs::msg::Header header){
         bboxes_ex_msgs::msg::BoundingBoxes boxes;
