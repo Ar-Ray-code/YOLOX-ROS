@@ -69,6 +69,15 @@ setup(
         (os.path.join('share', package_name), glob('../weights/*.pth')),
         (os.path.join('share', package_name), glob('../weights/openvino/*')),
     ],
+    install_requires=['setuptools'],
+    zip_safe=True,
+    author='Ar-Ray-code',
+    author_email="ray255ar@gmail.com",
+    maintainer='Ar-Ray-code',
+    maintainer_email="ray255ar@gmail.com",
+    description='YOLOX + ROS2 Foxy',
+    license='Apache License, Version 2.0',
+    tests_require=['pytest'],
     entry_points={
         'console_scripts': [
             'yolox_ros = '+package_name+'.yolox_ros:ros_main',
@@ -77,13 +86,3 @@ setup(
     },
 )
 
-
-    # install_requires=['setuptools'],
-    # zip_safe=True,
-    # author='Ar-Ray-code',
-    # author_email="ray255ar@gmail.com",
-    # maintainer='Ar-Ray-code',
-    # maintainer_email="ray255ar@gmail.com",
-    # description='YOLOX + ROS2 Foxy',
-    # license='Apache License, Version 2.0',
-    # tests_require=['pytest'],
