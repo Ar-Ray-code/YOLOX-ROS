@@ -25,10 +25,10 @@ find_package(cv_bridge REQUIRED)
 find_package(image_transport REQUIRED)
 find_package(OpenCV REQUIRED)
 find_package(bboxes_ex_msgs REQUIRED)
-find_package(yolox_cpp QUIET)
+find_package(yolox_cpp)
 
 if(NOT yolox_cpp_FOUND)
-  message(WARNING "yolox_cpp is not found.\n skip building yolox_ros_cpp.")
+  message(WARNING "skipping yolox_ros_cpp, no yolox_cpp found")
   return()
 endif()
 

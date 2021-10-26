@@ -80,8 +80,9 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'yolox_ros = yolox_ros_py.yolox_ros:ros_main',
-            'yolox_openvino = yolox_ros_py.yolox_openvino:ros_main',
+            'yolox_ros = '+package_name+'.yolox_ros:ros_main',
+            'yolox_openvino = '+package_name+'.yolox_openvino:ros_main',
         ],
     },
 )
+
