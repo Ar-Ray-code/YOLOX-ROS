@@ -52,9 +52,6 @@ namespace yolox_cpp{
             cv::Mat pr_img_;
             cv::Mat re_;
 
-            void* buffers_[2];
-            float* blob_;
-            float* prob_;
             const std::vector<float> mean_ = {0.485, 0.456, 0.406};
             const std::vector<float> std_ = {0.229, 0.224, 0.225};
 

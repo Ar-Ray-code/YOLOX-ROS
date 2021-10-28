@@ -55,27 +55,23 @@ namespace yolox_cpp{
         // Note that indices are guaranteed to be less than IEngine::getNbBindings()
         assert(this->engine_->getBindingDataType(this->inputIndex_) == nvinfer1::DataType::kFLOAT);
         assert(this->engine_->getBindingDataType(this->outputIndex_) == nvinfer1::DataType::kFLOAT);
-        // this->engine_->getBindingIndex(this->OUTPUT_BLOB_NAME_.c_str());
-        // this->engine_->getBindingIndex(this->INPUT_BLOB_NAME_.c_str());
-
-        this->prob_ = new float[this->output_size_];
     }
     YoloXTensorRT::~YoloXTensorRT(){
-        CHECK(cudaFree(buffers_[inputIndex_]));
-        CHECK(cudaFree(buffers_[outputIndex_]));
-        delete blob_;
-        delete prob_;
     }
     std::vector<Object> YoloXTensorRT::inference(cv::Mat frame){
         this->pr_img_ = static_resize(frame);
 
-        this->blob_ = blobFromImage(this->pr_img_);
-        this->doInference(this->blob_, this->prob_);
+        float* input = blobFromImage(this->pr_img_);
+        float* output = new float[this->output_size_];
+        this->doInference(input, output);
         
         float scale = std::min(this->input_w_ / (frame.cols*1.0), this->input_h_ / (frame.rows*1.0));
         
         std::vector<Object> objects;
-        decode_outputs(prob_, objects, scale, frame.cols, frame.rows);
+        decode_outputs(output, objects, scale, frame.cols, frame.rows);
+
+        delete input;
+        delete output;
         return objects;
     }
 
@@ -192,24 +188,29 @@ namespace yolox_cpp{
     }
 
     void YoloXTensorRT::doInference(float* input, float* output) {
+        // Pointers to input and output device buffers to pass to engine.
+        // Engine requires exactly IEngine::getNbBindings() number of buffers.
+        void* buffers[2];
 
-            // Create GPU buffers on device
-            CHECK(cudaMalloc(&this->buffers_[this->inputIndex_], 3 * this->input_h_ * this->input_w_ * sizeof(float)));
-            CHECK(cudaMalloc(&this->buffers_[this->outputIndex_], this->output_size_ * sizeof(float)));
+        // Create GPU buffers on device
+        CHECK(cudaMalloc(&buffers[this->inputIndex_], 3 * this->input_h_ * this->input_w_ * sizeof(float)));
+        CHECK(cudaMalloc(&buffers[this->outputIndex_], this->output_size_ * sizeof(float)));
 
-            // Create stream
-            cudaStream_t stream;
-            CHECK(cudaStreamCreate(&stream));
+        // Create stream
+        cudaStream_t stream;
+        CHECK(cudaStreamCreate(&stream));
 
-            // DMA input batch data to device, infer on the batch asynchronously, and DMA output back to host
-            CHECK(cudaMemcpyAsync(this->buffers_[this->inputIndex_], input, 3 * this->input_h_ * this->input_w_ * sizeof(float), cudaMemcpyHostToDevice, stream));
-            context_->enqueue(1, this->buffers_, stream, nullptr);
-            CHECK(cudaMemcpyAsync(output, this->buffers_[this->outputIndex_], this->output_size_ * sizeof(float), cudaMemcpyDeviceToHost, stream));
-            cudaStreamSynchronize(stream);
+        // DMA input batch data to device, infer on the batch asynchronously, and DMA output back to host
+        CHECK(cudaMemcpyAsync(buffers[this->inputIndex_], input, 3 * this->input_h_ * this->input_w_ * sizeof(float), cudaMemcpyHostToDevice, stream));
+        context_->enqueue(1, buffers, stream, nullptr);
+        CHECK(cudaMemcpyAsync(output, buffers[this->outputIndex_], this->output_size_ * sizeof(float), cudaMemcpyDeviceToHost, stream));
+        cudaStreamSynchronize(stream);
 
-            // Release stream and buffers
-            cudaStreamDestroy(stream);
-        }
+        // Release stream and buffers
+        cudaStreamDestroy(stream);
+        CHECK(cudaFree(buffers[0]));
+        CHECK(cudaFree(buffers[1]));
+    }
 
     void YoloXTensorRT::generate_yolox_proposals(std::vector<GridAndStride> grid_strides, float* feat_blob, float prob_threshold, std::vector<Object>& objects)
     {
@@ -277,41 +278,41 @@ namespace yolox_cpp{
 
     void YoloXTensorRT::decode_outputs(float* prob, std::vector<Object>& objects, 
                                        float scale, const int img_w, const int img_h) {
-            std::vector<Object> proposals;
-            std::vector<int> strides = {8, 16, 32};
-            std::vector<GridAndStride> grid_strides;
-            generate_grids_and_stride(strides, grid_strides);
-            generate_yolox_proposals(grid_strides, prob,  this->bbox_conf_thresh_, proposals);
+        std::vector<Object> proposals;
+        std::vector<int> strides = {8, 16, 32};
+        std::vector<GridAndStride> grid_strides;
+        generate_grids_and_stride(strides, grid_strides);
+        generate_yolox_proposals(grid_strides, prob,  this->bbox_conf_thresh_, proposals);
 
-            qsort_descent_inplace(proposals);
+        qsort_descent_inplace(proposals);
 
-            std::vector<int> picked;
-            nms_sorted_bboxes(proposals, picked, this->nms_thresh_);
+        std::vector<int> picked;
+        nms_sorted_bboxes(proposals, picked, this->nms_thresh_);
 
-            int count = picked.size();
+        int count = picked.size();
 
-            objects.resize(count);
-            for (int i = 0; i < count; i++)
-            {
-                objects[i] = proposals[picked[i]];
+        objects.resize(count);
+        for (int i = 0; i < count; i++)
+        {
+            objects[i] = proposals[picked[i]];
 
-                // adjust offset to original unpadded
-                float x0 = (objects[i].rect.x) / scale;
-                float y0 = (objects[i].rect.y) / scale;
-                float x1 = (objects[i].rect.x + objects[i].rect.width) / scale;
-                float y1 = (objects[i].rect.y + objects[i].rect.height) / scale;
+            // adjust offset to original unpadded
+            float x0 = (objects[i].rect.x) / scale;
+            float y0 = (objects[i].rect.y) / scale;
+            float x1 = (objects[i].rect.x + objects[i].rect.width) / scale;
+            float y1 = (objects[i].rect.y + objects[i].rect.height) / scale;
 
-                // clip
-                x0 = std::max(std::min(x0, (float)(img_w - 1)), 0.f);
-                y0 = std::max(std::min(y0, (float)(img_h - 1)), 0.f);
-                x1 = std::max(std::min(x1, (float)(img_w - 1)), 0.f);
-                y1 = std::max(std::min(y1, (float)(img_h - 1)), 0.f);
+            // clip
+            x0 = std::max(std::min(x0, (float)(img_w - 1)), 0.f);
+            y0 = std::max(std::min(y0, (float)(img_h - 1)), 0.f);
+            x1 = std::max(std::min(x1, (float)(img_w - 1)), 0.f);
+            y1 = std::max(std::min(y1, (float)(img_h - 1)), 0.f);
 
-                objects[i].rect.x = x0;
-                objects[i].rect.y = y0;
-                objects[i].rect.width = x1 - x0;
-                objects[i].rect.height = y1 - y0;
-            }
+            objects[i].rect.x = x0;
+            objects[i].rect.y = y0;
+            objects[i].rect.width = x1 - x0;
+            objects[i].rect.height = y1 - y0;
+        }
     }
 
 
