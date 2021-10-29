@@ -13,11 +13,8 @@
 #include "bboxes_ex_msgs/msg/bounding_box.hpp"
 #include "bboxes_ex_msgs/msg/bounding_boxes.hpp"
 
-#include "yolox_openvino/yolox_openvino.hpp"
-#include "yolox_openvino/utils.hpp"
-
-using namespace yolox_openvino;
-using namespace yolox_openvino::utils;
+#include "yolox_cpp/yolox.hpp"
+#include "yolox_cpp/utils.hpp"
 
 namespace yolox_ros_cpp{
 
@@ -29,13 +26,18 @@ namespace yolox_ros_cpp{
 
     private:
         void initializeParameter();
-        std::unique_ptr<YoloX> yolox_;
+        std::unique_ptr<yolox_cpp::AbsYoloX> yolox_;
         std::string model_path_;
+        std::string model_type_;
         std::string device_;
         float conf_th_;
         float nms_th_;
         int image_width_;
         int image_height_;
+
+        std::string src_image_topic_name_;
+        std::string publish_image_topic_name_;
+        std::string publish_boundingbox_topic_name_;
 
         image_transport::Subscriber sub_image_;
         void colorImageCallback(const sensor_msgs::msg::Image::ConstSharedPtr& ptr);
@@ -43,9 +45,9 @@ namespace yolox_ros_cpp{
         rclcpp::Publisher<bboxes_ex_msgs::msg::BoundingBoxes>::SharedPtr pub_bboxes_;
         image_transport::Publisher pub_image_;
 
-        bboxes_ex_msgs::msg::BoundingBoxes objects_to_bboxes(cv::Mat frame, std::vector<Object> objects,std_msgs::msg::Header header);
+        bboxes_ex_msgs::msg::BoundingBoxes objects_to_bboxes(cv::Mat frame, std::vector<yolox_cpp::Object> objects, std_msgs::msg::Header header);
 
-        const std::string WINDOW_NAME_ = "YOLOX";
+        std::string WINDOW_NAME_ = "YOLOX";
         bool imshow_ = true;
     };
 }

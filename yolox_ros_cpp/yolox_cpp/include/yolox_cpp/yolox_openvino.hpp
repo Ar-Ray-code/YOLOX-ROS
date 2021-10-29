@@ -1,5 +1,5 @@
-#ifndef _YOLOX_OPENVINO_YOLOX_OPENVINO_HPP
-#define _YOLOX_OPENVINO_YOLOX_OPENVINO_HPP
+#ifndef _YOLOX_CPP_YOLOX_OPENVINO_HPP
+#define _YOLOX_CPP_YOLOX_OPENVINO_HPP
 
 #include <iterator>
 #include <memory>
@@ -12,13 +12,13 @@
 #include "core.hpp"
 #include "coco_names.hpp"
 
-namespace yolox_openvino{
-    class YoloX{
+namespace yolox_cpp{
+    class YoloXOpenVINO: public AbsYoloX{
         public:
-            YoloX(file_name_t path_to_model, std::string device_name, 
-                    float nms_th=0.45, float conf_th=0.3,
-                    int input_width=416, int input_height=416);
-            std::vector<Object> inference(cv::Mat frame);
+            YoloXOpenVINO(file_name_t path_to_model, std::string device_name, 
+                          float nms_th=0.45, float conf_th=0.3,
+                          int input_width=416, int input_height=416);
+            std::vector<Object> inference(cv::Mat frame) override;
 
         private:
             cv::Mat static_resize(cv::Mat& img);
@@ -30,11 +30,11 @@ namespace yolox_openvino{
             void qsort_descent_inplace(std::vector<Object>& objects);
             void nms_sorted_bboxes(const std::vector<Object>& faceobjects, std::vector<int>& picked, float nms_threshold);
             void decode_outputs(const float* prob, std::vector<Object>& objects, float scale, const int img_w, const int img_h);
-            int input_w_ = 416;
-            int input_h_ = 416;
-            int num_classes_ = 80;
-            double nms_thresh_ = 0.45;
-            double bbox_conf_thresh_ = 0.3;
+            // int input_w_ = 416;
+            // int input_h_ = 416;
+            // int num_classes_ = 80;
+            // double nms_thresh_ = 0.45;
+            // double bbox_conf_thresh_ = 0.3;
 
             std::string input_name_;
             std::string output_name_;

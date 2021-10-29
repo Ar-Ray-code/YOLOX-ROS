@@ -1,0 +1,7 @@
+#ifndef _YOLOX_CPP_CONFIG_H_
+#define _YOLOX_CPP_CONFIG_H_
+
+#cmakedefine ENABLE_OPENVINO
+#cmakedefine ENABLE_TENSORRT
+
+#endif // _YOLOX_CPP_CONFIG_H_

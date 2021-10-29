@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.17)
 project(yolox_ros_cpp)
 
 # Default to C99
@@ -24,11 +24,11 @@ find_package(sensor_msgs REQUIRED)
 find_package(cv_bridge REQUIRED)
 find_package(image_transport REQUIRED)
 find_package(OpenCV REQUIRED)
-find_package(yolox_openvino)
 find_package(bboxes_ex_msgs REQUIRED)
+find_package(yolox_cpp)
 
-if (NOT yolox_openvino_FOUND)
-  message(INFO "skipping yolox_ros_cpp, no yolox_openvino found")
+if(NOT yolox_cpp_FOUND)
+  message(WARNING "skipping yolox_ros_cpp, no yolox_cpp found")
   return()
 endif()
 
@@ -56,9 +56,9 @@ ament_target_dependencies(yolox_ros_cpp
   std_msgs
   sensor_msgs
   OpenCV
+  yolox_cpp
   bboxes_ex_msgs
-  yolox_openvino
-)
+  )
 
 
 install(TARGETS yolox_ros_cpp
@@ -69,6 +69,7 @@ install(TARGETS yolox_ros_cpp
 install(DIRECTORY
   launch
   param
+  ../../weights
   DESTINATION share/${PROJECT_NAME}
 )
 
