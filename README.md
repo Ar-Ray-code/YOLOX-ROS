@@ -8,15 +8,15 @@
 
 ## Supported List
 
-| Base        | ROS1 C++ | ROS1 Python | ROS2 C++ | ROS2 Python |
-| ----------- | -------- | ----------- | -------- | ---------- |
-| CPU        |          |            |          | ✅          |
-| CUDA        |          |           |          | ✅          |
-| CUDA (FP16) |          |           |          | ✅          |
-| TensorRT    |          |             |          |   ❓     |
-| OpenVINO    |          |             | ✅        |            |
-| MegEngine   |          |             |          |            |
-| ncnn        |          |             |          |            |
+| Base            | ROS1 C++ | ROS1 Python | ROS2 C++ | ROS2 Python |
+| --------------- | -------- | ----------- | -------- | ----------- |
+| CPU             |          |             |          | ✅           |
+| CUDA            |          |             |          | ✅           |
+| CUDA (FP16)     |          |             |          | ✅           |
+| TensorRT (CUDA) |          |             | ✅        |             |
+| OpenVINO        |          |             | ✅        |             |
+| MegEngine       |          |             |          |             |
+| ncnn            |          |             |          |             |
 
 ## Installation & Demo
 <details>
@@ -81,6 +81,8 @@ ros2 launch yolox_ros_py yolox_s_cpu.launch.py
 
 <details>
 <summary>C++ (OpenVINO)</summary>
+  
+- Docker Images is [Released](https://github.com/Ar-Ray-code/YOLOX-ROS/tree/main/yolox_ros_cpp).
 
 ## Requirements
 
@@ -111,6 +113,13 @@ source /opt/ros/foxy/setup.bash
 source ~/ros2_ws/install/local_setup.bash
 ros2 launch yolox_ros_cpp yolox_openvino.launch.py
 ```
+</details>
+
+<details>
+<summary>C++ (TensorRT)</summary>
+
+Docker Images is [Released](https://github.com/Ar-Ray-code/YOLOX-ROS/tree/main/yolox_ros_cpp).
+
 </details>
 
 
