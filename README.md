@@ -39,7 +39,7 @@ Install the dependent packages based on all tutorials.
 [YOLOX Quick-start (Python)](https://github.com/Megvii-BaseDetection/YOLOX#quick-start)
 
 ```bash
-git clone https://github.com/Megvii-BaseDetection/YOLOX
+git clone --recursive https://github.com/Megvii-BaseDetection/YOLOX
 cd YOLOX
 pip3 install -U pip && pip3 install -r requirements.txt
 pip3 install -v -e .  # or  python3 setup.py develop
