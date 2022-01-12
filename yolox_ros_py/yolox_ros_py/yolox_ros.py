@@ -107,7 +107,8 @@ class Predictor(object):
         scores = output[:, 4] * output[:, 5]
 
         vis_res = vis(img, bboxes, scores, cls, cls_conf, self.cls_names)
-        return vis_res
+        
+        return vis_res, bboxes, scores, cls, self.cls_names
 
 class yolox_ros(Node):
     def __init__(self) -> None:
@@ -159,9 +160,8 @@ class yolox_ros(Node):
         fuse = self.get_parameter('fuse').value
         trt = self.get_parameter('trt').value
         fp16 = self.get_parameter('fp16').value
-        fp16 = self.get_parameter('fp16').value
         device = self.get_parameter('device').value
-        #  = self.get_parameter('').value
+
         ckpt = self.get_parameter('ckpt').value
         conf = self.get_parameter('conf').value
         legacy = self.get_parameter('legacy').value
@@ -256,9 +256,11 @@ class yolox_ros(Node):
             try:
                 result_img_rgb, bboxes, scores, cls, cls_names = self.predictor.visual(outputs[0], img_info)
                 bboxes = self.yolox2bboxes_msgs(bboxes, scores, cls, cls_names, msg.header)
-
+                
                 self.pub.publish(bboxes)
-                self.pub_image.publish(self.bridge.cv2_to_imgmsg(img_rgb,"bgr8"))
+                msg = self.bridge.cv2_to_imgmsg(img_rgb,"bgr8")
+                msg.header.frame_id = "camera"
+                self.pub_image.publish(msg)
 
                 if (self.imshow_isshow):
                     cv2.imshow("YOLOX",result_img_rgb)
