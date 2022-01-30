@@ -2,8 +2,9 @@
 
 [YOLOX](https://github.com/Megvii-BaseDetection/YOLOX)+ROS2 Foxy
 
+![yolox_s_result](images_for_readme/unity-YOLOX-ROS.gif)
 
-![yolox_s_result](images_for_readme/yolox_s_result.png)
+:arrow_up: Unity + YOLOX-ROS (ROS2)
 
 
 ## Supported List
@@ -15,8 +16,6 @@
 | CUDA (FP16)     |          |             |          | ✅           |
 | TensorRT (CUDA) |          |             | ✅        |             |
 | OpenVINO        |          |             | ✅        |             |
-| MegEngine       |          |             |          |             |
-| ncnn            |          |             |          |             |
 
 ## Installation & Demo
 <details>
@@ -27,7 +26,8 @@
 - ROS2 Foxy
 - OpenCV 4
 - Python 3.8 (Ubuntu 20.04 Default)
-- [YOLOX Depends](https://github.com/Megvii-BaseDetection/YOLOX)
+- PyTorch >= v1.7
+- [YOLOX v0.2.0](https://github.com/Megvii-BaseDetection/YOLOX)
 - [bbox_ex_msgs](https://github.com/Ar-Ray-code/bbox_ex_msgs)
 
 ## Installation
@@ -39,11 +39,9 @@ Install the dependent packages based on all tutorials.
 [YOLOX Quick-start (Python)](https://github.com/Megvii-BaseDetection/YOLOX#quick-start)
 
 ```bash
-git clone --recursive https://github.com/Megvii-BaseDetection/YOLOX
+git clone https://github.com/Megvii-BaseDetection/YOLOX.git
 cd YOLOX
-pip3 install -U pip && pip3 install -r requirements.txt
-pip3 install -v -e .  # or  python3 setup.py develop
-pip3 install cython; pip3 install 'git+https://github.com/cocodataset/cocoapi.git#subdirectory=PythonAPI'
+pip3 install -v -e .
 ```
 
 ### STEP 2 : Install YOLOX-ROS
@@ -81,7 +79,7 @@ ros2 launch yolox_ros_py yolox_s_cpu.launch.py
 
 <details>
 <summary>C++ (OpenVINO)</summary>
-  
+
 - Docker Images is [Released](https://github.com/Ar-Ray-code/YOLOX-ROS/tree/main/yolox_ros_cpp).
 
 ## Requirements
