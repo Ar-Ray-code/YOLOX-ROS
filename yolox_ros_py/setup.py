@@ -59,7 +59,7 @@ if not os.path.exists(YOLOX_S_WEIGHTS_PATH):
 
 setup(
     name=package_name,
-    version='1.0.0',
+    version='0.2.0',
     packages=[package_name],
     data_files=[
         ('share/ament_index/resource_index/packages',
