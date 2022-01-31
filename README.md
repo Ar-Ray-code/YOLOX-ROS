@@ -4,7 +4,7 @@
 
 ![yolox_s_result](https://github.com/Ar-Ray-code/RenderTexture2ROS2Image/blob/main/images_for_readme/unity-demo.gif?raw=true)
 
-<div align="center">🔼 Unity +YOLOX-ROS</div>
+<div align="center">🔼 Unity + YOLOX-ROS Demo</div>
 
 ## Supported List
 
@@ -33,9 +33,9 @@
 
 Install the dependent packages based on all tutorials.
 
-### STEP 1 : YOLOX Quick-start
+### STEP 1 : YOLOX Installation
 
-[YOLOX Quick-start (Python)](https://github.com/Megvii-BaseDetection/YOLOX#quick-start)
+[YOLOX Installation (Python)](https://github.com/Megvii-BaseDetection/YOLOX#quick-start)
 
 ```bash
 git clone https://github.com/Megvii-BaseDetection/YOLOX.git
@@ -145,7 +145,7 @@ Docker Images is [Released](https://github.com/Ar-Ray-code/YOLOX-ROS/tree/main/y
 
 ## YOLOX-ROS + Unity
 
-Check this repository [RenderTexture2ROS2Image](https://github.com/Ar-Ray-code/RenderTexture2ROS2Image).
+Check this repository ([RenderTexture2ROS2Image](https://github.com/Ar-Ray-code/RenderTexture2ROS2Image)).
 
 ## Reference
 
