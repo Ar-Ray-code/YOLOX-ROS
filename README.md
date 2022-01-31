@@ -4,18 +4,17 @@
 
 ![yolox_s_result](https://github.com/Ar-Ray-code/RenderTexture2ROS2Image/blob/main/images_for_readme/unity-demo.gif?raw=true)
 
-:arrow_up: Unity + YOLOX-ROS (ROS2)
-
+<div align="center">🔼 Unity +YOLOX-ROS</div>
 
 ## Supported List
 
-| Base            | ROS1 C++ | ROS1 Python | ROS2 C++ | ROS2 Python |
-| --------------- | -------- | ----------- | -------- | ----------- |
-| CPU             |          |             |          | ✅           |
-| CUDA            |          |             |          | ✅           |
-| CUDA (FP16)     |          |             |          | ✅           |
-| TensorRT (CUDA) |          |             | ✅        |             |
-| OpenVINO        |          |             | ✅        |             |
+| Base            | ROS2 C++ | ROS2 Python |
+| --------------- | -------- | ----------- |
+| CPU             |           | ✅           |
+| CUDA            |           | ✅           |
+| CUDA (FP16)     |           | ✅           |
+| TensorRT (CUDA) |  ✅       |              |
+| OpenVINO        |  ✅       |              |
 
 ## Installation & Demo
 <details>
