@@ -143,6 +143,10 @@ Docker Images is [Released](https://github.com/Ar-Ray-code/YOLOX-ROS/tree/main/y
 
 - Supports C++ only.
 
+## YOLOX-ROS + Unity
+
+Check this repository [RenderTexture2ROS2Image](https://github.com/Ar-Ray-code/RenderTexture2ROS2Image).
+
 ## Reference
 
 ![](https://raw.githubusercontent.com/Megvii-BaseDetection/YOLOX/main/assets/logo.png)
