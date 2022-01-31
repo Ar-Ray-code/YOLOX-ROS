@@ -2,7 +2,7 @@
 
 [YOLOX](https://github.com/Megvii-BaseDetection/YOLOX)+ROS2 Foxy
 
-![yolox_s_result](images_for_readme/unity-YOLOX-ROS.gif)
+![yolox_s_result](https://raw.githubusercontent.com/Ar-Ray-code/YOLOX-ROS/main/images_for_readme/unity-YOLOX-ROS.gif)
 
 :arrow_up: Unity + YOLOX-ROS (ROS2)
 
