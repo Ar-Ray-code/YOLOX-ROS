@@ -10,9 +10,9 @@ fi
 MODEL=$1
 SCRIPT_DIR=$(cd $(dirname $0); pwd)
 
-ONNX_MODEL_PATH=$SCRIPT_DIR/../onnx/$MODEL.onnx
+ONNX_MODEL_PATH=$SCRIPT_DIR/../../onnx/$MODEL.onnx
 if [ ! -e $ONNX_MODEL_PATH ]; then
-    $SCRIPT_DIR/../onnx/download.bash $MODEL
+    $SCRIPT_DIR/../../onnx/download.bash $MODEL
 fi
 
 trtexec --onnx=$SCRIPT_DIR/../../onnx/$MODEL.onnx \

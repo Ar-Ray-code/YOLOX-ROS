@@ -19,10 +19,11 @@ MODEL=$1
 SCRIPT_DIR=$(cd $(dirname $0); pwd)
 
 echo $MODEL
+EXPS="$MODEL"
 if [ "$MODEL" = "yolox_nano" ]; then
-    EXPS="nano"
-else
-    EXPS="$MODEL"
+    if [ "$YOLOX_VERSION" = "0.1.0" -o "$YOLOX_VERSION" = "0.1.1rc0"]; then
+        EXPS="nano"
+    fi
 fi
 
 PYTORCH_MODEL_PATH=$SCRIPT_DIR/../pytorch/$MODEL.pth
@@ -31,10 +32,13 @@ if [ ! -e $PYTORCH_MODEL_PATH ]; then
 fi
 
 cd /workspace/YOLOX
-python3 tools/trt.py -f exps/default/$EXPS.py \
-                     -c $PYTORCH_MODEL_PATH
-# python3 tools/trt.py -f exps/default/$EXPS.py \
-#                      -c $PYTORCH_MODEL_PATH \
-#                      -w $TRT_WORKSPACE
+if [ "$YOLOX_VERSION" = "0.2.0" ]; then
+    python3 tools/trt.py -f exps/default/$EXPS.py \
+                         -c $PYTORCH_MODEL_PATH \
+                         -w $TRT_WORKSPACE
+else
+    python3 tools/trt.py -f exps/default/$EXPS.py \
+                         -c $PYTORCH_MODEL_PATH
+fi
 cp -r YOLOX_outputs $SCRIPT_DIR
 cd $CURDIR

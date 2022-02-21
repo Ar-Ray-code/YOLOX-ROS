@@ -3,7 +3,7 @@ model_type: "tensorrt"
 device: "0"
 image_size/height: 416
 image_size/width: 416
-imshow_isshow: true
+imshow_isshow: false
 nms: 0.45
 conf: 0.30
 src_image_topic_name: image_raw

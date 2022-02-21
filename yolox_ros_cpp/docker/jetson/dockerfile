@@ -1,0 +1,65 @@
+FROM dustynv/ros:foxy-ros-base-l4t-r32.6.1
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt update && \
+    apt install -y libeigen3-dev python3-pip && \
+    apt -y clean && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN python3 -m pip install -U pip && \
+    python3 -m pip install cmake
+
+# add PATH
+ENV PATH=$PATH:/usr/src/tensorrt/bin
+
+# torch 1.9.0
+WORKDIR /workspace
+RUN apt update && \
+    apt install -y libopenblas-base libopenmpi-dev && \
+    apt -y clean && \
+    rm -rf /var/lib/apt/lists/*
+RUN wget https://nvidia.box.com/shared/static/h1z9sw4bb1ybi0rm3tu8qdj8hs05ljbm.whl -O torch-1.9.0-cp36-cp36m-linux_aarch64.whl && \
+    python3 -m pip install Cython && \
+    python3 -m pip install numpy torch-1.9.0-cp36-cp36m-linux_aarch64.whl &&\
+    rm torch-1.9.0-cp36-cp36m-linux_aarch64.whl 
+
+# torch2trt
+WORKDIR /workspace
+RUN git clone https://github.com/NVIDIA-AI-IOT/torch2trt && \
+    cd torch2trt && \
+    python3 setup.py install    
+
+# torchvision
+ENV TORCHVISION_VERSION=0.10.0
+WORKDIR /workspace
+RUN apt update && \
+    apt install -y libjpeg-dev zlib1g-dev libpython3-dev libavcodec-dev libavformat-dev libswscale-dev && \
+    apt -y clean && \
+    rm -rf /var/lib/apt/lists/*
+RUN git clone --branch v${TORCHVISION_VERSION} https://github.com/pytorch/vision torchvision && \
+    cd torchvision && \
+    BUILD_VERSION=$TORCHVISION_VERSION && \
+    python3 setup.py install
+
+# YOLOX
+WORKDIR /workspace
+ENV YOLOX_VERSION=0.2.0
+# matplotlib, onnx-optimizer cannot install by pip
+RUN apt update && \
+    apt install -y python3-matplotlib && \
+    apt -y clean && \
+    rm -rf /var/lib/apt/lists/*
+RUN python3 -m pip install onnx==1.8.1 onnxruntime==1.8.0
+RUN git clone --recursive https://github.com/onnx/optimizer onnxoptimizer && \
+    cd onnxoptimizer && \
+    python3 -m pip install -e .
+
+# bugfix for numpy==1.19.5 
+# set OPENBLAS_CORETYPE environment variable to ARMV8
+ENV OPENBLAS_CORETYPE=ARMV8
+
+RUN git clone -b $YOLOX_VERSION https://github.com/Megvii-BaseDetection/YOLOX YOLOX && \
+    cd YOLOX && \
+    python3 -m pip install -e .
+
