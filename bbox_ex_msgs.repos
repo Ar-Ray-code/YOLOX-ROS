@@ -1,0 +1,6 @@
+repositories:
+  bbox_ex_msgs:
+    type: git
+    url: https://github.com/Ar-Ray-code/bbox_ex_msgs.git
+    version: main
+
