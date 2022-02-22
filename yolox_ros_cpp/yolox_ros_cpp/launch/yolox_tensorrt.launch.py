@@ -8,7 +8,7 @@ from launch_ros.descriptions import ComposableNode
 
 def generate_launch_description():
     yolox_ros_share_dir = get_package_share_directory('yolox_ros_cpp')
-    yolox_param_yaml = os.path.join(yolox_ros_share_dir, "param", "nano_trtexec.yaml")
+    yolox_param_yaml = os.path.join(yolox_ros_share_dir, "param", "tiny_trtexec.yaml")
 
     container = ComposableNodeContainer(
                 name='yolox_container',
