@@ -12,13 +12,13 @@ namespace yolox_ros_cpp_srv{
         RCLCPP_INFO(this->get_logger(), "initialize");
         this->initializeParameter();
 
-        if(this->imshow_){
-            char window_name[50];
-            sprintf(window_name, "%s %s %s", this->WINDOW_NAME_.c_str(), "_", this->get_name());
-            this->WINDOW_NAME_ = window_name;            
+        // if(this->imshow_){
+        //     char window_name[50];
+        //     sprintf(window_name, "%s %s %s", this->WINDOW_NAME_.c_str(), "_", this->get_name());
+        //     this->WINDOW_NAME_ = window_name;            
 
-            cv::namedWindow(this->WINDOW_NAME_, cv::WINDOW_AUTOSIZE);
-        }
+        //     cv::namedWindow(this->WINDOW_NAME_, cv::WINDOW_AUTOSIZE);
+        // }
         
         if(this->model_type_ == "tensorrt"){
             #ifdef ENABLE_TENSORRT
@@ -137,13 +137,13 @@ namespace yolox_ros_cpp_srv{
         (void)request_header;
 
         auto img = cv_bridge::toCvCopy(req->image, "bgr8");
-        cv::Mat frame = img->image;
-
-        RCLCPP_INFO(this->get_logger(), "step: %d", step++);
+        cv::Mat frame = img->image.clone();
 
         // fps
         auto now = std::chrono::system_clock::now();
+        RCLCPP_INFO(this->get_logger(), "step?: %d", step++);
         auto objects = this->yolox_->inference(frame);
+        RCLCPP_INFO(this->get_logger(), "step!: %d", step++);
 
         RCLCPP_INFO(this->get_logger(), "step: %d", step++);
 

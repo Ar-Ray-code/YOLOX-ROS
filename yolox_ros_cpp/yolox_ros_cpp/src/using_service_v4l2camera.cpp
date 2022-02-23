@@ -14,7 +14,6 @@ namespace using_service_v4l2camera
             if (!rclcpp::ok())
             {
                 RCLCPP_INFO(this->get_logger(), "Client interrupted while waiting for service");
-                // exit(-1);
                 return ;
             }
             RCLCPP_INFO(this->get_logger(), "waiting for service...");
@@ -23,19 +22,10 @@ namespace using_service_v4l2camera
 
         request = std::make_shared<yolo_msgs::srv::DetectObject::Request>();
         request->image = *image_msg;
-        // future_yolox = client_yolox->async_send_request(request);
-
-        
 
         future_yolox = client_yolox->async_send_request(request, std::bind(&using_service::callback_response,this,_1));
-
-        // future_yolox = client_yolox->async_send_request(request);
-        
     }
 
-    // void callback_response(rclcpp::Client<yolo_msgs::srv::DetectObject>::SharedFuture future){
-    //     auto response = future.get();
-    // }
     void using_service::callback_response(rclcpp::Client<yolo_msgs::srv::DetectObject>::SharedFuture future) {
         auto response = future.get();
         RCLCPP_INFO(this->get_logger(), "callback_response");
@@ -84,8 +74,6 @@ namespace using_service_v4l2camera
 
         frame = cv_ptr->image;
         image_msg = msg;
-        // imwrite to file
-        // cv::imwrite("/root/ros2_ws/src/image.jpg", frame);
         yolox_callback();
     }
 

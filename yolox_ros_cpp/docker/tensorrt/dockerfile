@@ -50,6 +50,7 @@ CMD ["bash"]
 # docker build . -t yolox_ros_tensorrt
 # docker run --rm -it --network host --runtime nvidia -v /home/ubuntu-i9rtx/Documents/github/yolox_ros_galactic_dir/src/:/root/ros2_ws/src -v /tmp/.X11-unix:/tmp/.X11-unix -w /root/ros2_ws -e DISPLAY=$DISPLAY --device /dev/video0:/dev/video0 yolox_ros_tensorrt /bin/bash
 
+# source /opt/ros/galactic/setup.bash
 # colcon build --symlink-install --cmake-args -DYOLOX_USE_TENSORRT=ON -DYOLOX_USE_OPENVINO=OFF
 # cd ~/ && git clone https://github.com/NVIDIA-AI-IOT/torch2trt && cd torch2trt && python3 setup.py install
 
