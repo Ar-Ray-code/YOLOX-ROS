@@ -54,21 +54,12 @@ docker run --rm -it \
 docker pull fateshelled/jetson_yolox_ros:foxy-ros-base-l4t-r32.6.1
 
 # This image cannot display GUI.
-# Use WebCam
 docker run --rm -it \
            --network host \
            --runtime nvidia \
            -v $HOME/ros2_ws:/root/ros2_ws \
            -w /root/ros2_ws \
            --device /dev/video0:/dev/video0 \
-           fateshelled/jetson_yolox_ros /bin/bash
-# Use CSI-Camera
-docker run --rm -it \
-           --network host \
-           --runtime nvidia \
-           -v $HOME/ros2_ws:/root/ros2_ws \
-           -v /tmp/argus_socket:/tmp/argus_socket \
-           -w /root/ros2_ws \
            fateshelled/jetson_yolox_ros /bin/bash
 ```
 
