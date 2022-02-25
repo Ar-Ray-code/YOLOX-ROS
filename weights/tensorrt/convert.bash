@@ -9,36 +9,53 @@ if [ -z "$1" ]; then
     exit 1
 fi
 
-# trt.py in YOLOX main branch has new vairable.
-TRT_WORKSPACE=32
+TRT_WORKSPACE=$2
 if [ -z "$2" ]; then
-    TRT_WORKSPACE=$2
+    TRT_WORKSPACE=32
+fi
+
+# use trtexec
+USE_TRTEXEC=$3
+if [ -z "$3" ]; then
+    USE_TRTEXEC=0
 fi
 
 MODEL=$1
 SCRIPT_DIR=$(cd $(dirname $0); pwd)
 
 echo $MODEL
-EXPS="$MODEL"
-if [ "$MODEL" = "yolox_nano" ]; then
-    if [ "$YOLOX_VERSION" = "0.1.0" -o "$YOLOX_VERSION" = "0.1.1rc0"]; then
-        EXPS="nano"
+
+if [ $USE_TRTEXEC = 1 ]; then
+    ONNX_MODEL_PATH=$SCRIPT_DIR/../onnx/$MODEL.onnx
+    if [ ! -e $ONNX_MODEL_PATH ]; then
+        $SCRIPT_DIR/../onnx/download.bash $MODEL
     fi
-fi
 
-PYTORCH_MODEL_PATH=$SCRIPT_DIR/../pytorch/$MODEL.pth
-if [ ! -e $PYTORCH_MODEL_PATH ]; then
-    $SCRIPT_DIR/../pytorch/download.bash $MODEL
-fi
-
-cd /workspace/YOLOX
-if [ "$YOLOX_VERSION" = "0.2.0" ]; then
-    python3 tools/trt.py -f exps/default/$EXPS.py \
-                         -c $PYTORCH_MODEL_PATH \
-                         -w $TRT_WORKSPACE
+    trtexec --onnx=$SCRIPT_DIR/../onnx/$MODEL.onnx \
+            --saveEngine=$SCRIPT_DIR/$MODEL.trt --fp16 --verbose --workspace=$((1<<$TRT_WORKSPACE))
 else
-    python3 tools/trt.py -f exps/default/$EXPS.py \
-                         -c $PYTORCH_MODEL_PATH
+    EXPS="$MODEL"
+    if [ "$MODEL" = "yolox_nano" ]; then
+        if [ "$YOLOX_VERSION" = "0.1.0" -o "$YOLOX_VERSION" = "0.1.1rc0"]; then
+            EXPS="nano"
+        fi
+    fi
+
+    PYTORCH_MODEL_PATH=$SCRIPT_DIR/../pytorch/$MODEL.pth
+    if [ ! -e $PYTORCH_MODEL_PATH ]; then
+        $SCRIPT_DIR/../pytorch/download.bash $MODEL
+    fi
+
+    cd /workspace/YOLOX
+    if [ "$YOLOX_VERSION" = "0.2.0" ]; then
+        python3 tools/trt.py -f exps/default/$EXPS.py \
+                            -c $PYTORCH_MODEL_PATH \
+                            -w $TRT_WORKSPACE
+    else
+        python3 tools/trt.py -f exps/default/$EXPS.py \
+                            -c $PYTORCH_MODEL_PATH
+    fi
+    mv YOLOX_outputs/$MODEL/model_trt.engine $SCRIPT_DIR/$MODEL.engine
+    mv YOLOX_outputs/$MODEL/model_trt.pth $SCRIPT_DIR/$MODEL.pth
 fi
-cp -r YOLOX_outputs $SCRIPT_DIR
 cd $CURDIR

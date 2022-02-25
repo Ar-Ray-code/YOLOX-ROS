@@ -9,7 +9,7 @@
 
 ※ Either one of OpenVINO or TensorRT is required.
 
-※ Jetson + TensorRT support. Tested on Jetson nano (Jetpack 4.6 r32.6.1)
+※ Jetson + TensorRT support.(Jetpack 4.6 r32.6.1)
 
 
 ### Execute with docker
@@ -73,21 +73,10 @@ docker run --rm -it \
 ```
 
 
-### Install YOLOX-ROS
+### Clone YOLOX-ROS
 ```bash
 cd /root/ros2_ws/src
 git clone https://github.com/fateshelled/YOLOX-ROS -b dev_cpp
-```
-
-#### build
-```bash
-source /opt/ros/foxy/setup.bash
-# # If use openvino
-# source /opt/intel/openvino_2021/bin/setupvars.sh
-
-cd /root/ros2_ws
-colcon build --symlink-install
-source ./install/setup.bash
 ```
 
 
@@ -104,11 +93,29 @@ cd /root/ros2_ws
 ```bash
 cd /root/ros2_ws
 
-# Download onnx file and Convert to TensorRT engine via torch2trt using YOLOX tools.
-./src/YOLOX-ROS/weights/tensorrt/convert.bash yolox_nano
+# Download onnx file and Convert to TensorRT engine via torch2trt. 
+# 1st arg is model name. 2nd is workspace size. 3rd is trtexec flag.
+./src/YOLOX-ROS/weights/tensorrt/convert.bash yolox_nano 16 0
+
+# Download onnx file and Convert to TensorRT engine via trtexec.
+./src/YOLOX-ROS/weights/tensorrt/convert.bash yolox_nano 16 1
+
+# For Jetson Nano.
+./src/YOLOX-ROS/weights/tensorrt/convert.bash yolox_nano 16 0
 ```
 
 ### DEMO
+
+#### build
+```bash
+# # If use openvino
+# source /opt/intel/openvino_2021/bin/setupvars.sh
+
+cd /root/ros2_ws
+colcon build --symlink-install
+source ./install/setup.bash
+```
+
 #### OpenVINO
 ```bash
 # run YOLOX_nano
@@ -123,7 +130,7 @@ ros2 launch yolox_ros_cpp yolox_tensorrt.launch.py
 
 #### Jetson + TensorRT
 Jetson docker container cannot display GUI.
-If you want to show detected image, subscribe from host jetson installed ROS2 Eloquent or Dashing.
+If you want to show image with bounding box drawn, subscribe from host jetson installed ROS2 Eloquent or Dashing.
 
 ```bash
 # run YOLOX_nano

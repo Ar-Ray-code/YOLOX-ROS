@@ -17,7 +17,7 @@ def generate_launch_description():
         ),
         DeclareLaunchArgument(
             "model_path",
-            default_value="./install/yolox_ros_cpp/share/yolox_ros_cpp/weights/tensorrt/YOLOX_outputs/yolox_nano/model_trt.engine",
+            default_value="./install/yolox_ros_cpp/share/yolox_ros_cpp/weights/tensorrt/yolox_nano.engine",
             description="yolox model path."
         ),
         DeclareLaunchArgument(
@@ -39,6 +39,26 @@ def generate_launch_description():
             "nms",
             default_value="0.45",
             description="yolox nms threshold"
+        ),
+        DeclareLaunchArgument(
+            "imshow_isshow",
+            default_value=False,
+            description=""
+        ),
+        DeclareLaunchArgument(
+            "src_image_topic_name",
+            default_value="/image_raw",
+            description="topic name for source image"
+        ),
+        DeclareLaunchArgument(
+            "publish_image_topic_name",
+            default_value="/yolox/image_raw",
+            description="topic name for publishing image with bounding box drawn"
+        ),
+        DeclareLaunchArgument(
+            "publish_boundingbox_topic_name",
+            default_value="/yolox/bounding_boxes",
+            description="topic name for publishing bounding box message."
         ),
     ]
     container = ComposableNodeContainer(
@@ -68,10 +88,10 @@ def generate_launch_description():
                             "image_size/width": LaunchConfiguration("image_size/width"),
                             "conf": LaunchConfiguration("conf"),
                             "nms": LaunchConfiguration("nms"),
-                            "imshow_isshow": False,
-                            "src_image_topic_name": "/image_raw",
-                            "publish_image_topic_name": "/yolox/image_raw",
-                            "publish_boundingbox_topic_name": "/yolox/bounding_boxes",
+                            "imshow_isshow": LaunchConfiguration("imshow_isshow"),
+                            "src_image_topic_name": LaunchConfiguration("src_image_topic_name"),
+                            "publish_image_topic_name": LaunchConfiguration("publish_image_topic_name"),
+                            "publish_boundingbox_topic_name": LaunchConfiguration("publish_boundingbox_topic_name"),
                         }],
                     ),
                 ],

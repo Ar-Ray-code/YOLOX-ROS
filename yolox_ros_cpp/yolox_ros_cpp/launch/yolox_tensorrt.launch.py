@@ -17,8 +17,14 @@ def generate_launch_description():
         ),
         DeclareLaunchArgument(
             "model_path",
-            default_value="./install/yolox_ros_cpp/share/yolox_ros_cpp/weights/tensorrt/YOLOX_outputs/yolox_nano/model_trt.engine",
+            # default_value="./install/yolox_ros_cpp/share/yolox_ros_cpp/weights/tensorrt/yolox_nano.engine",
+            default_value="./install/yolox_ros_cpp/share/yolox_ros_cpp/weights/tensorrt/yolox_nano.trt",
             description="yolox model path."
+        ),
+        DeclareLaunchArgument(
+            "device",
+            default_value="'0'",
+            description="GPU index. Set in string type. ex '0'"
         ),
         DeclareLaunchArgument(
             "image_size/height",
@@ -39,6 +45,26 @@ def generate_launch_description():
             "nms",
             default_value="0.45",
             description="yolox nms threshold"
+        ),
+        DeclareLaunchArgument(
+            "imshow_isshow",
+            default_value="true",
+            description=""
+        ),
+        DeclareLaunchArgument(
+            "src_image_topic_name",
+            default_value="/image_raw",
+            description="topic name for source image"
+        ),
+        DeclareLaunchArgument(
+            "publish_image_topic_name",
+            default_value="/yolox/image_raw",
+            description="topic name for publishing image with bounding box drawn"
+        ),
+        DeclareLaunchArgument(
+            "publish_boundingbox_topic_name",
+            default_value="/yolox/bounding_boxes",
+            description="topic name for publishing bounding box message."
         ),
     ]
     container = ComposableNodeContainer(
@@ -63,29 +89,29 @@ def generate_launch_description():
                         parameters=[{
                             "model_path": LaunchConfiguration("model_path"),
                             "model_type": "tensorrt",
-                            "device": "'0'",
+                            "device": LaunchConfiguration("device"),
                             "image_size/height": LaunchConfiguration("image_size/height"),
                             "image_size/width": LaunchConfiguration("image_size/width"),
                             "conf": LaunchConfiguration("conf"),
                             "nms": LaunchConfiguration("nms"),
-                            "imshow_isshow": True,
-                            "src_image_topic_name": "/image_raw",
-                            "publish_image_topic_name": "/yolox/image_raw",
-                            "publish_boundingbox_topic_name": "/yolox/bounding_boxes",
+                            "imshow_isshow": LaunchConfiguration("imshow_isshow"),
+                            "src_image_topic_name": LaunchConfiguration("src_image_topic_name"),
+                            "publish_image_topic_name": LaunchConfiguration("publish_image_topic_name"),
+                            "publish_boundingbox_topic_name": LaunchConfiguration("publish_boundingbox_topic_name"),
                         }],
                     ),
                 ],
                 output='screen',
         )
 
-    rqt_graph = launch_ros.actions.Node(
-        package="rqt_graph", executable="rqt_graph",
-    )
+    rqt = [
+        launch_ros.actions.Node(
+            package="rqt_graph", executable="rqt_graph",
+        )
+    ]
 
     return launch.LaunchDescription(
         launch_args + 
-        [
-            container,
-            rqt_graph,
-        ]
+        [container] + 
+        rqt
     )

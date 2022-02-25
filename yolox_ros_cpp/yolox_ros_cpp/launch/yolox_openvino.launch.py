@@ -23,7 +23,7 @@ def generate_launch_description():
         DeclareLaunchArgument(
             "device",
             default_value="CPU",
-            description="model device. if openvino, select CPU, GPU, etc... if tensorrt, input GPU index."
+            description="model device. CPU, GPU, etc..."
         ),
         DeclareLaunchArgument(
             "image_size/height",
@@ -44,6 +44,26 @@ def generate_launch_description():
             "nms",
             default_value="0.45",
             description="yolox nms threshold"
+        ),
+        DeclareLaunchArgument(
+            "imshow_isshow",
+            default_value="true",
+            description=""
+        ),
+        DeclareLaunchArgument(
+            "src_image_topic_name",
+            default_value="/image_raw",
+            description="topic name for source image"
+        ),
+        DeclareLaunchArgument(
+            "publish_image_topic_name",
+            default_value="/yolox/image_raw",
+            description="topic name for publishing image with bounding box drawn"
+        ),
+        DeclareLaunchArgument(
+            "publish_boundingbox_topic_name",
+            default_value="/yolox/bounding_boxes",
+            description="topic name for publishing bounding box message."
         ),
     ]
 
@@ -73,10 +93,10 @@ def generate_launch_description():
                             "image_size/width": LaunchConfiguration("image_size/width"),
                             "conf": LaunchConfiguration("conf"),
                             "nms": LaunchConfiguration("nms"),
-                            "imshow_isshow": True,
-                            "src_image_topic_name": "/image_raw",
-                            "publish_image_topic_name": "/yolox/image_raw",
-                            "publish_boundingbox_topic_name": "/yolox/bounding_boxes",
+                            "imshow_isshow": LaunchConfiguration("imshow_isshow"),
+                            "src_image_topic_name": LaunchConfiguration("src_image_topic_name"),
+                            "publish_image_topic_name": LaunchConfiguration("publish_image_topic_name"),
+                            "publish_boundingbox_topic_name": LaunchConfiguration("publish_boundingbox_topic_name"),
                         }],
                         ),
                 ],
