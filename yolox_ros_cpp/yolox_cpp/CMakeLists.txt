@@ -60,6 +60,9 @@ configure_file(
   "${PROJECT_SOURCE_DIR}/include/yolox_cpp/config.h"
 )
 
+# Jetson
+# include_directories(/usr/local/cuda-10.2/targets/aarch64-linux/include)
+# link_directories(/usr/local/cuda-10.2/targets/aarch64-linux/lib)
 
 add_library(yolox_cpp SHARED
   ${SRC}

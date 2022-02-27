@@ -290,6 +290,7 @@ namespace yolox_cpp{
         nms_sorted_bboxes(proposals, picked, this->nms_thresh_);
 
         int count = picked.size();
+        std::cout << "num of boxes: " << count << std::endl;
 
         objects.resize(count);
         for (int i = 0; i < count; i++)
