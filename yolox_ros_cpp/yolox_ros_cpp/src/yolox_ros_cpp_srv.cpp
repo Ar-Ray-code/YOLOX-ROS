@@ -141,11 +141,7 @@ namespace yolox_ros_cpp_srv{
 
         // fps
         auto now = std::chrono::system_clock::now();
-        RCLCPP_INFO(this->get_logger(), "step?: %d", step++);
         auto objects = this->yolox_->inference(frame);
-        RCLCPP_INFO(this->get_logger(), "step!: %d", step++);
-
-        RCLCPP_INFO(this->get_logger(), "step: %d", step++);
 
         yolox_cpp::utils::draw_objects(frame, objects);
         std::vector<yolo_msgs::msg::BoundingBox> boxes = objects_to_bboxes(frame, objects, img->header);

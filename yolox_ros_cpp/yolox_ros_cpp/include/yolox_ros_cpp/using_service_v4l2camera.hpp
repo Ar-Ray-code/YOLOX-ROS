@@ -7,6 +7,7 @@
 
 #include "yolo_msgs/srv/detect_object.hpp"
 #include "yolo_msgs/msg/bounding_box.hpp"
+#include "yolo_msgs/msg/bounding_boxes.hpp"
 
 #include <chrono>
 
@@ -19,6 +20,7 @@ namespace using_service_v4l2camera{
             rclcpp::Client<yolo_msgs::srv::DetectObject>::SharedFuture future_yolox;
 
             rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr sub_image;
+            rclcpp::Publisher<yolo_msgs::msg::BoundingBoxes>::SharedPtr pub_boundingboxes;
             yolo_msgs::srv::DetectObject::Request::SharedPtr request;
 
             sensor_msgs::msg::Image::SharedPtr image_msg;

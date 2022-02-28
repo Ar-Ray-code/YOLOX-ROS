@@ -44,11 +44,18 @@ namespace using_service_v4l2camera
         }
 
         // print all
-        for (auto &bbox : response->bounding_boxes)
-        {
-            RCLCPP_INFO(this->get_logger(), "xmin: %d, ymin: %d, xmax: %d, ymax: %d, class_id: %s, confidence: %f",
-                        bbox.xmin, bbox.ymin, bbox.xmax, bbox.ymax, bbox.class_id.c_str(), bbox.confidence);
-        }
+        // for (auto &bbox : response->bounding_boxes)
+        // {
+        //     RCLCPP_INFO(this->get_logger(), "xmin: %d, ymin: %d, xmax: %d, ymax: %d, class_id: %s, confidence: %f",
+        //                 bbox.xmin, bbox.ymin, bbox.xmax, bbox.ymax, bbox.class_id.c_str(), bbox.confidence);
+        // 
+        // }
+
+        // Publish bboxes
+        yolo_msgs::msg::BoundingBoxes boundingboxes_msg;
+        boundingboxes_msg.bounding_boxes = boundingboxes;
+        pub_boundingboxes->publish(boundingboxes_msg);
+
         // draw boundingboxes
         for (auto &bbox : boundingboxes)
         {
@@ -81,6 +88,7 @@ namespace using_service_v4l2camera
     {
         client_yolox = this->create_client<yolo_msgs::srv::DetectObject>("detect_object");
         sub_image = this->create_subscription<sensor_msgs::msg::Image>("image_raw", 10, std::bind(&using_service::callback_image, this, _1));
+        pub_boundingboxes = this->create_publisher<yolo_msgs::msg::BoundingBoxes>("boundingboxes", 10);
     }
 }
 
