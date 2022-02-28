@@ -269,7 +269,7 @@ namespace yolox_cpp{
                 for (size_t w = 0; w < img_w; w++) 
                 {
                     blob[c * img_w * img_h + h * img_w + w] =
-                        (((float)img.at<cv::Vec3b>(h, w)[c]) / 255.0f - this->mean_[c]) / this->std_[c];
+                        (float)img.at<cv::Vec3b>(h, w)[c]; // / 255.0f - this->mean_[c]) / this->std_[c];
                 }
             }
         }
@@ -290,6 +290,7 @@ namespace yolox_cpp{
         nms_sorted_bboxes(proposals, picked, this->nms_thresh_);
 
         int count = picked.size();
+        // std::cout << "num of boxes: " << count << std::endl;
 
         objects.resize(count);
         for (int i = 0; i < count; i++)

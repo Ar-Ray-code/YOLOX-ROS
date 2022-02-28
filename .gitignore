@@ -6,3 +6,4 @@ YOLOX_outputs/
 *.onnx
 *.trt
 *.engine
+.vscode

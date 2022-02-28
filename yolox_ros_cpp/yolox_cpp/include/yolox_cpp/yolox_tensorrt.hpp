@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <fstream>
 #include <opencv2/opencv.hpp>
 
 #include "cuda_runtime_api.h"

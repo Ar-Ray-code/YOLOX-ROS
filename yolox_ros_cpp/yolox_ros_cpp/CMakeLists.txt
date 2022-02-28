@@ -24,7 +24,8 @@ find_package(sensor_msgs REQUIRED)
 find_package(cv_bridge REQUIRED)
 find_package(image_transport REQUIRED)
 find_package(OpenCV REQUIRED)
-find_package(bboxes_ex_msgs REQUIRED)
+find_package(bboxes_ex_msgs QUIET)
+find_package(yolo_msgs REQUIRED)
 find_package(yolox_cpp)
 
 if(NOT yolox_cpp_FOUND)
@@ -57,6 +58,7 @@ ament_target_dependencies(yolox_ros_cpp
   sensor_msgs
   OpenCV
   yolox_cpp
+  yolo_msgs
   bboxes_ex_msgs
   )
 
@@ -65,6 +67,77 @@ install(TARGETS yolox_ros_cpp
   EXPORT export_${PROJECT_NAME}
   DESTINATION lib
 )
+
+# srv ================================================================
+add_library(yolox_ros_cpp_srv SHARED
+  src/yolox_ros_cpp_srv.cpp
+)
+rclcpp_components_register_nodes(yolox_ros_cpp_srv
+ "yolox_ros_cpp_srv::YoloXSrv")
+target_compile_definitions(yolox_ros_cpp_srv
+  PRIVATE "MY_LIBRARY_BUILDING_LIBRARY"
+)
+target_compile_options(yolox_ros_cpp_srv PUBLIC -Wall)
+
+target_include_directories(yolox_ros_cpp_srv PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>
+)
+
+ament_target_dependencies(yolox_ros_cpp_srv
+  rclcpp
+  rclcpp_components
+  cv_bridge
+  image_transport
+  builtin_interfaces
+  std_msgs
+  sensor_msgs
+  OpenCV
+  yolox_cpp
+  yolo_msgs
+  )
+
+
+install(TARGETS yolox_ros_cpp_srv
+  EXPORT export_${PROJECT_NAME}
+  DESTINATION lib
+)
+
+# using srv ================================================================
+add_library(using_service_v4l2camera SHARED
+  src/using_service_v4l2camera.cpp
+)
+rclcpp_components_register_nodes(using_service_v4l2camera
+ "using_service_v4l2camera::using_service")
+target_compile_definitions(using_service_v4l2camera
+  PRIVATE "MY_LIBRARY_BUILDING_LIBRARY"
+)
+target_compile_options(using_service_v4l2camera PUBLIC -Wall)
+
+target_include_directories(using_service_v4l2camera PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>
+)
+
+ament_target_dependencies(using_service_v4l2camera
+  rclcpp
+  rclcpp_components
+  cv_bridge
+  image_transport
+  builtin_interfaces
+  std_msgs
+  sensor_msgs
+  OpenCV
+  yolo_msgs
+  )
+
+
+install(TARGETS using_service_v4l2camera
+  EXPORT export_${PROJECT_NAME}
+  DESTINATION lib
+)
+
+# ================================================================
 
 install(DIRECTORY
   launch
