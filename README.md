@@ -16,6 +16,12 @@
 | TensorRT (CUDA) |  ✅       |              |
 | OpenVINO        |  ✅       |              |
 
+### Raspberry Pi4 🍓 + NCS2 + YOLOX-ROS
+
+Good news for studets❗🍓
+
+Check [GitHub Wiki](https://github.com/Ar-Ray-code/YOLOX-ROS/wiki/YOLOX-ROS---Raspbian-(NCS2)) to try YOLOX-ROS.
+
 ## Installation & Demo
 <details>
 <summary>Python (PyTorch)</summary>
