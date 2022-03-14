@@ -15,8 +15,9 @@
 
 #include "yolo_msgs/srv/detect_object.hpp"
 #include "yolo_msgs/msg/bounding_box.hpp"
-// #include "yolo_msgs/msg/bounding_boxes.hpp"
+#include "yolo_msgs/msg/bounding_boxes.hpp"
 
+#include "yolox_ros_cpp/bboxes_from_yaml.hpp"
 
 #include "yolox_cpp/yolox.hpp"
 #include "yolox_cpp/utils.hpp"
@@ -59,8 +60,12 @@ namespace yolox_ros_cpp_srv{
         // yolo_msgs::msg::BoundingBoxes objects_to_bboxes(cv::Mat frame, std::vector<yolox_cpp::Object> objects, std_msgs::msg::Header header);
         std::vector<yolo_msgs::msg::BoundingBox> objects_to_bboxes(cv::Mat frame, std::vector<yolox_cpp::Object> objects, std_msgs::msg::Header header);
 
+        void draw_objects(cv::Mat bgr, const std::vector<yolox_cpp::Object> &objects);
+
         std::string WINDOW_NAME_ = "YOLOX";
         bool imshow_ = true;
+        bboxes_from_yaml bboxes;
+        std::string yaml_file_name_;
     };
 }
 #endif
