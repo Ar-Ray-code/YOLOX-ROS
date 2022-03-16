@@ -8,7 +8,6 @@ from launch_ros.actions import ComposableNodeContainer
 from launch_ros.descriptions import ComposableNode
 
 def generate_launch_description():
-    
     launch_args = [
         DeclareLaunchArgument(
             "video_device",
@@ -66,7 +65,6 @@ def generate_launch_description():
             description="topic name for publishing bounding box message."
         ),
     ]
-
     container = ComposableNodeContainer(
                 name='yolox_container',
                 namespace='',
@@ -107,10 +105,7 @@ def generate_launch_description():
         package="rqt_graph", executable="rqt_graph",
     )
 
-    return launch.LaunchDescription(
-        launch_args + 
-        [
-            container,
-            rqt_graph,
-        ]
-    )
+    return launch.LaunchDescription([
+        container,
+        # rqt_graph,
+    ])
