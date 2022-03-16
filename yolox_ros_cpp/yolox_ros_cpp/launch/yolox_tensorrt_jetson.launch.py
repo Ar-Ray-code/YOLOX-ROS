@@ -43,7 +43,7 @@ def generate_launch_description():
         ),
         DeclareLaunchArgument(
             "imshow_isshow",
-            default_value=False,
+            default_value="false",
             description=""
         ),
         DeclareLaunchArgument(
@@ -84,7 +84,7 @@ def generate_launch_description():
                         parameters=[{
                             "model_path": LaunchConfiguration("model_path"),
                             "model_type": "tensorrt",
-                            "device": "'0'",
+                            "device": "0",
                             "image_size/height": LaunchConfiguration("image_size/height"),
                             "image_size/width": LaunchConfiguration("image_size/width"),
                             "conf": LaunchConfiguration("conf"),

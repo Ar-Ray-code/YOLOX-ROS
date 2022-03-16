@@ -7,8 +7,8 @@ services:
         volumes:
             - $HOME/ros2_ws:/root/ros2_ws
             - /tmp/argus_socket:/tmp/argus_socket # for CSI-camera
-        # devices:
-        #     - "/dev/video2:/dev/video0"
+        devices:
+            - "/dev/video2:/dev/video0"
         working_dir: /root/ros2_ws
         tty: true
         runtime: nvidia
