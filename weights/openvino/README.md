@@ -1,8 +1,7 @@
-## YOLOX_Nano's weights file (OpenVINO)
+## YOLOX_Tiny's weights file (OpenVINO)
 
-- yolox_nano.bin
-- yolox_nano.mapping
-- yolox_nano.xml
+- yolox_tiny.bin ([Download bin])(https://github.com/Ar-Ray-code/YOLOX-ROS/releases/download/v0.2.0/yolox_tiny.bin)
+- yolox_tiny.xml ([Download xml])(https://github.com/Ar-Ray-code/YOLOX-ROS/releases/download/v0.2.0/yolox_tiny.xml)
 
 ## How to create and Install OpenVINO's weights
 
