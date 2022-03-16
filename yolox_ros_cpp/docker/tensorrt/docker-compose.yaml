@@ -2,7 +2,8 @@ version: '3.4'
 services:
     yolox_ros:
         container_name: yolox_tensorrt
-        image: fateshelled/tensorrt_yolox_ros:latest
+        # build: .
+        image: fateshelled/tensorrt_yolox_ros:21.09-py3
         network_mode: host
         runtime: nvidia
         environment:

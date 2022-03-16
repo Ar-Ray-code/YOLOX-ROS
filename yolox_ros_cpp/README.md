@@ -4,12 +4,15 @@
 
 ### Requirements
 - ROS2 Foxy
+- OpenCV 4.x
 - OpenVINO *
-- TensorRT *
+- TensorRT 8.x *
 
 ※ Either one of OpenVINO or TensorRT is required.
 
-※ Jetson + TensorRT support.(Jetpack 4.6 r32.6.1)
+※ YOLOX is not required.
+
+※ Jetson + TensorRT docker support.(Jetpack 4.6 r32.6.1)
 
 
 ### Execute with docker
@@ -22,9 +25,10 @@ docker pull fateshelled/openvino_yolox_ros:latest
 xhost +
 docker run --rm -it \
            --network host \
-           -v $HOME/ros2_ws:/root/ros2_ws \
+           --user openvino \
+           -v $HOME/ros2_ws:/home/openvino/ros2_ws \
            -v /tmp/.X11-unix:/tmp/.X11-unix \
-           -w /root/ros2_ws \
+           -w /home/openvino/ros2_ws \
            -e DISPLAY=$DISPLAY \
            --device /dev/video0:/dev/video0 \
            fateshelled/openvino_yolox_ros /bin/bash
@@ -54,7 +58,6 @@ docker run --rm -it \
 docker pull fateshelled/jetson_yolox_ros:foxy-ros-base-l4t-r32.6.1
 
 # This image cannot display GUI.
-# Use WebCam
 docker run --rm -it \
            --network host \
            --runtime nvidia \
@@ -62,20 +65,12 @@ docker run --rm -it \
            -w /root/ros2_ws \
            --device /dev/video0:/dev/video0 \
            fateshelled/jetson_yolox_ros /bin/bash
-# Use CSI-Camera
-docker run --rm -it \
-           --network host \
-           --runtime nvidia \
-           -v $HOME/ros2_ws:/root/ros2_ws \
-           -v /tmp/argus_socket:/tmp/argus_socket \
-           -w /root/ros2_ws \
-           fateshelled/jetson_yolox_ros /bin/bash
 ```
 
 
 ### Clone YOLOX-ROS
 ```bash
-cd /root/ros2_ws/src
+cd ~/ros2_ws/src
 git clone https://github.com/fateshelled/YOLOX-ROS -b dev_cpp
 ```
 
@@ -83,7 +78,7 @@ git clone https://github.com/fateshelled/YOLOX-ROS -b dev_cpp
 ### Model Convert
 #### OpenVINO
 ```bash
-cd /root/ros2_ws
+cd ~/ros2_ws
 
 # Download onnx file and Convert to IR format.
 ./src/YOLOX-ROS/weights/openvino/install.bash yolox_nano
@@ -91,35 +86,35 @@ cd /root/ros2_ws
 
 #### TensorRT
 ```bash
-cd /root/ros2_ws
+cd ~/ros2_ws
 
-# Download onnx file and Convert to TensorRT engine via torch2trt. 
-# 1st arg is model name. 2nd is workspace size. 3rd is trtexec flag.
-./src/YOLOX-ROS/weights/tensorrt/convert.bash yolox_nano 16 0
-
-# Download onnx file and Convert to TensorRT engine via trtexec.
-./src/YOLOX-ROS/weights/tensorrt/convert.bash yolox_nano 16 1
-
-# For Jetson Nano.
-./src/YOLOX-ROS/weights/tensorrt/convert.bash yolox_nano 16 0
+# Download onnx model and Convert to TensorRT engine via trtexec.
+# 1st arg is model name. 2nd is workspace size. 3rd is trtexec flag(Optional).
+./src/YOLOX-ROS/weights/tensorrt/convert.bash yolox_nano 16
 ```
 
-### DEMO
-
-#### build
+### build packages
 ```bash
 # # If use openvino
 # source /opt/intel/openvino_2021/bin/setupvars.sh
 
-cd /root/ros2_ws
+cd ~/ros2_ws
 colcon build --symlink-install
 source ./install/setup.bash
 ```
+
+### Run
 
 #### OpenVINO
 ```bash
 # run YOLOX_nano
 ros2 launch yolox_ros_cpp yolox_openvino.launch.py
+
+# run other model
+ros2 launch yolox_ros_cpp yolox_openvino.launch.py \
+    model_path:=install/yolox_ros_cpp/share/yolox_ros_cpp/weights/tensorrt/yolox_s.trt \
+    image_size/height:=640 image_size/width:=640
+
 ```
 
 #### TensorRT
@@ -139,7 +134,7 @@ ros2 launch yolox_ros_cpp yolox_tensorrt_jetson.launch.py
 
 ### Parameter
 #### OpenVINO example
-- `model_path`: ~/ros2_ws/src/YOLOX-ROS/weights/openvino/yolox_nano.xml
+- `model_path`: ./install/yolox_ros_cpp/share/yolox_ros_cpp/weights/openvino/yolox_nano.xml
 - `device`: CPU
 - `image_size/width`: 416
 - `image_size/height`: 416
@@ -152,7 +147,7 @@ ros2 launch yolox_ros_cpp yolox_tensorrt_jetson.launch.py
 
 
 #### TensorRT example.
-- `model_path`: ~/ros2_ws/src/YOLOX-ROS/weights/tensorrt/YOLOX_outputs/yolox_nano.engine
+- `model_path`: ./install/yolox_ros_cpp/share/yolox_ros_cpp/weights/tensorrt/yolox_nano.trt
 - `device`: "0"
 - `image_size/width`: 416
 - `image_size/height`: 416

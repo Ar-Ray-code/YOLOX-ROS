@@ -2,6 +2,7 @@ version: '3.4'
 services:
     yolox_ros:
         container_name: yolox_openvino
+        build: .
         image: fateshelled/openvino_yolox_ros:latest
         network_mode: host
         environment:

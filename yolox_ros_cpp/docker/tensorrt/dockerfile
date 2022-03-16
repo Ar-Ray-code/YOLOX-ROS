@@ -1,4 +1,5 @@
-FROM nvcr.io/nvidia/tensorrt:21.09-py3
+ARG BASE_TAG=21.09-py3
+FROM nvcr.io/nvidia/tensorrt:${BASE_TAG}
 
 ENV DEBIAN_FRONTEND=noninteractive
 

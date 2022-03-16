@@ -1,4 +1,4 @@
-FROM openvino/ubuntu20_dev:latest
+FROM openvino/ubuntu20_dev:2021.4.1_20210416
 
 ENV DEBIAN_FRONTEND=noninteractive
 

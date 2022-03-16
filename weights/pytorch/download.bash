@@ -12,11 +12,11 @@ SCRIPT_DIR=$(cd $(dirname $0); pwd)
 
 echo $MODEL
 if [ "$MODEL" = "all" ]; then
-    wget https://github.com/Megvii-BaseDetection/YOLOX/releases/download/0.1.1rc0/yolox_tiny.pth -P $SCRIPT_DIR
-    wget https://github.com/Megvii-BaseDetection/YOLOX/releases/download/0.1.1rc0/yolox_nano.pth -P $SCRIPT_DIR
-    wget https://github.com/Megvii-BaseDetection/YOLOX/releases/download/0.1.1rc0/yolox_s.pth -P $SCRIPT_DIR
-    wget https://github.com/Megvii-BaseDetection/YOLOX/releases/download/0.1.1rc0/yolox_m.pth -P $SCRIPT_DIR
-    wget https://github.com/Megvii-BaseDetection/YOLOX/releases/download/0.1.1rc0/yolox_l.pth -P $SCRIPT_DIR
+    wget https://github.com/Megvii-BaseDetection/YOLOX/releases/download/0.1.0/yolox_tiny.pth -P $SCRIPT_DIR
+    wget https://github.com/Megvii-BaseDetection/YOLOX/releases/download/0.1.0/yolox_nano.pth -P $SCRIPT_DIR
+    wget https://github.com/Megvii-BaseDetection/YOLOX/releases/download/0.1.0/yolox_s.pth -P $SCRIPT_DIR
+    wget https://github.com/Megvii-BaseDetection/YOLOX/releases/download/0.1.0/yolox_m.pth -P $SCRIPT_DIR
+    wget https://github.com/Megvii-BaseDetection/YOLOX/releases/download/0.1.0/yolox_l.pth -P $SCRIPT_DIR
 else
-    wget https://github.com/Megvii-BaseDetection/YOLOX/releases/download/0.1.1rc0/$MODEL.pth -P $SCRIPT_DIR
+    wget https://github.com/Megvii-BaseDetection/YOLOX/releases/download/0.1.0/$MODEL.pth -P $SCRIPT_DIR
 fi

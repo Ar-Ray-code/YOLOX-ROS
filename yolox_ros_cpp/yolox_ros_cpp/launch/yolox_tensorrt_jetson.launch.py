@@ -17,7 +17,8 @@ def generate_launch_description():
         ),
         DeclareLaunchArgument(
             "model_path",
-            default_value="./install/yolox_ros_cpp/share/yolox_ros_cpp/weights/tensorrt/yolox_nano.engine",
+            # default_value="./install/yolox_ros_cpp/share/yolox_ros_cpp/weights/tensorrt/yolox_nano.engine",
+            default_value="./install/yolox_ros_cpp/share/yolox_ros_cpp/weights/tensorrt/yolox_nano.trt",
             description="yolox model path."
         ),
         DeclareLaunchArgument(

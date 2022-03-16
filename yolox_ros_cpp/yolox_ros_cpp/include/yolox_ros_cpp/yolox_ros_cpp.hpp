@@ -26,7 +26,7 @@ namespace yolox_ros_cpp{
 
     private:
         void initializeParameter();
-        std::unique_ptr<yolox_cpp::AbsYoloX> yolox_;
+        std::unique_ptr<yolox_cpp::AbcYoloX> yolox_;
         std::string model_path_;
         std::string model_type_;
         std::string device_;
