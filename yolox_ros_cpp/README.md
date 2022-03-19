@@ -25,10 +25,25 @@ docker pull fateshelled/openvino_yolox_ros:latest
 xhost +
 docker run --rm -it \
            --network host \
+           --privileged \
            --user openvino \
            -v $HOME/ros2_ws:/home/openvino/ros2_ws \
            -v /tmp/.X11-unix:/tmp/.X11-unix \
            -w /home/openvino/ros2_ws \
+           -e DISPLAY=$DISPLAY \
+           --device /dev/video0:/dev/video0 \
+           fateshelled/openvino_yolox_ros /bin/bash
+
+# If use NCS2, mount "/dev/bus/usb".
+xhost +
+docker run --rm -it \
+           --network host \
+           --privileged \
+           --user openvino \
+           -v $HOME/ros2_ws:/home/openvino/ros2_ws \
+           -v /tmp/.X11-unix:/tmp/.X11-unix \
+           -w /home/openvino/ros2_ws \
+           -v /dev/bus/usb:/dev/bus/usb
            -e DISPLAY=$DISPLAY \
            --device /dev/video0:/dev/video0 \
            fateshelled/openvino_yolox_ros /bin/bash
@@ -44,6 +59,7 @@ xhost +
 docker run --rm -it \
            --network host \
            --runtime nvidia \
+           --privileged \
            -v $HOME/ros2_ws:/root/ros2_ws \
            -v /tmp/.X11-unix:/tmp/.X11-unix \
            -w /root/ros2_ws \
@@ -88,8 +104,8 @@ cd ~/ros2_ws
 ```bash
 cd ~/ros2_ws
 
-# Download onnx model and Convert to TensorRT engine via trtexec.
-# 1st arg is model name. 2nd is workspace size. 3rd is trtexec flag(Optional).
+# Download onnx model and Convert to TensorRT engine.
+# 1st arg is model name. 2nd is workspace size.
 ./src/YOLOX-ROS/weights/tensorrt/convert.bash yolox_nano 16
 ```
 
@@ -114,6 +130,9 @@ ros2 launch yolox_ros_cpp yolox_openvino.launch.py
 ros2 launch yolox_ros_cpp yolox_openvino.launch.py \
     model_path:=install/yolox_ros_cpp/share/yolox_ros_cpp/weights/tensorrt/yolox_s.trt \
     image_size/height:=640 image_size/width:=640
+
+# run YOLOX-tiny with NCS2
+ros2 launch yolox_ros_cpp yolox_openvino_ncs2.launch.py
 
 ```
 

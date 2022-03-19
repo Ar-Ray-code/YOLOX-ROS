@@ -17,7 +17,6 @@ def generate_launch_description():
         ),
         DeclareLaunchArgument(
             "model_path",
-            # default_value="./install/yolox_ros_cpp/share/yolox_ros_cpp/weights/tensorrt/yolox_nano.engine",
             default_value="./install/yolox_ros_cpp/share/yolox_ros_cpp/weights/tensorrt/yolox_nano.trt",
             description="yolox model path."
         ),
@@ -104,14 +103,14 @@ def generate_launch_description():
                 output='screen',
         )
 
-    rqt = [
-        launch_ros.actions.Node(
+    rqt = launch_ros.actions.Node(
             package="rqt_graph", executable="rqt_graph",
-        )
-    ]
+    )
 
     return launch.LaunchDescription(
         launch_args + 
-        [container] + 
-        rqt
+        [
+            container,
+            # rqt
+        ]
     )

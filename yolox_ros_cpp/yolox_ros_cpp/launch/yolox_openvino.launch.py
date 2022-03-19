@@ -22,7 +22,7 @@ def generate_launch_description():
         DeclareLaunchArgument(
             "device",
             default_value="CPU",
-            description="model device. CPU, GPU, etc..."
+            description="model device. CPU, GPU, MYRIAD, etc..."
         ),
         DeclareLaunchArgument(
             "image_size/height",
@@ -101,11 +101,14 @@ def generate_launch_description():
                 output='screen',
         )
 
-    rqt_graph = launch_ros.actions.Node(
+    rqt = launch_ros.actions.Node(
         package="rqt_graph", executable="rqt_graph",
     )
 
-    return launch.LaunchDescription([
-        container,
-        # rqt_graph,
-    ])
+    return launch.LaunchDescription(
+        launch_args +
+        [
+            container,
+            # rqt_graph,
+        ]
+    )

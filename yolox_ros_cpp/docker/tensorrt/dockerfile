@@ -20,7 +20,8 @@ RUN python3 -m pip install torch==1.9.1+cu111 \
 WORKDIR /workspace
 RUN git clone https://github.com/NVIDIA-AI-IOT/torch2trt && \
     cd torch2trt && \
-    python3 setup.py install    
+    python3 -m pip install packaging && \
+    python3 setup.py install
 
 RUN apt update && \
     apt install -y curl gnupg2 lsb-release && \
@@ -34,7 +35,6 @@ RUN apt update && \
     apt -y clean && \
     rm -rf /var/lib/apt/lists/*
 
-RUN python3 -m pip install cmake
 WORKDIR /workspace
 ENV YOLOX_VERSION=0.2.0
 RUN git clone https://github.com/Megvii-BaseDetection/YOLOX -b $YOLOX_VERSION && \
