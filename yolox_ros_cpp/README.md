@@ -12,14 +12,14 @@
 
 ※ YOLOX is not required.
 
-※ Jetson + TensorRT docker support.(Jetpack 4.6 r32.6.1)
+※ Jetson + TensorRT docker support (Jetpack 4.6 r32.6.1). Tested with Jetson Nano 4GB.
 
 
 ### Execute with docker
 
 #### OpenVINO
 ```bash
-# base image is `openvino/ubuntu20_dev:2021.4.1_20210416`
+# base image is "openvino/ubuntu20_dev:2021.4.1_20210416"
 docker pull fateshelled/openvino_yolox_ros:latest
 
 xhost +
@@ -32,7 +32,7 @@ docker run --rm -it \
            -w /home/openvino/ros2_ws \
            -e DISPLAY=$DISPLAY \
            --device /dev/video0:/dev/video0 \
-           fateshelled/openvino_yolox_ros /bin/bash
+           fateshelled/openvino_yolox_ros:latest /bin/bash
 
 # If use NCS2, mount "/dev/bus/usb".
 xhost +
@@ -46,13 +46,14 @@ docker run --rm -it \
            -v /dev/bus/usb:/dev/bus/usb
            -e DISPLAY=$DISPLAY \
            --device /dev/video0:/dev/video0 \
-           fateshelled/openvino_yolox_ros /bin/bash
+           fateshelled/openvino_yolox_ros:latest \
+           /bin/bash
 
 ```
 
 #### TensorRT
 ```bash
-# base image is `nvcr.io/nvidia/tensorrt:21.09-py3`
+# base image is "nvcr.io/nvidia/pytorch:21.09-py3"
 docker pull fateshelled/tensorrt_yolox_ros:latest
 
 xhost +
@@ -65,12 +66,13 @@ docker run --rm -it \
            -w /root/ros2_ws \
            -e DISPLAY=$DISPLAY \
            --device /dev/video0:/dev/video0 \
-           fateshelled/tensorrt_yolox_ros /bin/bash
+           fateshelled/tensorrt_yolox_ros:latest \
+           /bin/bash
 ```
 
 #### Jetson + TensorRT
 ```bash
-# base image is `dustynv/ros:foxy-ros-base-l4t-r32.6.1`
+# base image is "dustynv/ros:foxy-ros-base-l4t-r32.6.1"
 docker pull fateshelled/jetson_yolox_ros:foxy-ros-base-l4t-r32.6.1
 
 # This image cannot display GUI.
@@ -80,14 +82,15 @@ docker run --rm -it \
            -v $HOME/ros2_ws:/root/ros2_ws \
            -w /root/ros2_ws \
            --device /dev/video0:/dev/video0 \
-           fateshelled/jetson_yolox_ros /bin/bash
+           fateshelled/jetson_yolox_ros:foxy-ros-base-l4t-r32.6.1 \
+           /bin/bash
 ```
 
 
 ### Clone YOLOX-ROS
 ```bash
 cd ~/ros2_ws/src
-git clone https://github.com/fateshelled/YOLOX-ROS -b dev_cpp
+git clone --recursive https://github.com/fateshelled/YOLOX-ROS -b dev_cpp
 ```
 
 
@@ -96,7 +99,7 @@ git clone https://github.com/fateshelled/YOLOX-ROS -b dev_cpp
 ```bash
 cd ~/ros2_ws
 
-# Download onnx file and Convert to IR format.
+# Download onnx file and convert to IR format.
 ./src/YOLOX-ROS/weights/openvino/install.bash yolox_nano
 ```
 
@@ -104,7 +107,7 @@ cd ~/ros2_ws
 ```bash
 cd ~/ros2_ws
 
-# Download onnx model and Convert to TensorRT engine.
+# Download onnx model and convert to TensorRT engine.
 # 1st arg is model name. 2nd is workspace size.
 ./src/YOLOX-ROS/weights/tensorrt/convert.bash yolox_nano 16
 ```
@@ -144,7 +147,7 @@ ros2 launch yolox_ros_cpp yolox_tensorrt.launch.py
 
 #### Jetson + TensorRT
 Jetson docker container cannot display GUI.
-If you want to show image with bounding box drawn, subscribe from host jetson installed ROS2 Eloquent or Dashing.
+If you want to show image with bounding box drawn, subscribe from host jetson or other PC.
 
 ```bash
 # run YOLOX_nano
