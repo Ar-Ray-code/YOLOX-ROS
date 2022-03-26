@@ -14,7 +14,7 @@
 | CUDA            |           | ✅           |
 | CUDA (FP16)     |           | ✅           |
 | TensorRT (CUDA) |  ✅       |              |
-| OpenVINO        |  ✅       |              |
+| OpenVINO        |  ✅       | ✅           |
 
 ### Raspberry Pi4 🍓 + NCS2 + YOLOX-ROS
 
