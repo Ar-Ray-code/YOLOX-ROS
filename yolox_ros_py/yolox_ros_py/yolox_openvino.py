@@ -7,8 +7,6 @@ import rclpy
 
 import argparse
 import logging as log
-import os
-import sys
 
 import cv2
 import numpy as np
@@ -126,7 +124,7 @@ class yolox_ros(Node):
             _, _, h, w = self.net.input_info[self.input_blob].input_data.shape
             mean = (0.485, 0.456, 0.406)
             std = (0.229, 0.224, 0.225)
-            image, ratio = preprocess(origin_img, (h, w), mean, std)
+            image, ratio = preprocess(origin_img, (h, w))#, mean, std)
 
             res = self.exec_net.infer(inputs={self.input_blob: image})
             res = res[self.out_blob]
@@ -136,17 +134,17 @@ class yolox_ros(Node):
 
             boxes = predictions[:, :4]
             scores = predictions[:, 4, None] * predictions[:, 5:]
-            print(scores)
+            # print(scores)
 
             boxes_xyxy = np.ones_like(boxes)
             boxes_xyxy[:, 0] = boxes[:, 0] - boxes[:, 2]/2.
             boxes_xyxy[:, 1] = boxes[:, 1] - boxes[:, 3]/2.
             boxes_xyxy[:, 2] = boxes[:, 0] + boxes[:, 2]/2.
             boxes_xyxy[:, 3] = boxes[:, 1] + boxes[:, 3]/2.
-            boxes_xyxy /= ratio
+            # boxes_xyxy /= ratio
             dets = multiclass_nms(boxes_xyxy, scores, nms_thr=0.45, score_thr=0.1)
 
-            print(dets)
+            # print(dets)
             if dets is not None:
                 final_boxes = dets[:, :4]
                 final_scores, final_cls_inds = dets[:, 4], dets[:, 5]
@@ -162,13 +160,13 @@ class yolox_ros(Node):
             
             try:
                 bboxes = self.yolox2bboxes_msgs(dets[:, :4], final_scores, final_cls_inds, COCO_CLASSES, msg.header)
-                self.get_logger().info(f'bboxes: {bboxes}')
+                # self.get_logger().info(f'bboxes: {bboxes}')
                 if (self.imshow_isshow):
                     cv2.imshow("YOLOX",origin_img)
                     cv2.waitKey(1)
                 
             except:
-                self.get_logger().info('No object detected')
+                # self.get_logger().info('No object detected')
                 if (self.imshow_isshow):
                     cv2.imshow("YOLOX",origin_img)
                     cv2.waitKey(1)

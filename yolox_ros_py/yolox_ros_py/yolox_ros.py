@@ -136,7 +136,9 @@ class yolox_ros(Node):
 
         self.declare_parameter('imshow_isshow',True)
 
-        self.declare_parameter('yolo_type','yolox-s')
+        # self.declare_parameter('yolo_type','yolox-s')
+        self.declare_parameter('yolox_exp_py', '')
+
         self.declare_parameter('fuse',False)
         self.declare_parameter('trt', False)
         self.declare_parameter('fp16', False)
@@ -152,11 +154,14 @@ class yolox_ros(Node):
         self.declare_parameter('resize', 640)
         self.declare_parameter('image_size/width', 640)
         self.declare_parameter('image_size/height', 480)
+        
 
         # =============================================================
         self.imshow_isshow = self.get_parameter('imshow_isshow').value
 
-        yolo_type = self.get_parameter('yolo_type').value
+        # yolo_type = self.get_parameter('yolo_type').value
+        exp_py = self.get_parameter('yolox_exp_py').value
+
         fuse = self.get_parameter('fuse').value
         trt = self.get_parameter('trt').value
         fp16 = self.get_parameter('fp16').value
@@ -175,7 +180,9 @@ class yolox_ros(Node):
 
         cudnn.benchmark = True
 
-        exp = get_exp(None, yolo_type)
+        # exp = get_exp(None, "yolox-s")
+        exp = get_exp(exp_py, None)
+
 
         BASE_PATH = os.getcwd()
         file_name = os.path.join(BASE_PATH, "YOLOX_PATH/")
