@@ -5,7 +5,7 @@ namespace yolox_cpp{
     YoloXTensorRT::YoloXTensorRT(file_name_t path_to_engine, int device,
                                  float nms_th, float conf_th,
                                  int input_width, int input_height)
-    :AbsYoloX(nms_th, conf_th, input_width, input_height),
+    :AbcYoloX(nms_th, conf_th, input_width, input_height),
      DEVICE_(device)
     {
         cudaSetDevice(this->DEVICE_);
@@ -56,8 +56,11 @@ namespace yolox_cpp{
         assert(this->engine_->getBindingDataType(this->inputIndex_) == nvinfer1::DataType::kFLOAT);
         assert(this->engine_->getBindingDataType(this->outputIndex_) == nvinfer1::DataType::kFLOAT);
     }
-    YoloXTensorRT::~YoloXTensorRT(){
-    }
+    // YoloXTensorRT::~YoloXTensorRT(){
+    //     delete runtime_;
+    //     delete engine_;
+    //     delete context_;
+    // }
     std::vector<Object> YoloXTensorRT::inference(cv::Mat frame){
         this->pr_img_ = static_resize(frame);
 

@@ -2,14 +2,69 @@ import os
 import sys
 import launch
 import launch_ros.actions
-from ament_index_python.packages import get_package_share_directory
+from launch.actions import DeclareLaunchArgument
+from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import ComposableNodeContainer
 from launch_ros.descriptions import ComposableNode
 
 def generate_launch_description():
-    yolox_ros_share_dir = get_package_share_directory('yolox_ros_cpp')
-    yolox_param_yaml = os.path.join(yolox_ros_share_dir, "param", "tiny_openvino.yaml")
-
+    launch_args = [
+        DeclareLaunchArgument(
+            "video_device",
+            default_value="/dev/video0",
+            description="input video source"
+        ),
+        DeclareLaunchArgument(
+            "model_path",
+            default_value="./install/yolox_ros_cpp/share/yolox_ros_cpp/weights/openvino/yolox_nano.xml",
+            description="yolox model path."
+        ),
+        DeclareLaunchArgument(
+            "device",
+            default_value="CPU",
+            description="model device. CPU, GPU, MYRIAD, etc..."
+        ),
+        DeclareLaunchArgument(
+            "image_size/height",
+            default_value="416",
+            description="model input image height."
+        ),
+        DeclareLaunchArgument(
+            "image_size/width",
+            default_value="416",
+            description="model input image width."
+        ),
+        DeclareLaunchArgument(
+            "conf",
+            default_value="0.30",
+            description="yolox confidence threshold."
+        ),
+        DeclareLaunchArgument(
+            "nms",
+            default_value="0.45",
+            description="yolox nms threshold"
+        ),
+        DeclareLaunchArgument(
+            "imshow_isshow",
+            default_value="true",
+            description=""
+        ),
+        DeclareLaunchArgument(
+            "src_image_topic_name",
+            default_value="/image_raw",
+            description="topic name for source image"
+        ),
+        DeclareLaunchArgument(
+            "publish_image_topic_name",
+            default_value="/yolox/image_raw",
+            description="topic name for publishing image with bounding box drawn"
+        ),
+        DeclareLaunchArgument(
+            "publish_boundingbox_topic_name",
+            default_value="/yolox/bounding_boxes",
+            description="topic name for publishing bounding box message."
+        ),
+    ]
     container = ComposableNodeContainer(
                 name='yolox_container',
                 namespace='',
@@ -21,23 +76,39 @@ def generate_launch_description():
                         plugin='v4l2_camera::V4L2Camera',
                         name='v4l2_camera',
                         parameters=[{
+                            "video_device": LaunchConfiguration("video_device"),
                             "image_size": [640,480]
                         }]),
                     ComposableNode(
                         package='yolox_ros_cpp',
                         plugin='yolox_ros_cpp::YoloXNode',
                         name='yolox_ros_cpp',
-                        parameters=[yolox_param_yaml],
-                        )
+                        parameters=[{
+                            "model_path": LaunchConfiguration("model_path"),
+                            "model_type": "openvino",
+                            "device": LaunchConfiguration("device"),
+                            "image_size/height": LaunchConfiguration("image_size/height"),
+                            "image_size/width": LaunchConfiguration("image_size/width"),
+                            "conf": LaunchConfiguration("conf"),
+                            "nms": LaunchConfiguration("nms"),
+                            "imshow_isshow": LaunchConfiguration("imshow_isshow"),
+                            "src_image_topic_name": LaunchConfiguration("src_image_topic_name"),
+                            "publish_image_topic_name": LaunchConfiguration("publish_image_topic_name"),
+                            "publish_boundingbox_topic_name": LaunchConfiguration("publish_boundingbox_topic_name"),
+                        }],
+                        ),
                 ],
                 output='screen',
         )
 
-    rqt_graph = launch_ros.actions.Node(
+    rqt = launch_ros.actions.Node(
         package="rqt_graph", executable="rqt_graph",
     )
 
-    return launch.LaunchDescription([
-        container,
-#         rqt_graph,
-    ])
+    return launch.LaunchDescription(
+        launch_args +
+        [
+            container,
+            # rqt_graph,
+        ]
+    )

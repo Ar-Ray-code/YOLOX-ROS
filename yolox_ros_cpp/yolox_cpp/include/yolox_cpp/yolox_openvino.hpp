@@ -13,7 +13,7 @@
 #include "coco_names.hpp"
 
 namespace yolox_cpp{
-    class YoloXOpenVINO: public AbsYoloX{
+    class YoloXOpenVINO: public AbcYoloX{
         public:
             YoloXOpenVINO(file_name_t path_to_model, std::string device_name, 
                           float nms_th=0.45, float conf_th=0.3,

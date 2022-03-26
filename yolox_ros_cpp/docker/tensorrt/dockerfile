@@ -1,4 +1,5 @@
-FROM nvcr.io/nvidia/tensorrt:21.09-py3
+ARG BASE_TAG=21.09-py3
+FROM nvcr.io/nvidia/pytorch:${BASE_TAG}
 
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -9,37 +10,25 @@ RUN apt update && apt install locales && \
     rm -rf /var/lib/apt/lists/*
 ENV LANG=en_US.UTF-8
 
-# pytorch
-RUN python3 -m pip install torch==1.9.1+cu111 \
-                           torchvision==0.10.1+cu111 \
-                           torchaudio==0.9.1 \
-                           -f https://download.pytorch.org/whl/torch_stable.html
-
-# torch2trt
-WORKDIR /workspace
-RUN git clone https://github.com/NVIDIA-AI-IOT/torch2trt && \
-    cd torch2trt && \
-    python3 setup.py install    
-
 RUN apt update && \
     apt install -y curl gnupg2 lsb-release && \
     curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key  -o /usr/share/keyrings/ros-archive-keyring.gpg && \
     echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/ros2.list > /dev/null && \
     sed -i -e 's/ubuntu .* main/ubuntu focal main/g' /etc/apt/sources.list.d/ros2.list && \
     apt update && \
-    apt install -y ros-foxy-desktop && \
+    apt install -y ros-foxy-ros-base && \
     apt install -y python3-colcon-common-extensions && \
     apt install -y ros-foxy-v4l2-camera && \
     apt -y clean && \
     rm -rf /var/lib/apt/lists/*
 
-RUN python3 -m pip install cmake
 WORKDIR /workspace
-ENV YOLOX_VERSION=0.1.0
+ENV YOLOX_VERSION=0.2.0
 RUN git clone https://github.com/Megvii-BaseDetection/YOLOX -b $YOLOX_VERSION && \
     cd YOLOX && \
     python3 -m pip install -r requirements.txt && \
-    python3 setup.py install
+    python3 setup.py install && \
+    python3 -m pip cache purge
 
 COPY ./ros_entrypoint.sh /ros_entrypoint.sh
 RUN echo "source /ros_entrypoint.sh" >> /root/.bashrc

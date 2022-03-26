@@ -1,12 +1,12 @@
-FROM openvino/ubuntu20_dev:latest
+FROM openvino/ubuntu20_dev:2021.4.1_20210416
 
 ENV DEBIAN_FRONTEND=noninteractive
 
 USER root
 
-RUN python3 -m pip install -U pip && \
-    python3 -m pip install cmake && \
-    python3 -m pip install -r /opt/intel/openvino/deployment_tools/model_optimizer/requirements.txt
+RUN python3 -m pip install --no-cache-dir -U pip && \
+    python3 -m pip install --no-cache-dir cmake && \
+    python3 -m pip install --no-cache-dir -r /opt/intel/openvino/deployment_tools/model_optimizer/requirements.txt
 
 # Install ROS2
 RUN apt update && \
@@ -15,17 +15,20 @@ RUN apt update && \
     echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/ros2.list > /dev/null && \
     sed -i -e 's/ubuntu .* main/ubuntu focal main/g' /etc/apt/sources.list.d/ros2.list && \
     apt update && \
-    apt install -y ros-foxy-desktop && \
+    apt install -y ros-foxy-ros-base \
+                   ros-foxy-v4l2-camera \
+                   ros-foxy-cv-bridge \
+                   ros-foxy-rqt-graph \
+                   ros-foxy-rqt-image-view && \
     apt install -y python3-colcon-common-extensions && \
-    apt install -y ros-foxy-v4l2-camera && \
     apt -y clean && \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR /workspace
-ENV YOLOX_VERSION=0.1.0
+ENV YOLOX_VERSION=0.2.0
 RUN git clone https://github.com/Megvii-BaseDetection/YOLOX -b $YOLOX_VERSION && \
     cd YOLOX && \
-    python3 -m pip install -r requirements.txt && \
+    python3 -m pip install --no-cache-dir -r requirements.txt && \
     python3 setup.py install
 
 COPY ./ros_entrypoint.sh /ros_entrypoint.sh

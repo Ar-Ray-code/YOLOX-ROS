@@ -21,11 +21,6 @@ def generate_launch_description():
             description="yolox model path."
         ),
         DeclareLaunchArgument(
-            "device",
-            default_value="'0'",
-            description="GPU index. Set in string type. ex '0'"
-        ),
-        DeclareLaunchArgument(
             "image_size/height",
             default_value="416",
             description="model input image height."
@@ -47,7 +42,7 @@ def generate_launch_description():
         ),
         DeclareLaunchArgument(
             "imshow_isshow",
-            default_value="true",
+            default_value="false",
             description=""
         ),
         DeclareLaunchArgument(
@@ -88,7 +83,7 @@ def generate_launch_description():
                         parameters=[{
                             "model_path": LaunchConfiguration("model_path"),
                             "model_type": "tensorrt",
-                            "device": LaunchConfiguration("device"),
+                            "device": "0",
                             "image_size/height": LaunchConfiguration("image_size/height"),
                             "image_size/width": LaunchConfiguration("image_size/width"),
                             "conf": LaunchConfiguration("conf"),
@@ -103,14 +98,6 @@ def generate_launch_description():
                 output='screen',
         )
 
-    rqt = launch_ros.actions.Node(
-            package="rqt_graph", executable="rqt_graph",
-    )
-
     return launch.LaunchDescription(
-        launch_args + 
-        [
-            container,
-            # rqt
-        ]
+        launch_args + [container]
     )

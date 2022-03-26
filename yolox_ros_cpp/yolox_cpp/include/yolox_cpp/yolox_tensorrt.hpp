@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <fstream>
 #include <opencv2/opencv.hpp>
 
 #include "cuda_runtime_api.h"
@@ -30,12 +31,12 @@ namespace yolox_cpp{
         } while (0)
 
 
-    class YoloXTensorRT: public AbsYoloX{
+    class YoloXTensorRT: public AbcYoloX{
         public:
             YoloXTensorRT(file_name_t path_to_engine, int device=0,
                           float nms_th=0.45, float conf_th=0.3,
                           int input_width=416, int input_height=416);
-            ~YoloXTensorRT();
+            // ~YoloXTensorRT();
             std::vector<Object> inference(cv::Mat frame) override;
 
         private:

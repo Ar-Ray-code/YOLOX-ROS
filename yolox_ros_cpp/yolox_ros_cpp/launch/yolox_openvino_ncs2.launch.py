@@ -8,7 +8,6 @@ from launch_ros.actions import ComposableNodeContainer
 from launch_ros.descriptions import ComposableNode
 
 def generate_launch_description():
-
     launch_args = [
         DeclareLaunchArgument(
             "video_device",
@@ -17,13 +16,8 @@ def generate_launch_description():
         ),
         DeclareLaunchArgument(
             "model_path",
-            default_value="./install/yolox_ros_cpp/share/yolox_ros_cpp/weights/tensorrt/yolox_nano.trt",
+            default_value="./install/yolox_ros_cpp/share/yolox_ros_cpp/weights/openvino/yolox_tiny.xml",
             description="yolox model path."
-        ),
-        DeclareLaunchArgument(
-            "device",
-            default_value="'0'",
-            description="GPU index. Set in string type. ex '0'"
         ),
         DeclareLaunchArgument(
             "image_size/height",
@@ -77,18 +71,17 @@ def generate_launch_description():
                         plugin='v4l2_camera::V4L2Camera',
                         name='v4l2_camera',
                         parameters=[{
-                            "video_device": LaunchConfiguration("video_device"), 
+                            "video_device": LaunchConfiguration("video_device"),
                             "image_size": [640,480]
-                        }]
-                    ),
+                        }]),
                     ComposableNode(
                         package='yolox_ros_cpp',
                         plugin='yolox_ros_cpp::YoloXNode',
                         name='yolox_ros_cpp',
                         parameters=[{
                             "model_path": LaunchConfiguration("model_path"),
-                            "model_type": "tensorrt",
-                            "device": LaunchConfiguration("device"),
+                            "model_type": "openvino",
+                            "device": "MYRIAD",
                             "image_size/height": LaunchConfiguration("image_size/height"),
                             "image_size/width": LaunchConfiguration("image_size/width"),
                             "conf": LaunchConfiguration("conf"),
@@ -98,19 +91,19 @@ def generate_launch_description():
                             "publish_image_topic_name": LaunchConfiguration("publish_image_topic_name"),
                             "publish_boundingbox_topic_name": LaunchConfiguration("publish_boundingbox_topic_name"),
                         }],
-                    ),
+                        ),
                 ],
                 output='screen',
         )
 
     rqt = launch_ros.actions.Node(
-            package="rqt_graph", executable="rqt_graph",
+        package="rqt_graph", executable="rqt_graph",
     )
 
     return launch.LaunchDescription(
-        launch_args + 
+        launch_args +
         [
             container,
-            # rqt
+            # rqt_graph,
         ]
     )

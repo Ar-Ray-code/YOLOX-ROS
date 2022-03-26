@@ -25,10 +25,10 @@ namespace yolox_cpp{
         int stride;
     };
     
-    class AbsYoloX{
+    class AbcYoloX{
         public:
-            AbsYoloX(){}
-            AbsYoloX(float nms_th=0.45, float conf_th=0.3,
+            AbcYoloX(){}
+            AbcYoloX(float nms_th=0.45, float conf_th=0.3,
                      int input_width=416, int input_height=416)
             :nms_thresh_(nms_th), bbox_conf_thresh_(conf_th),
              input_w_(input_width), input_h_(input_height)

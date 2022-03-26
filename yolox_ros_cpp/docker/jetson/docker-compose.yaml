@@ -1,22 +1,18 @@
 version: '3.4'
 services:
     yolox_ros:
-        container_name: yolox_tensorrt
+        container_name: yolox_ros
         # build:
         #     context: .
-        #     args:
-        #         - BASE_TAB=21.09-py3
-        image: fateshelled/tensorrt_yolox_ros:latest
+        image: fateshelled/jetson_yolox_ros:foxy-ros-base-l4t-r32.6.1
         network_mode: host
-        runtime: nvidia
-        environment:
-            - DISPLAY=$DISPLAY
         volumes:
             - $HOME/ros2_ws:/root/ros2_ws
-            - /tmp/.X11-unix:/tmp/.X11-unix
+            # - /tmp/argus_socket:/tmp/argus_socket # for CSI-camera
         devices:
             - "/dev/video0:/dev/video0"
         working_dir: /root/ros2_ws
         tty: true
+        runtime: nvidia
         command: bash
 
