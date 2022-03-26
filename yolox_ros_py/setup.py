@@ -15,7 +15,9 @@ YOLOX_DARKNET53_WEIGHTS = 'yolox_darknet53.pth'
 YOLOX_NANO_WEIGHTS = 'yolox_nano.pth'
 YOLOX_TINY_WEIGHTS = 'yolox_tiny.pth'
 
-BASE_LINK = 'https://github.com/Megvii-BaseDetection/YOLOX/releases/download/0.1.1rc0/'
+YOLOX_VERSION = '0.1.1rc0'
+
+BASE_LINK = 'https://github.com/Megvii-BaseDetection/YOLOX/releases/download/'+YOLOX_VERSION+'/'
 YOLOX_S_WEIGHTS_URL = BASE_LINK + YOLOX_S_WEIGHTS
 YOLOX_M_WEIGHTS_URL = BASE_LINK + YOLOX_M_WEIGHTS
 YOLOX_L_WEIGHTS_URL = BASE_LINK + YOLOX_L_WEIGHTS
@@ -38,21 +40,7 @@ YOLOX_TINY_WEIGHTS_PATH = BASE_PATH + YOLOX_TINY_WEIGHTS
 if not os.path.exists(YOLOX_S_WEIGHTS_PATH):
     urlretrieve(YOLOX_S_WEIGHTS_URL, YOLOX_S_WEIGHTS_PATH)
 
-# if not os.path.exists(YOLOX_M_WEIGHTS_PATH):
-#     urlretrieve(YOLOX_M_WEIGHTS_URL, YOLOX_M_WEIGHTS_PATH)
-    
-# if not os.path.exists(YOLOX_L_WEIGHTS_PATH):
-#     urlretrieve(YOLOX_L_WEIGHTS_URL, YOLOX_L_WEIGHTS_PATH)
-
-# if not os.path.exists(YOLOX_X_WEIGHTS_PATH):
-#     urlretrieve(YOLOX_X_WEIGHTS_URL, YOLOX_X_WEIGHTS_PATH)
-
-# if not os.path.exists(YOLOX_DARKNET53_WEIGHTS_PATH):
-#     urlretrieve(YOLOX_DARKNET53_WEIGHTS_URL, YOLOX_DARKNET53_WEIGHTS_PATH)
-
-# if not os.path.exists(YOLOX_NANO_WEIGHTS_PATH):
-#     urlretrieve(YOLOX_NANO_WEIGHTS_URL, YOLOX_NANO_WEIGHTS_PATH)
-
+# Download examples
 # if not os.path.exists(YOLOX_TINY_WEIGHTS_PATH):
 #     urlretrieve(YOLOX_TINY_WEIGHTS_URL, YOLOX_TINY_WEIGHTS_PATH)
 
@@ -68,6 +56,7 @@ setup(
         (os.path.join('share', package_name), glob('./launch/*.launch.py')),
         (os.path.join('share', package_name), glob('../weights/*.pth')),
         (os.path.join('share', package_name), glob('../weights/openvino/*')),
+        (os.path.join('share', package_name), glob('./YOLOX/exps/default/*.py')),
     ],
     install_requires=['setuptools'],
     zip_safe=True,

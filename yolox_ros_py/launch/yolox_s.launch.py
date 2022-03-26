@@ -19,7 +19,7 @@ def generate_launch_description():
         parameters=[
             {"image_size/width": 640},
             {"image_size/height": 480},
-            {"yolo_type" : 'yolox-s'},
+            {"yolox_exp_py" : yolox_ros_share_dir+'/yolox_s.py'},
             {"device" : 'gpu'},
             {"fp16" : True},
             {"fuse" : False},

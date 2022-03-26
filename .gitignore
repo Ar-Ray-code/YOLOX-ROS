@@ -6,3 +6,5 @@ YOLOX_outputs/
 *.onnx
 *.trt
 *.engine
+YOLOX/
+YOLOX_outputs/
