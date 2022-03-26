@@ -39,27 +39,29 @@ Check [GitHub Wiki](https://github.com/Ar-Ray-code/YOLOX-ROS/wiki/YOLOX-ROS---Ra
 
 Install the dependent packages based on all tutorials.
 
-### STEP 1 : YOLOX Installation
-
-[YOLOX Installation (Python)](https://github.com/Megvii-BaseDetection/YOLOX#quick-start)
+### STEP 1 : Download from GitHub
 
 ```bash
-git clone https://github.com/Megvii-BaseDetection/YOLOX.git
-cd YOLOX
-pip3 install -v -e .
+mkdir -p ~/ros2_ws/src
+cd ~/ros2_ws/src
+git clone https://github.com/Ar-Ray-code/yolox_ros.git --recursive
 ```
 
-### STEP 2 : Install YOLOX-ROS
+### STEP 2 : YOLOX Installation (yolox_rps_py)
+
+```bash
+bash YOLOX-ROS/yolox_ros_py/install_yolox_py.bash
+```
+
+### STEP 3 : Install YOLOX-ROS
 
 ```bash
 source /opt/ros/foxy/setup.bash
 sudo apt install ros-foxy-v4l2-camera
-git clone --recursive https://github.com/Ar-Ray-code/yolox_ros.git ~/ros2_ws/src/yolox_ros/
-cd ~/ros2_ws
 colcon build --symlink-install # weights files will be installed automatically.
 ```
 
-### (Step 2) Using CUDA
+### (Step 3) Using CUDA
 
 If you have NVIDIA Graphics, you can run YOLOX-ROS on GPU.
 
@@ -82,48 +84,9 @@ ros2 launch yolox_ros_py yolox_s_cpu.launch.py
 
 </details>
 
-<details>
-<summary>C++ (OpenVINO)</summary>
+## C++
 
-- Docker Images is [Released](https://github.com/Ar-Ray-code/YOLOX-ROS/tree/main/yolox_ros_cpp).
-
-## Requirements
-
-- ROS2 Foxy
-- OpenCV 4
-- OpenVINO
-- [bbox_ex_msgs](https://github.com/Ar-Ray-code/bbox_ex_msgs)
-
-### Step1 :  Installation
-
-```bash
-source /opt/ros/foxy/setup.bash
-sudo apt install ros-foxy-v4l2-camera
-
-source /opt/intel/openvino_2021/bin/setupvars.sh
-cd ~/ros2_ws/src
-git clone --recursive https://github.com/Ar-Ray-code/YOLOX-ROS.git
-# Download onnx file and Convert to IR format.
-./YOLOX-ROS/weights/openvino/install.bash yolox_nano
-```
-
-### Step2 : Demo
-
-Connect your web camera.
-
-```bash
-source /opt/ros/foxy/setup.bash
-source ~/ros2_ws/install/local_setup.bash
-ros2 launch yolox_ros_cpp yolox_openvino.launch.py
-```
-</details>
-
-<details>
-<summary>C++ (TensorRT)</summary>
-
-Docker Images is [Released](https://github.com/Ar-Ray-code/YOLOX-ROS/tree/main/yolox_ros_cpp).
-
-</details>
+Check [this URL](https://github.com/Ar-Ray-code/YOLOX-ROS/tree/main/yolox_ros_cpp).
 
 
 ## Topic
