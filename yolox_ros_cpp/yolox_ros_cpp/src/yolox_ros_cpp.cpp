@@ -8,24 +8,23 @@ namespace yolox_ros_cpp{
 
     YoloXNode::YoloXNode(const std::string &node_name, const rclcpp::NodeOptions& options)
     : rclcpp::Node("yolox_ros_cpp", node_name, options){
-        
+
         RCLCPP_INFO(this->get_logger(), "initialize");
         this->initializeParameter();
 
         if(this->imshow_){
             char window_name[50];
             sprintf(window_name, "%s %s %s", this->WINDOW_NAME_.c_str(), "_", this->get_name());
-            this->WINDOW_NAME_ = window_name;            
+            this->WINDOW_NAME_ = window_name;
 
             cv::namedWindow(this->WINDOW_NAME_, cv::WINDOW_AUTOSIZE);
         }
-        
+
         if(this->model_type_ == "tensorrt"){
             #ifdef ENABLE_TENSORRT
                 RCLCPP_INFO(this->get_logger(), "Model Type is TensorRT");
                 this->yolox_ = std::make_unique<yolox_cpp::YoloXTensorRT>(this->model_path_, std::stoi(this->device_),
-                                                                          this->nms_th_, this->conf_th_, 
-                                                                          this->image_width_, this->image_height_);
+                                                                          this->nms_th_, this->conf_th_, this->model_version_);
             #else
                 RCLCPP_ERROR(this->get_logger(), "yolox_cpp is not built with TensorRT");
                 rclcpp::shutdown();
@@ -34,8 +33,7 @@ namespace yolox_ros_cpp{
             #ifdef ENABLE_OPENVINO
                 RCLCPP_INFO(this->get_logger(), "Model Type is OpenVINO");
                 this->yolox_ = std::make_unique<yolox_cpp::YoloXOpenVINO>(this->model_path_, this->device_,
-                                                                          this->nms_th_, this->conf_th_,
-                                                                          this->image_width_, this->image_height_);
+                                                                          this->nms_th_, this->conf_th_, this->model_version_);
             #else
                 RCLCPP_ERROR(this->get_logger(), "yolox_cpp is not built with OpenVINO");
                 rclcpp::shutdown();
@@ -43,8 +41,8 @@ namespace yolox_ros_cpp{
         }
 
         this->sub_image_ = image_transport::create_subscription(
-            this, this->src_image_topic_name_, 
-            std::bind(&YoloXNode::colorImageCallback, this, std::placeholders::_1), 
+            this, this->src_image_topic_name_,
+            std::bind(&YoloXNode::colorImageCallback, this, std::placeholders::_1),
             "raw");
         this->pub_bboxes_ = this->create_publisher<bboxes_ex_msgs::msg::BoundingBoxes>(
             this->publish_boundingbox_topic_name_,
@@ -60,21 +58,19 @@ namespace yolox_ros_cpp{
         this->declare_parameter<float>("conf", 0.3f);
         this->declare_parameter<float>("nms", 0.45f);
         this->declare_parameter<std::string>("device", "0");
-        this->declare_parameter<int>("image_size/width", 416);
-        this->declare_parameter<int>("image_size/height", 416);
         this->declare_parameter<std::string>("model_type", "tensorrt");
+        this->declare_parameter<std::string>("model_version", "0.1.1rc0");
         this->declare_parameter<std::string>("src_image_topic_name", "image_raw");
-        this->declare_parameter<std::string>("publish_image_topic_name", "yolox/image_raw");        
-        this->declare_parameter<std::string>("publish_boundingbox_topic_name", "yolox/bounding_boxes");        
+        this->declare_parameter<std::string>("publish_image_topic_name", "yolox/image_raw");
+        this->declare_parameter<std::string>("publish_boundingbox_topic_name", "yolox/bounding_boxes");
 
         this->get_parameter("imshow_isshow", this->imshow_);
         this->get_parameter("model_path", this->model_path_);
         this->get_parameter("conf", this->conf_th_);
         this->get_parameter("nms", this->nms_th_);
         this->get_parameter("device", this->device_);
-        this->get_parameter("image_size/width", this->image_width_);
-        this->get_parameter("image_size/height", this->image_height_);
         this->get_parameter("model_type", this->model_type_);
+        this->get_parameter("model_version", this->model_version_);
         this->get_parameter("src_image_topic_name", this->src_image_topic_name_);
         this->get_parameter("publish_image_topic_name", this->publish_image_topic_name_);
         this->get_parameter("publish_boundingbox_topic_name", this->publish_boundingbox_topic_name_);
@@ -84,9 +80,8 @@ namespace yolox_ros_cpp{
         RCLCPP_INFO(this->get_logger(), "Set parameter conf: %f", this->conf_th_);
         RCLCPP_INFO(this->get_logger(), "Set parameter nms: %f", this->nms_th_);
         RCLCPP_INFO(this->get_logger(), "Set parameter device: %s", this->device_.c_str());
-        RCLCPP_INFO(this->get_logger(), "Set parameter image_size/width: %i", this->image_width_);
-        RCLCPP_INFO(this->get_logger(), "Set parameter image_size/height: %i", this->image_height_);
         RCLCPP_INFO(this->get_logger(), "Set parameter model_type: '%s'", this->model_type_.c_str());
+        RCLCPP_INFO(this->get_logger(), "Set parameter model_version: '%s'", this->model_version_.c_str());
         RCLCPP_INFO(this->get_logger(), "Set parameter src_image_topic_name: '%s'", this->src_image_topic_name_.c_str());
         RCLCPP_INFO(this->get_logger(), "Set parameter publish_image_topic_name: '%s'", this->publish_image_topic_name_.c_str());
 
@@ -140,6 +135,16 @@ namespace yolox_ros_cpp{
         }
         return boxes;
     }
+}
+
+int main(int argc, char * argv[])
+{
+  rclcpp::init(argc, argv);
+  rclcpp::NodeOptions node_options;
+  node_options.enable_topic_statistics(true);
+  rclcpp::spin(std::make_shared<yolox_ros_cpp::YoloXNode>(node_options));
+  rclcpp::shutdown();
+  return 0;
 }
 
 RCLCPP_COMPONENTS_REGISTER_NODE(yolox_ros_cpp::YoloXNode)

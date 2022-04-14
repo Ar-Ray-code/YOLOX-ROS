@@ -29,6 +29,7 @@ namespace yolox_ros_cpp{
         std::unique_ptr<yolox_cpp::AbcYoloX> yolox_;
         std::string model_path_;
         std::string model_type_;
+        std::string model_version_;
         std::string device_;
         float conf_th_;
         float nms_th_;

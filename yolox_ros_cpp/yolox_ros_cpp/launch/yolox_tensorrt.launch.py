@@ -26,14 +26,9 @@ def generate_launch_description():
             description="GPU index. Set in string type. ex '0'"
         ),
         DeclareLaunchArgument(
-            "image_size/height",
-            default_value="416",
-            description="model input image height."
-        ),
-        DeclareLaunchArgument(
-            "image_size/width",
-            default_value="416",
-            description="model input image width."
+            "model_version",
+            default_value="0.1.1rc0",
+            description="yolox model version."
         ),
         DeclareLaunchArgument(
             "conf",
@@ -77,7 +72,7 @@ def generate_launch_description():
                         plugin='v4l2_camera::V4L2Camera',
                         name='v4l2_camera',
                         parameters=[{
-                            "video_device": LaunchConfiguration("video_device"), 
+                            "video_device": LaunchConfiguration("video_device"),
                             "image_size": [640,480]
                         }]
                     ),
@@ -88,9 +83,8 @@ def generate_launch_description():
                         parameters=[{
                             "model_path": LaunchConfiguration("model_path"),
                             "model_type": "tensorrt",
+                            "model_version": LaunchConfiguration("model_version"),
                             "device": LaunchConfiguration("device"),
-                            "image_size/height": LaunchConfiguration("image_size/height"),
-                            "image_size/width": LaunchConfiguration("image_size/width"),
                             "conf": LaunchConfiguration("conf"),
                             "nms": LaunchConfiguration("nms"),
                             "imshow_isshow": LaunchConfiguration("imshow_isshow"),

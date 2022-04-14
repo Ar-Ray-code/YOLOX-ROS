@@ -4,14 +4,14 @@
 if [ -z "$1" ]; then
     echo "Usage: $0 <target-model> <workspace>"
     echo "Target-Models : yolox_tiny, yolox_nano, yolox_s, yolox_m, yolox_l"
-    echo "WORKSPACE : GPU memory workspace. Default 32."
+    echo "WORKSPACE : GPU memory workspace. Default 16."
     exit 1
 fi
 
 MODEL=$1
 TRT_WORKSPACE=$2
 if [ -z "$2" ]; then
-    TRT_WORKSPACE=32
+    TRT_WORKSPACE=16
 fi
 
 SCRIPT_DIR=$(cd $(dirname $0); pwd)
@@ -31,7 +31,7 @@ if [ ! -e $ONNX_MODEL_PATH ]; then
     exit 1
 fi
 
-trtexec \
+/usr/src/tensorrt/bin/trtexec \
     --onnx=$SCRIPT_DIR/../onnx/$MODEL.onnx \
     --saveEngine=$SCRIPT_DIR/$MODEL.trt \
     --fp16 --verbose --workspace=$((1<<$TRT_WORKSPACE))
