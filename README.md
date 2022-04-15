@@ -71,7 +71,7 @@ If you have NVIDIA Graphics, you can run YOLOX-ROS on GPU.
 - CUDA toolkit (11.0)
 - torch+cuda
 
-### Step3 : Demo
+### Step : Demo
 
 Connect your web camera.
 
