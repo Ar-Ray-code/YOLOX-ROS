@@ -121,7 +121,7 @@ cd ~/ros2_ws
 - ONNX model copy to weight dir
   - `cp saved_model_yolox_nano_480x640/yolox_nano_480x640.onnx src/YOLOX-ROS/weight/onnx/`
 - Convert to TensorRT engine
-  ./src/YOLOX-ROS/weights/tensorrt/convert.bash yolox_nano_480x640
+  - `./src/YOLOX-ROS/weights/tensorrt/convert.bash yolox_nano_480x640`
 
 
 ### build packages
