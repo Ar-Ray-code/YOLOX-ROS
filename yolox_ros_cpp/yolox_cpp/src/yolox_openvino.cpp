@@ -48,7 +48,7 @@ namespace yolox_cpp{
         output_name_ = network_.getOutputsInfo().begin()->first;
 
         // output_info->setPrecision(Precision::FP16);
-        output_info->setPrecision(Precision::FP16);
+        output_info->setPrecision(Precision::FP32);
 
         //  Step 4. Loading a model to the device
         std::cout << "Loading a model to the device: " << device_name_ << std::endl;
