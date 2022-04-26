@@ -7,42 +7,62 @@ from urllib.request import urlretrieve
 package_name = 'yolox_ros_py'
 
 
-YOLOX_S_WEIGHTS = 'yolox_s.pth'
-YOLOX_M_WEIGHTS = 'yolox_m.pth'
-YOLOX_L_WEIGHTS = 'yolox_l.pth'
-YOLOX_X_WEIGHTS = 'yolox_x.pth'
-YOLOX_DARKNET53_WEIGHTS = 'yolox_darknet53.pth'
-YOLOX_NANO_WEIGHTS = 'yolox_nano.pth'
-YOLOX_TINY_WEIGHTS = 'yolox_tiny.pth'
+YOLOX_S = 'yolox_s'
+YOLOX_M = 'yolox_m'
+YOLOX_L = 'yolox_l'
+YOLOX_X = 'yolox_x'
+YOLOX_DARKNET53 = 'yolox_darknet53'
+YOLOX_NANO = 'yolox_nano'
+YOLOX_TINY = 'yolox_tiny'
+
+PTH = '.pth'
+ONNX = '.onnx'
 
 YOLOX_VERSION = '0.1.1rc0'
 
 BASE_LINK = 'https://github.com/Megvii-BaseDetection/YOLOX/releases/download/'+YOLOX_VERSION+'/'
-YOLOX_S_WEIGHTS_URL = BASE_LINK + YOLOX_S_WEIGHTS
-YOLOX_M_WEIGHTS_URL = BASE_LINK + YOLOX_M_WEIGHTS
-YOLOX_L_WEIGHTS_URL = BASE_LINK + YOLOX_L_WEIGHTS
-YOLOX_X_WEIGHTS_URL = BASE_LINK + YOLOX_X_WEIGHTS
-YOLOX_DARKNET53_WEIGHTS_URL = BASE_LINK + YOLOX_DARKNET53_WEIGHTS
-YOLOX_NANO_WEIGHTS_URL = BASE_LINK + YOLOX_NANO_WEIGHTS
-YOLOX_TINY_WEIGHTS_URL = BASE_LINK + YOLOX_TINY_WEIGHTS
+# .pth
+YOLOX_S_URL = BASE_LINK + YOLOX_S + PTH
+YOLOX_M_URL = BASE_LINK + YOLOX_M + PTH
+YOLOX_L_URL = BASE_LINK + YOLOX_L + PTH
+YOLOX_X_URL = BASE_LINK + YOLOX_X + PTH
+YOLOX_X_URL = BASE_LINK + YOLOX_DARKNET53 + PTH
+YOLOX_NANO_URL = BASE_LINK + YOLOX_NANO + PTH
+YOLOX_TINY_URL = BASE_LINK + YOLOX_TINY + PTH
+# .onnx
+YOLOX_S_ONNX_URL = BASE_LINK + YOLOX_S + ONNX
+YOLOX_M_ONNX_URL = BASE_LINK + YOLOX_M + ONNX
+YOLOX_L_ONNX_URL = BASE_LINK + YOLOX_L + ONNX
+YOLOX_X_ONNX_URL = BASE_LINK + YOLOX_X + ONNX
+YOLOX_X_ONNX_URL = BASE_LINK + YOLOX_DARKNET53 + ONNX
+YOLOX_NANO_ONNX_URL = BASE_LINK + YOLOX_NANO + ONNX
+YOLOX_TINY_ONNX_URL = BASE_LINK + YOLOX_TINY + ONNX
 
 BASE_PATH = os.getcwd() + '/../weights/'
 os.makedirs(BASE_PATH, exist_ok=True)
-YOLOX_S_WEIGHTS_PATH = BASE_PATH + YOLOX_S_WEIGHTS
-YOLOX_M_WEIGHTS_PATH = BASE_PATH + YOLOX_M_WEIGHTS
-YOLOX_L_WEIGHTS_PATH = BASE_PATH + YOLOX_L_WEIGHTS
-YOLOX_X_WEIGHTS_PATH = BASE_PATH + YOLOX_X_WEIGHTS
-YOLOX_DARKNET53_WEIGHTS_PATH = BASE_PATH + YOLOX_DARKNET53_WEIGHTS
-YOLOX_NANO_WEIGHTS_PATH = BASE_PATH + YOLOX_NANO_WEIGHTS
-YOLOX_TINY_WEIGHTS_PATH = BASE_PATH + YOLOX_TINY_WEIGHTS
+# .pth
+YOLOX_S_PATH = BASE_PATH + YOLOX_S + PTH
+YOLOX_M_PATH = BASE_PATH + YOLOX_M + PTH
+YOLOX_L_PATH = BASE_PATH + YOLOX_L + PTH
+YOLOX_X_PATH = BASE_PATH + YOLOX_X + PTH
+YOLOX_DARKNET53_PATH = BASE_PATH + YOLOX_DARKNET53 + PTH
+YOLOX_NANO_PATH = BASE_PATH + YOLOX_NANO + PTH
+YOLOX_TINY_PATH = BASE_PATH + YOLOX_TINY + PTH
+# .onnx
+YOLOX_S_ONNX_PATH = BASE_PATH + YOLOX_S + ONNX
+YOLOX_M_ONNX_PATH = BASE_PATH + YOLOX_M + ONNX
+YOLOX_L_ONNX_PATH = BASE_PATH + YOLOX_L + ONNX
+YOLOX_X_ONNX_PATH = BASE_PATH + YOLOX_X + ONNX
+YOLOX_DARKNET53_ONNX_PATH = BASE_PATH + YOLOX_DARKNET53 + ONNX
+YOLOX_NANO_ONNX_PATH = BASE_PATH + YOLOX_NANO + ONNX
+YOLOX_TINY_ONNX_PATH = BASE_PATH + YOLOX_TINY + ONNX
 
-# Download YOLOX-S Weights
-if not os.path.exists(YOLOX_S_WEIGHTS_PATH):
-    urlretrieve(YOLOX_S_WEIGHTS_URL, YOLOX_S_WEIGHTS_PATH)
-
-# Download examples
-# if not os.path.exists(YOLOX_TINY_WEIGHTS_PATH):
-#     urlretrieve(YOLOX_TINY_WEIGHTS_URL, YOLOX_TINY_WEIGHTS_PATH)
+# Download YOLOX-NANO Weights
+if not os.path.exists(YOLOX_NANO_PATH):
+    urlretrieve(YOLOX_NANO_URL, YOLOX_NANO_PATH)
+# Download YOLOX-NANO ONNX
+if not os.path.exists(YOLOX_NANO_ONNX_PATH):
+    urlretrieve(YOLOX_NANO_ONNX_URL, YOLOX_NANO_ONNX_PATH)
 
 
 setup(
@@ -56,7 +76,8 @@ setup(
         (os.path.join('share', package_name), glob('./launch/*.launch.py')),
         (os.path.join('share', package_name), glob('../weights/*.pth')),
         (os.path.join('share', package_name), glob('../weights/openvino/*')),
-        (os.path.join('share', package_name), glob('./YOLOX/exps/default/*.py')),
+        (os.path.join('share', package_name), glob('../weights/onnx/*')),
+        (os.path.join('share', package_name), glob('./exps/*.py')),
     ],
     install_requires=['setuptools'],
     zip_safe=True,
@@ -71,6 +92,7 @@ setup(
         'console_scripts': [
             'yolox_ros = '+package_name+'.yolox_ros:ros_main',
             'yolox_openvino = '+package_name+'.yolox_openvino:ros_main',
+            'yolox_onnx = '+package_name+'.yolox_onnx:ros_main',
         ],
     },
 )

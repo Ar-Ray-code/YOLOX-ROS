@@ -132,7 +132,7 @@ class yolox_ros(Node):
         
         # ==============================================================
 
-        WEIGHTS_PATH = '../../weights/yolox_s.pth'
+        WEIGHTS_PATH = '../../weights/yolox_nano.pth'
 
         self.declare_parameter('imshow_isshow',True)
 
@@ -280,15 +280,17 @@ class yolox_ros(Node):
         except:
             pass
 
-def ros_main(args = None) -> None:
+def ros_main(args = None):
     rclpy.init(args=args)
+    ros_class = yolox_ros()
 
-    yolox_ros_class = yolox_ros()
-    rclpy.spin(yolox_ros_class)
-
-    yolox_ros_class.destroy_node()
-    cv2.destroyAllWindows()
-    rclpy.shutdown()
-
+    try:
+        rclpy.spin(ros_class)
+    except KeyboardInterrupt:
+        pass
+    finally:
+        ros_class.destroy_node()
+        rclpy.shutdown()
+    
 if __name__ == "__main__":
     ros_main()
