@@ -58,8 +58,14 @@ pip3 install yolox
 ```bash
 source /opt/ros/foxy/setup.bash
 sudo apt install ros-foxy-v4l2-camera
+# source /opt/intel/openvino_2021/bin/setupvars.sh # <- Using OpenVINO
 colcon build --symlink-install # weights (YOLOX-Nano) files will be installed automatically.
 ```
+
+**Automatic download weights**
+
+- yolox_nano.onnx
+- yolox_nano.pth
 
 ### (Step 3) Using CUDA
 
@@ -71,6 +77,12 @@ If you have NVIDIA Graphics, you can run YOLOX-ROS on GPU.
 - CUDA toolkit (11.0)
 - torch+cuda
 
+```bash
+source /opt/ros/foxy/setup.bash
+sudo apt install ros-foxy-v4l2-camera
+colcon build --symlink-install # weights (YOLOX-Nano) files will be installed automatically.
+```
+
 ### Step : Demo
 
 Connect your web camera.
@@ -78,13 +90,13 @@ Connect your web camera.
 ```bash
 source /opt/ros/foxy/setup.bash
 source ~/ros2_ws/install/local_setup.bash
-ros2 launch yolox_ros_py yolox_nano_cpu.launch.py
-# ros2 launch yolox_ros_py yolox_nano.launch.py # <- GPU
+ros2 launch yolox_ros_py yolox_nano_cpu.launch.py # <- CPU (PyTorch)
+# ros2 launch yolox_ros_py yolox_nano.launch.py # <- GPU (PyTorch)
 # ros2 launch yolox_ros_py yolox_nano_onnx.launch.py # <- ONNXRuntime
 
-# OpenVINO ---
+# OpenVINO -------------------------------------
 # source /opt/intel/openvino_2021/bin/setupvars.sh
-# ros2 launch yolox_ros_py yolox_nano_openvino.launch.py # <- OpenVINO
+# ros2 launch yolox_ros_py yolox_nano_openvino.launch.py
 ```
 
 </details>
