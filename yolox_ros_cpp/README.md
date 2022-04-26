@@ -5,10 +5,12 @@
 ### Requirements
 - ROS2 Foxy
 - OpenCV 4.x
-- OpenVINO *
+- OpenVINO 2021.*
 - TensorRT 8.x *
 
 ※ Either one of OpenVINO or TensorRT is required.
+
+※ Model convert script is not supported OpenVINO 2022.*
 
 ※ YOLOX is not required.
 
@@ -112,6 +114,16 @@ cd ~/ros2_ws
 ./src/YOLOX-ROS/weights/tensorrt/convert.bash yolox_nano 16
 ```
 
+#### PINTO_model_zoo
+- Support PINTO_model_zoo model
+- Download model using the following script.
+  - https://github.com/PINTO0309/PINTO_model_zoo/blob/main/132_YOLOX/download_nano.sh
+- ONNX model copy to weight dir
+  - `cp saved_model_yolox_nano_480x640/yolox_nano_480x640.onnx src/YOLOX-ROS/weight/onnx/`
+- Convert to TensorRT engine
+  - `./src/YOLOX-ROS/weights/tensorrt/convert.bash yolox_nano_480x640`
+
+
 ### build packages
 ```bash
 # # If use openvino
@@ -131,8 +143,13 @@ ros2 launch yolox_ros_cpp yolox_openvino.launch.py
 
 # run other model
 ros2 launch yolox_ros_cpp yolox_openvino.launch.py \
-    model_path:=install/yolox_ros_cpp/share/yolox_ros_cpp/weights/tensorrt/yolox_s.trt \
-    image_size/height:=640 image_size/width:=640
+    model_path:=install/yolox_ros_cpp/share/yolox_ros_cpp/weights/openvino/yolox_s.xml
+
+# run PINTO_model_zoo model
+# This model is converted from version 0.1.0.
+ros2 launch yolox_ros_cpp yolox_openvino.launch.py \
+    model_path:=install/yolox_ros_cpp/share/yolox_ros_cpp/weights/onnx/yolox_nano_480x640.onnx \
+    model_version:="0.1.0"
 
 # run YOLOX-tiny with NCS2
 ros2 launch yolox_ros_cpp yolox_openvino_ncs2.launch.py
@@ -143,6 +160,13 @@ ros2 launch yolox_ros_cpp yolox_openvino_ncs2.launch.py
 ```bash
 # run YOLOX_nano
 ros2 launch yolox_ros_cpp yolox_tensorrt.launch.py
+
+# run PINTO_model_zoo model
+# This model is converted from version 0.1.0.
+ros2 launch yolox_ros_cpp yolox_tensorrt.launch.py \
+    model_path:=install/yolox_ros_cpp/share/yolox_ros_cpp/weights/tensorrt/yolox_nano_480x640.trt \
+    model_version:="0.1.0"
+
 ```
 
 #### Jetson + TensorRT
@@ -157,9 +181,8 @@ ros2 launch yolox_ros_cpp yolox_tensorrt_jetson.launch.py
 ### Parameter
 #### OpenVINO example
 - `model_path`: ./install/yolox_ros_cpp/share/yolox_ros_cpp/weights/openvino/yolox_nano.xml
+- `model_version`: 0.1.1rc0
 - `device`: CPU
-- `image_size/width`: 416
-- `image_size/height`: 416
 - `conf`: 0.3
 - `nms`: 0.45
 - `imshow_isshow`: true
@@ -170,9 +193,8 @@ ros2 launch yolox_ros_cpp yolox_tensorrt_jetson.launch.py
 
 #### TensorRT example.
 - `model_path`: ./install/yolox_ros_cpp/share/yolox_ros_cpp/weights/tensorrt/yolox_nano.trt
+- `model_version`: 0.1.1rc0
 - `device`: "0"
-- `image_size/width`: 416
-- `image_size/height`: 416
 - `conf`: 0.3
 - `nms`: 0.45
 - `imshow_isshow`: true

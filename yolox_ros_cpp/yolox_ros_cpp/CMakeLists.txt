@@ -32,22 +32,49 @@ if(NOT yolox_cpp_FOUND)
   return()
 endif()
 
-add_library(yolox_ros_cpp SHARED
+
+# executable
+add_executable(yolox_ros_cpp
   src/yolox_ros_cpp.cpp
 )
-rclcpp_components_register_nodes(yolox_ros_cpp
- "yolox_ros_cpp::YoloXNode")
-target_compile_definitions(yolox_ros_cpp
-  PRIVATE "MY_LIBRARY_BUILDING_LIBRARY"
+ament_target_dependencies(yolox_ros_cpp
+  rclcpp
+  rclcpp_components
+  cv_bridge
+  image_transport
+  builtin_interfaces
+  std_msgs
+  sensor_msgs
+  OpenCV
+  yolox_cpp
+  bboxes_ex_msgs
 )
-target_compile_options(yolox_ros_cpp PUBLIC -Wall)
-
 target_include_directories(yolox_ros_cpp PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>
 )
+install(TARGETS
+yolox_ros_cpp
+  DESTINATION lib/${PROJECT_NAME}
+)
 
-ament_target_dependencies(yolox_ros_cpp
+# components
+add_library(yolox_ros_cpp_components SHARED
+  src/yolox_ros_cpp.cpp
+)
+rclcpp_components_register_nodes(yolox_ros_cpp_components
+ "yolox_ros_cpp::YoloXNode")
+target_compile_definitions(yolox_ros_cpp_components
+  PRIVATE "YOLOX_ROS_CPP_LIBRARY"
+)
+target_compile_options(yolox_ros_cpp_components PUBLIC -Wall)
+
+target_include_directories(yolox_ros_cpp_components PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>
+)
+
+ament_target_dependencies(yolox_ros_cpp_components
   rclcpp
   rclcpp_components
   cv_bridge
@@ -60,11 +87,11 @@ ament_target_dependencies(yolox_ros_cpp
   bboxes_ex_msgs
   )
 
-
-install(TARGETS yolox_ros_cpp
+install(TARGETS yolox_ros_cpp_components
   EXPORT export_${PROJECT_NAME}
   DESTINATION lib
 )
+
 
 install(DIRECTORY
   launch
