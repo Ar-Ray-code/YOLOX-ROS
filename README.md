@@ -32,7 +32,7 @@ Check [GitHub Wiki](https://github.com/Ar-Ray-code/YOLOX-ROS/wiki/YOLOX-ROS---Ra
 - OpenCV 4
 - Python 3.8 (Ubuntu 20.04 Default)
 - PyTorch >= v1.7
-- [YOLOX v0.2.0](https://github.com/Megvii-BaseDetection/YOLOX)
+- [YOLOX v0.3.0](https://github.com/Megvii-BaseDetection/YOLOX)
 - [bbox_ex_msgs](https://github.com/Ar-Ray-code/bbox_ex_msgs)
 
 ## Installation
@@ -50,7 +50,7 @@ git clone https://github.com/Ar-Ray-code/yolox_ros.git --recursive
 ### STEP 2 : YOLOX Installation (yolox_rps_py)
 
 ```bash
-bash YOLOX-ROS/yolox_ros_py/install_yolox_py.bash
+pip3 install yolox
 ```
 
 ### STEP 3 : Install YOLOX-ROS
@@ -58,7 +58,7 @@ bash YOLOX-ROS/yolox_ros_py/install_yolox_py.bash
 ```bash
 source /opt/ros/foxy/setup.bash
 sudo apt install ros-foxy-v4l2-camera
-colcon build --symlink-install # weights files will be installed automatically.
+colcon build --symlink-install # weights (YOLOX-Nano) files will be installed automatically.
 ```
 
 ### (Step 3) Using CUDA
@@ -78,8 +78,13 @@ Connect your web camera.
 ```bash
 source /opt/ros/foxy/setup.bash
 source ~/ros2_ws/install/local_setup.bash
-ros2 launch yolox_ros_py yolox_s_cpu.launch.py
-# ros2 launch yolox_ros_py yolox_s.launch.py # <- GPU
+ros2 launch yolox_ros_py yolox_nano_cpu.launch.py
+# ros2 launch yolox_ros_py yolox_nano.launch.py # <- GPU
+# ros2 launch yolox_ros_py yolox_nano_onnx.launch.py # <- ONNXRuntime
+
+# OpenVINO ---
+# source /opt/intel/openvino_2021/bin/setupvars.sh
+# ros2 launch yolox_ros_py yolox_nano_openvino.launch.py # <- OpenVINO
 ```
 
 </details>

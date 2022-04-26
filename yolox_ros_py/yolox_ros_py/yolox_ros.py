@@ -117,9 +117,6 @@ class yolox_ros(Node):
         super().__init__('yolox_ros')
 
         self.setting_yolox_exp()
-
-        # if (self.imshow_isshow):
-        #     cv2.namedWindow("YOLOX")
         
         self.bridge = CvBridge()
         
