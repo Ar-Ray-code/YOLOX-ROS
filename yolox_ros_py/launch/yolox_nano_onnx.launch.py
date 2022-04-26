@@ -17,12 +17,16 @@ def generate_launch_description():
         ],
     )
     yolox_openvino = launch_ros.actions.Node(
-        package="yolox_ros_py", executable="yolox_openvino",output="screen",
+        package="yolox_ros_py", executable="yolox_onnx",output="screen",
         parameters=[
             {"image_size/width": 640},
             {"image_size/height": 480},
-            {"device" : 'CPU'},
-            {"model_path" : yolox_ros_share_dir+"/yolox_s.xml"},
+            
+            {"input_shape/width": 416},
+            {"input_shape/height": 416},
+
+            {"with_p6" : False},
+            {"model_path" : yolox_ros_share_dir+"/yolox_nano.onnx"},
             {"conf" : 0.3},
         ],
     )
