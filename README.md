@@ -16,6 +16,7 @@
 | TensorRT (CUDA) |  ✅       |              |
 | OpenVINO        |  ✅       | ✅           |
 | ONNX Runtime    |           | ✅           |
+| TFLite          |           | ✅           |
 
 ### Raspberry Pi4 🍓 + NCS2 + YOLOX-ROS
 

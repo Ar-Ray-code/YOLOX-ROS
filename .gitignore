@@ -6,5 +6,9 @@ YOLOX_outputs/
 *.onnx
 *.trt
 *.engine
+*.tflite
 YOLOX/
 YOLOX_outputs/
+install/
+build/
+log/
