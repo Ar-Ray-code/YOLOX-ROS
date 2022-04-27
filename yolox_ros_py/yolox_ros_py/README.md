@@ -4,7 +4,7 @@ Raspberry Pi 4のCPU動作を想定した人検出モデルとデモスクリプ
 https://user-images.githubusercontent.com/37477845/165418118-16a1fc94-e2d7-4711-ae9c-99bf157863cb.mp4
 
 PINTOさんの「[TensorflowLite-bin](https://github.com/PINTO0309/TensorflowLite-bin)」を使用し4スレッド動作時で45~60ms程度で動作します ※1スレッドは75ms前後<br>
-ノートPC等でも動作しますが、精度を求めるのであれば本リポジトリ以外の物体検出モデルの使用をおすすめします。<br>
+ノートPC等でも動作しますが、精度が必要であれば本リポジトリ以外の物体検出モデルをおすすめします。<br>
 また、ノートPC使用時はIntel CPUであれば「model.onnx」のほうが速いことが多いです。※Core i7-8750Hで10ms前後
 
 # Requirement 
