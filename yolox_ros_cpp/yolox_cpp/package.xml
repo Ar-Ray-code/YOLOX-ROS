@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>yolox_cpp</name>
+  <version>0.2.0</version>
+  <description>The yolox_cpp package</description>
+  <maintainer email="53618876+fateshelled@users.noreply.github.com">fateshelled</maintainer>
+  <license>Apache-2.0 License</license>
+  <author email="53618876+fateshelled@users.noreply.github.com">fateshelled</author>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <depend>OpenCV</depend>
+
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

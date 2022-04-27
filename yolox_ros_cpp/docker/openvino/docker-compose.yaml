@@ -1,0 +1,19 @@
+version: '3.4'
+services:
+    yolox_ros:
+        container_name: yolox_openvino
+        # build:
+        #     context: .
+        image: fateshelled/openvino_yolox_ros:latest
+        network_mode: host
+        environment:
+            - DISPLAY=$DISPLAY
+        volumes:
+            - $HOME/ros2_ws:/root/ros2_ws
+            - /tmp/.X11-unix:/tmp/.X11-unix
+        devices:
+            - "/dev/video0:/dev/video0"
+        working_dir: /root/ros2_ws
+        tty: true
+        command: bash
+

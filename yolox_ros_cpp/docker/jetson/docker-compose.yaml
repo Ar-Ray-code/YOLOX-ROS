@@ -1,0 +1,18 @@
+version: '3.4'
+services:
+    yolox_ros:
+        container_name: yolox_ros
+        # build:
+        #     context: .
+        image: fateshelled/jetson_yolox_ros:foxy-ros-base-l4t-r32.6.1
+        network_mode: host
+        volumes:
+            - $HOME/ros2_ws:/root/ros2_ws
+            # - /tmp/argus_socket:/tmp/argus_socket # for CSI-camera
+        devices:
+            - "/dev/video0:/dev/video0"
+        working_dir: /root/ros2_ws
+        tty: true
+        runtime: nvidia
+        command: bash
+
