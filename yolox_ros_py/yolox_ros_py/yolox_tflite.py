@@ -19,8 +19,8 @@
 import time
 import cv2
 
-from detector import Detector
-from demo import draw_debug
+from .module_tflite.detector import Detector
+from .module_tflite.demo import draw_debug
 
 # ROS2 =====================================
 import rclpy
