@@ -169,8 +169,13 @@ class Detector(object):
 
         result_bboxes, result_scores, result_class_ids = [], [], []
         if len(indexes) > 0:
-            result_bboxes = bboxes[indexes[:, 0]]
-            result_scores = scores[indexes[:, 0]]
-            result_class_ids = np.zeros(result_scores.shape)
+            if indexes.ndim == 2:
+                result_bboxes = bboxes[indexes[:, 0]]
+                result_scores = scores[indexes[:, 0]]
+                result_class_ids = np.zeros(result_scores.shape)
+            elif indexes.ndim == 1:
+                result_bboxes = bboxes[indexes[:]]
+                result_scores = scores[indexes[:]]
+                result_class_ids = np.zeros(result_scores.shape)
 
         return result_bboxes, result_scores, result_class_ids
