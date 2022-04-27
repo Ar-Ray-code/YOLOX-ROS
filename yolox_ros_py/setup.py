@@ -64,6 +64,11 @@ if not os.path.exists(YOLOX_NANO_PATH):
 if not os.path.exists(YOLOX_NANO_ONNX_PATH):
     urlretrieve(YOLOX_NANO_ONNX_URL, YOLOX_NANO_ONNX_PATH)
 
+# tflite
+TFLITE_PATH = BASE_PATH + 'tflite/model.onnx'
+if not os.path.exists(TFLITE_PATH):
+    urlretrieve('https://github.com/Kazuhito00/Person-Detection-using-RaspberryPi-CPU/raw/main/model/model.onnx', TFLITE_PATH)
+
 
 setup(
     name=package_name,
@@ -77,6 +82,7 @@ setup(
         (os.path.join('share', package_name), glob('../weights/*.pth')),
         (os.path.join('share', package_name), glob('../weights/openvino/*')),
         (os.path.join('share', package_name), glob('../weights/onnx/*')),
+        (os.path.join('share', package_name), glob('../weights/tflite/*')),
         (os.path.join('share', package_name), glob('./exps/*.py')),
     ],
     install_requires=['setuptools'],
@@ -93,6 +99,7 @@ setup(
             'yolox_ros = '+package_name+'.yolox_ros:ros_main',
             'yolox_openvino = '+package_name+'.yolox_openvino:ros_main',
             'yolox_onnx = '+package_name+'.yolox_onnx:ros_main',
+            'yolox_tflite = '+package_name+'.yolox_tflite:ros_main',
         ],
     },
 )
