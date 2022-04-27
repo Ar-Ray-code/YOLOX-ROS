@@ -32,9 +32,6 @@ python demo.py
 * --model<br>
 ロードするモデルの格納パス<br>
 デフォルト：model/model.tflite
-* --input_shape<br>
-モデルの入力サイズ<br>
-デフォルト：192,192
 * --score_th<br>
 検出閾値<br>
 デフォルト：0.4
