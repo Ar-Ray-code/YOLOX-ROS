@@ -42,6 +42,19 @@ NMSの閾値<br>
 使用スレッド数 ※TensorFlow-Lite使用時のみ有効<br>
 デフォルト：None
 
+# Demo(ROS2)
+ROS2向けのデモです。
+
+ターミナル1
+```bash
+ros2 run v4l2_camera v4l2_camera_node
+```
+
+ターミナル2
+```bash
+python3 ./demo_ros2.py
+```
+
 # Reference
 * [PINTO0309/TensorflowLite-bin](https://github.com/PINTO0309/TensorflowLite-bin)
 
