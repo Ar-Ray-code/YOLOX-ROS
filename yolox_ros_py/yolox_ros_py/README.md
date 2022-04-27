@@ -1,7 +1,7 @@
 # Person-Detection-using-RaspberryPi-CPU
 Raspberry Pi 4のCPU動作を想定した人検出モデルとデモスクリプトです。<br>
 
-https://user-images.githubusercontent.com/37477845/165418118-16a1fc94-e2d7-4711-ae9c-99bf157863cb.mp4
+https://user-images.githubusercontent.com/37477845/165421632-600f5f63-51e5-4afa-a0d5-3abc59d0d711.mp4
 
 PINTOさんの「[TensorflowLite-bin](https://github.com/PINTO0309/TensorflowLite-bin)」を使用し4スレッド動作時で45~60ms程度で動作します ※1スレッドは75ms前後<br>
 ノートPC等でも動作しますが、精度が必要であれば本リポジトリ以外の物体検出モデルをおすすめします。<br>
