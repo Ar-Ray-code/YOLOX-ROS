@@ -1,5 +1,5 @@
 # Person-Detection-using-RaspberryPi-CPU
-Raspberry Pi 4での使用を想定した人検出モデルとデモスクリプトです。<br>
+Raspberry Pi 4のCPU動作を想定した人検出モデルとデモスクリプトです。<br>
 
 https://user-images.githubusercontent.com/37477845/165418118-16a1fc94-e2d7-4711-ae9c-99bf157863cb.mp4
 
