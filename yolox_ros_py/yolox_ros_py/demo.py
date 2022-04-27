@@ -71,7 +71,7 @@ def main():
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, cap_height)
 
     # モデルロード #############################################################
-    yolox = Detector(
+    detector = Detector(
         model_path=model_path,
         input_shape=input_shape,
         score_th=score_th,
@@ -90,7 +90,7 @@ def main():
         debug_image = copy.deepcopy(frame)
 
         # 推論実施 ########################################################
-        bboxes, scores, class_ids = yolox.inference(frame)
+        bboxes, scores, class_ids = detector.inference(frame)
 
         elapsed_time = time.time() - start_time
 
