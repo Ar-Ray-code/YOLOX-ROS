@@ -103,8 +103,6 @@ ros2 launch yolox_ros_py yolox_nano_cpu.launch.py # <- CPU (PyTorch)
 
 </details>
 
-<br>
-
 <details>
 <summary>C++</summary>
 
@@ -182,9 +180,11 @@ ros2 launch yolox_ros_py yolox_nano_onnx_gazebo.launch.py
 ```bash
 # git clone https://github.com/Ar-Ray-code/YOLOX-ROS.git --recursive
 vcs import . < YOLOX-ROS/youtube-publisher.repos
+pip3 install -r YouTube-publisher-ROS2/requirements.txt
 cd ..
 colcon build --symlink-install --pacakges-select yolox_ros_py bboxes_ex_msgs youtube_publisher
 source install/setup.bash
+
 # run launch.py
 ros2 launch yolox_ros_py yolox_nano_onnx_youtube.launch.py
 ```
