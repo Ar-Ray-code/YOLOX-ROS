@@ -16,7 +16,7 @@ def generate_launch_description():
             {"image_size": [640,480]},
         ],
     )
-    yolox_openvino = launch_ros.actions.Node(
+    yolox_onnx = launch_ros.actions.Node(
         package="yolox_ros_py", executable="yolox_onnx",output="screen",
         parameters=[
             {"image_size/width": 640},
@@ -37,6 +37,6 @@ def generate_launch_description():
 
     return launch.LaunchDescription([
         webcam,
-        yolox_openvino,
+        yolox_onnx,
         # rqt_graph
     ])

@@ -75,8 +75,8 @@ class yolox_ros(Node):
         self.conf = self.get_parameter('conf').value
         self.device = self.get_parameter('device').value
 
-        self.input_width = self.get_parameter('image_size/width').value
-        self.input_height = self.get_parameter('image_size/height').value
+        self.input_image_w = self.get_parameter('image_size/width').value
+        self.input_image_h = self.get_parameter('image_size/height').value
 
         self.sensor_qos_mode = self.get_parameter('sensor_qos_mode').value
 
@@ -125,7 +125,7 @@ class yolox_ros(Node):
             bboxes = BoundingBoxes()
             img_rgb = self.bridge.imgmsg_to_cv2(msg,"bgr8")
             # resize
-            img_rgb = cv2.resize(img_rgb, (self.input_width, self.input_height))
+            img_rgb = cv2.resize(img_rgb, (self.input_image_w, self.input_image_h))
 
             origin_img = img_rgb
             _, _, h, w = self.net.input_info[self.input_blob].input_data.shape

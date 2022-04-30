@@ -78,8 +78,8 @@ class yolox_ros(Node):
         self.model_path = self.get_parameter('model_path').value
         self.conf = self.get_parameter('conf').value
 
-        self.input_width = self.get_parameter('image_size/width').value
-        self.input_height = self.get_parameter('image_size/height').value
+        self.image_size_w = self.get_parameter('image_size/width').value
+        self.image_size_h = self.get_parameter('image_size/height').value
         self.input_shape_w = self.get_parameter('input_shape/width').value
         self.input_shape_h = self.get_parameter('input_shape/height').value
 
@@ -91,7 +91,7 @@ class yolox_ros(Node):
         self.get_logger().info('model_path: {}'.format(self.model_path))
         self.get_logger().info('conf: {}'.format(self.conf))
         self.get_logger().info('input_shape: {}'.format((self.input_shape_w, self.input_shape_h)))
-        self.get_logger().info('image_size: {}'.format((self.input_width, self.input_height)))
+        self.get_logger().info('image_size: {}'.format((self.image_size_w, self.image_size_h)))
 
         self.get_logger().info('with_p6: {}'.format(self.with_p6))
         self.get_logger().info('sensor_qos_mode: {}'.format(self.sensor_qos_mode))
@@ -124,7 +124,7 @@ class yolox_ros(Node):
             bboxes = BoundingBoxes()
             origin_img = self.bridge.imgmsg_to_cv2(msg,"bgr8")
             # resize
-            img = cv2.resize(origin_img, (self.input_width, self.input_height))
+            origin_img = cv2.resize(origin_img, (self.image_size_w, self.image_size_h))
 
             # preprocess
             img, self.ratio = preprocess(origin_img, self.input_shape)

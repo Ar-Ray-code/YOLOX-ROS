@@ -1,6 +1,6 @@
 # YOLOX-ROS
 
-[YOLOX](https://github.com/Megvii-BaseDetection/YOLOX)+ROS2 Foxy
+[YOLOX](https://github.com/Megvii-BaseDetection/YOLOX) + ROS2 Foxy demo
 
 ![yolox_s_result](https://github.com/Ar-Ray-code/RenderTexture2ROS2Image/blob/main/images_for_readme/unity-demo.gif?raw=true)
 
@@ -49,7 +49,7 @@ cd ~/ros2_ws/src
 git clone https://github.com/Ar-Ray-code/yolox_ros.git --recursive
 ```
 
-### STEP 2 : YOLOX Installation (yolox_rps_py)
+### STEP 2 : YOLOX Installation (yolox_ros_py)
 
 ```bash
 pip3 install yolox
@@ -103,19 +103,26 @@ ros2 launch yolox_ros_py yolox_nano_cpu.launch.py # <- CPU (PyTorch)
 
 </details>
 
-## C++
+<br>
+
+<details>
+<summary>C++</summary>
 
 Check [this URL](https://github.com/Ar-Ray-code/YOLOX-ROS/tree/main/yolox_ros_cpp).
 
+</details>
+
+<br></br>
 
 ## Topic
+
 ### Subscribe
 
 - image_raw (`sensor_msgs/Image`)
 
 ### Publish
 
-- yolox/image_raw : Resized image (`sensor_msgs/Image`)
+<!-- - yolox/image_raw : Resized image (`sensor_msgs/Image`) -->
 
 - yololx/bounding_boxes : Output BoundingBoxes like darknet_ros_msgs (`bboxes_ex_msgs/BoundingBoxes`)
 
@@ -123,13 +130,19 @@ Check [this URL](https://github.com/Ar-Ray-code/YOLOX-ROS/tree/main/yolox_ros_cp
 
 ![yolox_topic](images_for_readme/yolox_topic.png)
 
+<br>
+
 ## Parameters 
 
 - Check launch files.
 
+<br>
+
 ## Composition
 
 - Supports C++ only.
+
+<br>
 
 ## YOLOX-ROS + ?
 
@@ -141,11 +154,29 @@ Check this repository ([RenderTexture2ROS2Image](https://github.com/Ar-Ray-code/
 
 - [yolox_nano_onnx_gazebo.launch.py](./yolox_ros_py/launch/yolox_nano_onnx_gazebo.launch.py)
 
+```bash
+ros2 launch yolox_ros_py yolox_nano_onnx_gazebo.launch.py
+```
+
 ![](./images_for_readme/gazebo.png)
 
 ### YouTube
 
 - [YouTube-publisher-ROS2](https://github.com/Ar-Ray-code/YouTube-publisher-ROS2)
+
+```bash
+git clone https://github.com/Ar-Ray-code/YOLOX-ROS.git --recursive
+vcs import . < YOLOX-ROS/youtube-publisher.repos
+cd ../
+colcon build --symlink-install --pacakges-select yolox_ros_py bboxes_ex_msgs youtube_publisher
+source install/setup.bash
+
+ros2 launch yolox_ros_py yolox_nano_onnx_youtube.launch.py
+```
+
+![](https://raw.githubusercontent.com/Ar-Ray-code/YouTube-publisher-ROS2/main/images_for_readme/youtube-pub.png)
+
+<br>
 
 ## Reference
 
@@ -162,9 +193,14 @@ Check this repository ([RenderTexture2ROS2Image](https://github.com/Ar-Ray-code/
 }
 ```
 
+<br>
+
 ## Contributors
 - [Ar-Ray](https://github.com/Ar-Ray-code)
 - [fateshelled](https://github.com/fateshelled)
+- [Kazuhito00](https://github.com/Kazuhito00)
+
+<br>
 
 ## About writer
 

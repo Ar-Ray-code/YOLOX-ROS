@@ -1,6 +1,3 @@
-# https://github.com/ros-simulation/gazebo_ros_pkgs/blob/galactic/gazebo_plugins/worlds/gazebo_ros_camera_demo.world
-
-
 import os
 
 from ament_index_python.packages import get_package_share_directory
@@ -34,7 +31,7 @@ def generate_launch_description():
         )
     )
     
-    yolox_openvino = launch_ros.actions.Node(
+    yolox_onnx = launch_ros.actions.Node(
         package="yolox_ros_py", executable="yolox_onnx",output="screen",
         parameters=[
             {"image_size/width": 640},
@@ -56,5 +53,5 @@ def generate_launch_description():
     return LaunchDescription([
         gzserver_cmd,
         gzclient_cmd,
-        yolox_openvino,
+        yolox_onnx,
     ])

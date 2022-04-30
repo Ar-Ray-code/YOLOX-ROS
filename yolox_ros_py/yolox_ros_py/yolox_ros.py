@@ -155,6 +155,8 @@ class yolox_ros(Node):
         self.declare_parameter('threshold', 0.65)
         # --tsize -> resize
         self.declare_parameter('resize', 640)
+
+        # resize input image
         self.declare_parameter('image_size/width', 640)
         self.declare_parameter('image_size/height', 480)
         
@@ -262,6 +264,7 @@ class yolox_ros(Node):
     def imageflow_callback(self,msg:Image) -> None:
         try:
             img_rgb = self.bridge.imgmsg_to_cv2(msg,"bgr8")
+            # resize
             img_rgb = cv2.resize(img_rgb,(self.input_width,self.input_height))
 
             outputs, img_info = self.predictor.inference(img_rgb)
