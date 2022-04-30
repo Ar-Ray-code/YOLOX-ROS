@@ -7,6 +7,7 @@ import rclpy
 
 import cv2
 import numpy as np
+import copy
 
 from openvino.inference_engine import IECore
 
@@ -125,13 +126,13 @@ class yolox_ros(Node):
             bboxes = BoundingBoxes()
             img_rgb = self.bridge.imgmsg_to_cv2(msg,"bgr8")
             # resize
-            img_rgb = cv2.resize(img_rgb, (self.input_image_w, self.input_image_h))
+            origin_img = cv2.resize(img_rgb, (self.input_image_w, self.input_image_h))
+            # deep copy
+            nodetect_image = copy.deepcopy(origin_img)
 
-            origin_img = img_rgb
+            # origin_img = img_rgb
             _, _, h, w = self.net.input_info[self.input_blob].input_data.shape
-            mean = (0.485, 0.456, 0.406)
-            std = (0.229, 0.224, 0.225)
-            image, ratio = preprocess(origin_img, (h, w))#, mean, std)
+            image, ratio = preprocess(origin_img, (h, w))
 
             res = self.exec_net.infer(inputs={self.input_blob: image})
             res = res[self.out_blob]
@@ -148,7 +149,7 @@ class yolox_ros(Node):
             boxes_xyxy[:, 1] = boxes[:, 1] - boxes[:, 3]/2.
             boxes_xyxy[:, 2] = boxes[:, 0] + boxes[:, 2]/2.
             boxes_xyxy[:, 3] = boxes[:, 1] + boxes[:, 3]/2.
-            # boxes_xyxy /= ratio
+            boxes_xyxy /= ratio
             dets = multiclass_nms(boxes_xyxy, scores, nms_thr=0.45, score_thr=0.1)
 
             # print(dets)
@@ -164,6 +165,8 @@ class yolox_ros(Node):
                 
             # rclpy log FPS
             self.get_logger().info(f'FPS: {1 / time_took}')
+
+            self.get_logger().info(f'Width: {self.input_image_w}, Height: {self.input_image_h}')
             
             try:
                 bboxes = self.yolox2bboxes_msgs(dets[:, :4], final_scores, final_cls_inds, COCO_CLASSES, msg.header)
@@ -179,7 +182,7 @@ class yolox_ros(Node):
                     cv2.waitKey(1)
 
             self.pub.publish(bboxes)
-            self.pub_image.publish(self.bridge.cv2_to_imgmsg(img_rgb,"bgr8"))
+            self.pub_image.publish(self.bridge.cv2_to_imgmsg(nodetect_image,"bgr8"))
 
         except Exception as e:
             self.get_logger().info(f'Error: {e}')

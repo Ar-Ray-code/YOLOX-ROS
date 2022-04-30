@@ -146,9 +146,24 @@ Check [this URL](https://github.com/Ar-Ray-code/YOLOX-ROS/tree/main/yolox_ros_cp
 
 ## YOLOX-ROS + ?
 
+<details>
+<summary>Examples</summary>
+
+### Web Camera (v4l2-camera)
+
+- [yolox_nano_onnx.launch.py](./yolox_ros_py/launch/yolox_nano_onnx.launch.py)
+
+```bash
+ros2 launch yolox_ros_py yolox_nano_onnx.launch.py video_device:=/dev/video0
+```
+
+![](./images_for_readme/yolox_webcam.png)
+
 ### Unity
 
-Check this repository ([RenderTexture2ROS2Image](https://github.com/Ar-Ray-code/RenderTexture2ROS2Image)).
+- [Ar-Ray-code/RenderTexture2ROS2Image](https://github.com/Ar-Ray-code/RenderTexture2ROS2Image)
+
+![yolox_s_result](https://github.com/Ar-Ray-code/RenderTexture2ROS2Image/blob/main/images_for_readme/unity-demo.gif?raw=true)
 
 ### Gazebo
 
@@ -162,19 +177,21 @@ ros2 launch yolox_ros_py yolox_nano_onnx_gazebo.launch.py
 
 ### YouTube
 
-- [YouTube-publisher-ROS2](https://github.com/Ar-Ray-code/YouTube-publisher-ROS2)
+- [Ar-Ray-code/YouTube-publisher-ROS2](https://github.com/Ar-Ray-code/YouTube-publisher-ROS2)
 
 ```bash
-git clone https://github.com/Ar-Ray-code/YOLOX-ROS.git --recursive
+# git clone https://github.com/Ar-Ray-code/YOLOX-ROS.git --recursive
 vcs import . < YOLOX-ROS/youtube-publisher.repos
-cd ../
+cd ..
 colcon build --symlink-install --pacakges-select yolox_ros_py bboxes_ex_msgs youtube_publisher
 source install/setup.bash
-
+# run launch.py
 ros2 launch yolox_ros_py yolox_nano_onnx_youtube.launch.py
 ```
 
-![](https://raw.githubusercontent.com/Ar-Ray-code/YouTube-publisher-ROS2/main/images_for_readme/youtube-pub.png)
+![](./images_for_readme/yolox_ydl.png)
+
+</details>
 
 <br>
 
