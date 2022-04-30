@@ -131,9 +131,21 @@ Check [this URL](https://github.com/Ar-Ray-code/YOLOX-ROS/tree/main/yolox_ros_cp
 
 - Supports C++ only.
 
-## YOLOX-ROS + Unity
+## YOLOX-ROS + ?
+
+### Unity
 
 Check this repository ([RenderTexture2ROS2Image](https://github.com/Ar-Ray-code/RenderTexture2ROS2Image)).
+
+### Gazebo
+
+- [yolox_nano_onnx_gazebo.launch.py](./yolox_ros_py/launch/yolox_nano_onnx_gazebo.launch.py)
+
+![](./images_for_readme/gazebo.png)
+
+### YouTube
+
+- [YouTube-publisher-ROS2](https://github.com/Ar-Ray-code/YouTube-publisher-ROS2)
 
 ## Reference
 
