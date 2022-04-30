@@ -177,6 +177,7 @@ ros2 launch yolox_ros_py yolox_nano_onnx_gazebo.launch.py
 
 ### YouTube
 
+- [yolox_nano_onnx_youtube.launch.py](./yolox_ros_py/launch/yolox_nano_onnx_youtube.launch.py)
 - [Ar-Ray-code/YouTube-publisher-ROS2](https://github.com/Ar-Ray-code/YouTube-publisher-ROS2)
 
 ```bash
