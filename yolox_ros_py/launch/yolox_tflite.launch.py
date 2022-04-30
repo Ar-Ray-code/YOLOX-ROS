@@ -6,9 +6,17 @@ from launch.launch_description_sources import PythonLaunchDescriptionSource
 
 from urllib.request import urlretrieve
 import os
+import time
 
 def generate_launch_description():
     yolox_ros_share_dir = get_package_share_directory('yolox_ros_py')
+
+    print("")
+    print("-------------------------------------------------------")
+    print("Warning : This model is based on YOLOX and is lightweight for RaspberryPi CPU operation. Detection other than human detection may not work correctly.")
+    print("-------------------------------------------------------")
+    print("")
+    time.sleep(1)
 
     webcam = launch_ros.actions.Node(
         package="v4l2_camera", executable="v4l2_camera_node",

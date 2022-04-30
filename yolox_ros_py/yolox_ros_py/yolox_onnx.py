@@ -26,6 +26,8 @@ from sensor_msgs.msg import Image
 from bboxes_ex_msgs.msg import BoundingBoxes
 from bboxes_ex_msgs.msg import BoundingBox
 
+from rclpy.qos import qos_profile_sensor_data
+
 # from darkself.net_ros_msgs.msg import BoundingBoxes
 # from darkself.net_ros_msgs.msg import BoundingBox
 
@@ -44,7 +46,11 @@ class yolox_ros(Node):
         
         self.pub = self.create_publisher(BoundingBoxes,"yolox/bounding_boxes", 10)
         self.pub_image = self.create_publisher(Image,"yolox/image_raw", 10)
-        self.sub = self.create_subscription(Image,"image_raw",self.imageflow_callback, 10)
+
+        if (self.sensor_qos_mode):
+            self.sub = self.create_subscription(Image,"image_raw",self.imageflow_callback, qos_profile_sensor_data)
+        else:
+            self.sub = self.create_subscription(Image,"image_raw",self.imageflow_callback, 10)
 
     def setting_yolox_exp(self) -> None:
         # set environment variables for distributed training
@@ -64,6 +70,8 @@ class yolox_ros(Node):
         self.declare_parameter('image_size/width', 640)
         self.declare_parameter('image_size/height', 480)
 
+        self.declare_parameter('sensor_qos_mode', False)
+
         # =============================================================
         self.imshow_isshow = self.get_parameter('imshow_isshow').value
 
@@ -75,6 +83,8 @@ class yolox_ros(Node):
         self.input_shape_w = self.get_parameter('input_shape/width').value
         self.input_shape_h = self.get_parameter('input_shape/height').value
 
+        self.sensor_qos_mode = self.get_parameter('sensor_qos_mode').value
+
         # ==============================================================
         self.with_p6 = self.get_parameter('with_p6').value
 
@@ -82,6 +92,9 @@ class yolox_ros(Node):
         self.get_logger().info('conf: {}'.format(self.conf))
         self.get_logger().info('input_shape: {}'.format((self.input_shape_w, self.input_shape_h)))
         self.get_logger().info('image_size: {}'.format((self.input_width, self.input_height)))
+
+        self.get_logger().info('with_p6: {}'.format(self.with_p6))
+        self.get_logger().info('sensor_qos_mode: {}'.format(self.sensor_qos_mode))
 
 
         self.input_shape = (self.input_shape_h, self.input_shape_w)
