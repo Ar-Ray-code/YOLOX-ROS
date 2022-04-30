@@ -37,7 +37,7 @@ def generate_launch_description():
     yolox_tflite = launch_ros.actions.Node(
         package="yolox_ros_py", executable="yolox_tflite",output="screen",
         parameters=[
-            {"model" : yolox_ros_share_dir+"/model.onnx"},
+            {"model" : yolox_ros_share_dir+"/model.tflite"},
             {"score_th" : 0.4},
             {"nms_th" : 0.5},
             {"input_shape/height" : 192},
