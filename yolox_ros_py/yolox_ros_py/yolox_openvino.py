@@ -7,6 +7,7 @@ import rclpy
 
 import cv2
 import numpy as np
+import copy
 
 from openvino.inference_engine import IECore
 
@@ -21,6 +22,8 @@ from rclpy.node import Node
 from std_msgs.msg import Header
 from cv_bridge import CvBridge
 from sensor_msgs.msg import Image
+
+from rclpy.qos import qos_profile_sensor_data
 
 from bboxes_ex_msgs.msg import BoundingBoxes
 from bboxes_ex_msgs.msg import BoundingBox
@@ -43,7 +46,10 @@ class yolox_ros(Node):
         
         self.pub = self.create_publisher(BoundingBoxes,"yolox/bounding_boxes", 10)
         self.pub_image = self.create_publisher(Image,"yolox/image_raw", 10)
-        self.sub = self.create_subscription(Image,"image_raw",self.imageflow_callback, 10)
+        if (self.sensor_qos_mode):
+            self.sub = self.create_subscription(Image,"image_raw",self.imageflow_callback, qos_profile_sensor_data)
+        else:
+            self.sub = self.create_subscription(Image,"image_raw",self.imageflow_callback, 10)
 
     def setting_yolox_exp(self) -> None:
         # set environment variables for distributed training
@@ -61,6 +67,7 @@ class yolox_ros(Node):
         self.declare_parameter('image_size/width', 640)
         self.declare_parameter('image_size/height', 480)
 
+        self.declare_parameter('sensor_qos_mode', False)
 
         # =============================================================
         self.imshow_isshow = self.get_parameter('imshow_isshow').value
@@ -69,8 +76,10 @@ class yolox_ros(Node):
         self.conf = self.get_parameter('conf').value
         self.device = self.get_parameter('device').value
 
-        self.input_width = self.get_parameter('image_size/width').value
-        self.input_height = self.get_parameter('image_size/height').value
+        self.input_image_w = self.get_parameter('image_size/width').value
+        self.input_image_h = self.get_parameter('image_size/height').value
+
+        self.sensor_qos_mode = self.get_parameter('sensor_qos_mode').value
 
         # ==============================================================
 
@@ -117,13 +126,13 @@ class yolox_ros(Node):
             bboxes = BoundingBoxes()
             img_rgb = self.bridge.imgmsg_to_cv2(msg,"bgr8")
             # resize
-            img_rgb = cv2.resize(img_rgb, (self.input_width, self.input_height))
+            origin_img = cv2.resize(img_rgb, (self.input_image_w, self.input_image_h))
+            # deep copy
+            nodetect_image = copy.deepcopy(origin_img)
 
-            origin_img = img_rgb
+            # origin_img = img_rgb
             _, _, h, w = self.net.input_info[self.input_blob].input_data.shape
-            mean = (0.485, 0.456, 0.406)
-            std = (0.229, 0.224, 0.225)
-            image, ratio = preprocess(origin_img, (h, w))#, mean, std)
+            image, ratio = preprocess(origin_img, (h, w))
 
             res = self.exec_net.infer(inputs={self.input_blob: image})
             res = res[self.out_blob]
@@ -140,7 +149,7 @@ class yolox_ros(Node):
             boxes_xyxy[:, 1] = boxes[:, 1] - boxes[:, 3]/2.
             boxes_xyxy[:, 2] = boxes[:, 0] + boxes[:, 2]/2.
             boxes_xyxy[:, 3] = boxes[:, 1] + boxes[:, 3]/2.
-            # boxes_xyxy /= ratio
+            boxes_xyxy /= ratio
             dets = multiclass_nms(boxes_xyxy, scores, nms_thr=0.45, score_thr=0.1)
 
             # print(dets)
@@ -156,6 +165,8 @@ class yolox_ros(Node):
                 
             # rclpy log FPS
             self.get_logger().info(f'FPS: {1 / time_took}')
+
+            self.get_logger().info(f'Width: {self.input_image_w}, Height: {self.input_image_h}')
             
             try:
                 bboxes = self.yolox2bboxes_msgs(dets[:, :4], final_scores, final_cls_inds, COCO_CLASSES, msg.header)
@@ -171,7 +182,7 @@ class yolox_ros(Node):
                     cv2.waitKey(1)
 
             self.pub.publish(bboxes)
-            self.pub_image.publish(self.bridge.cv2_to_imgmsg(img_rgb,"bgr8"))
+            self.pub_image.publish(self.bridge.cv2_to_imgmsg(nodetect_image,"bgr8"))
 
         except Exception as e:
             self.get_logger().info(f'Error: {e}')

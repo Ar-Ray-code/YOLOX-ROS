@@ -80,6 +80,7 @@ setup(
         ('share/' + package_name, ['package.xml']),
         (os.path.join('share', package_name), glob('./launch/*.launch.py')),
         (os.path.join('share', package_name), glob('../weights/*.pth')),
+        (os.path.join('share', package_name), glob('../weights/*.onnx')),
         (os.path.join('share', package_name), glob('../weights/openvino/*')),
         (os.path.join('share', package_name), glob('../weights/onnx/*')),
         (os.path.join('share', package_name), glob('../weights/tflite/*')),

@@ -26,6 +26,8 @@ from std_msgs.msg import Header
 from cv_bridge import CvBridge
 from sensor_msgs.msg import Image
 
+from rclpy.qos import qos_profile_sensor_data
+
 from bboxes_ex_msgs.msg import BoundingBoxes
 from bboxes_ex_msgs.msg import BoundingBox
 
@@ -122,7 +124,11 @@ class yolox_ros(Node):
         
         self.pub = self.create_publisher(BoundingBoxes,"yolox/bounding_boxes", 10)
         self.pub_image = self.create_publisher(Image,"yolox/image_raw", 10)
-        self.sub = self.create_subscription(Image,"image_raw",self.imageflow_callback, 10)
+        
+        if (self.sensor_qos_mode):
+            self.sub = self.create_subscription(Image,"image_raw",self.imageflow_callback, qos_profile_sensor_data)
+        else:
+            self.sub = self.create_subscription(Image,"image_raw",self.imageflow_callback, 10)
 
     def setting_yolox_exp(self) -> None:
         # set environment variables for distributed training
@@ -149,9 +155,12 @@ class yolox_ros(Node):
         self.declare_parameter('threshold', 0.65)
         # --tsize -> resize
         self.declare_parameter('resize', 640)
+
+        # resize input image
         self.declare_parameter('image_size/width', 640)
         self.declare_parameter('image_size/height', 480)
         
+        self.declare_parameter('sensor_qos_mode', False)
 
         # =============================================================
         self.imshow_isshow = self.get_parameter('imshow_isshow').value
@@ -172,6 +181,8 @@ class yolox_ros(Node):
         resize = self.get_parameter('resize').value
         self.input_width = self.get_parameter('image_size/width').value
         self.input_height = self.get_parameter('image_size/height').value
+
+        self.sensor_qos_mode = self.get_parameter('sensor_qos_mode').value
 
         # ==============================================================
 
@@ -253,6 +264,7 @@ class yolox_ros(Node):
     def imageflow_callback(self,msg:Image) -> None:
         try:
             img_rgb = self.bridge.imgmsg_to_cv2(msg,"bgr8")
+            # resize
             img_rgb = cv2.resize(img_rgb,(self.input_width,self.input_height))
 
             outputs, img_info = self.predictor.inference(img_rgb)

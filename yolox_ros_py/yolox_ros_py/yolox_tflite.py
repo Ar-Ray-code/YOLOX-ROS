@@ -32,6 +32,8 @@ from sensor_msgs.msg import Image
 
 from yolox.data.datasets import COCO_CLASSES
 
+from rclpy.qos import qos_profile_sensor_data
+
 from bboxes_ex_msgs.msg import BoundingBoxes
 from bboxes_ex_msgs.msg import BoundingBox
 
@@ -46,6 +48,11 @@ class yolox_cpu(Node):
         self.declare_parameter('num_threads', None)
         self.declare_parameter('input_shape/height', 192)
         self.declare_parameter('input_shape/width', 192)
+
+        self.declare_parameter('image_size/width', 640)
+        self.declare_parameter('image_size/height', 480)
+
+        self.declare_parameter('sensor_qos_mode', False)
         
         # パラメータ取得 ###################################################
         self.model_path = self.get_parameter('model').value
@@ -54,6 +61,11 @@ class yolox_cpu(Node):
         self.num_threads = self.get_parameter('num_threads').value
         self.input_shape_h = self.get_parameter('input_shape/height').value
         self.input_shape_w = self.get_parameter('input_shape/width').value
+
+        self.image_size_w = self.get_parameter('image_size/width').value
+        self.image_size_h = self.get_parameter('image_size/height').value
+
+        self.sensor_qos_mode = self.get_parameter('sensor_qos_mode').value
 
         self.input_shape = (self.input_shape_h, self.input_shape_w)
 
@@ -68,12 +80,10 @@ class yolox_cpu(Node):
             num_threads=self.num_threads,
         )
 
-        self.sub_image = self.create_subscription(
-            Image,
-            'image_raw',
-            self.image_callback,
-            10
-        )
+        if (self.sensor_qos_mode):
+            self.sub = self.create_subscription(Image,"image_raw",self.imageflow_callback, qos_profile_sensor_data)
+        else:
+            self.sub = self.create_subscription(Image,"image_raw",self.imageflow_callback, 10)
 
         self.pub_detection = self.create_publisher(
             BoundingBoxes,
@@ -81,11 +91,11 @@ class yolox_cpu(Node):
             10
         )
 
-    def image_callback(self, msg):
+    def imageflow_callback(self, msg):
         start = time.time()
         image = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
         # resize
-        # image = cv2.resize(image, (self.width, self.height))
+        image = cv2.resize(image, (self.image_size_w, self.image_size_h))
         bboxes, scores, class_ids = self.yolox.inference(image)
         elapsed_time = time.time() - start
         fps = 1 / elapsed_time
@@ -150,7 +160,6 @@ class yolox_cpu(Node):
 
     def __del__(self):
         cv2.destroyAllWindows()
-        self.sub_image.destroy()
         self.pub_detection.destroy()
         super().destroy_node()
 
