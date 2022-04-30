@@ -66,8 +66,10 @@ colcon build --symlink-install # weights (YOLOX-Nano) files will be installed au
 
 **Automatic download weights**
 
-- yolox_nano.onnx
-- yolox_nano.pth
+- yolox_nano.onnx by [Megvii-BaseDetection/YOLOX](https://github.com/Megvii-BaseDetection/YOLOX)
+- yolox_nano.pth by [Megvii-BaseDetection/YOLOX](https://github.com/Megvii-BaseDetection/YOLOX)
+- model.onnx by [Kazuhito00](https://github.com/Kazuhito00/Person-Detection-using-RaspberryPi-CPU)
+- model.tflite by [Kazuhito00](https://github.com/Kazuhito00/Person-Detection-using-RaspberryPi-CPU)
 
 ### (Step 3) Using CUDA
 

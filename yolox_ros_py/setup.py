@@ -64,10 +64,15 @@ if not os.path.exists(YOLOX_NANO_PATH):
 if not os.path.exists(YOLOX_NANO_ONNX_PATH):
     urlretrieve(YOLOX_NANO_ONNX_URL, YOLOX_NANO_ONNX_PATH)
 
-# tflite
+# onnx
 TFLITE_PATH = BASE_PATH + 'tflite/model.onnx'
 if not os.path.exists(TFLITE_PATH):
     urlretrieve('https://github.com/Kazuhito00/Person-Detection-using-RaspberryPi-CPU/raw/main/model/model.onnx', TFLITE_PATH)
+
+# tflite
+TFLITE_PATH = BASE_PATH + 'tflite/model.tflite'
+if not os.path.exists(TFLITE_PATH):
+    urlretrieve('https://github.com/Kazuhito00/Person-Detection-using-RaspberryPi-CPU/raw/main/model/model.tflite', TFLITE_PATH)
 
 
 setup(
@@ -81,9 +86,11 @@ setup(
         (os.path.join('share', package_name), glob('./launch/*.launch.py')),
         (os.path.join('share', package_name), glob('../weights/*.pth')),
         (os.path.join('share', package_name), glob('../weights/*.onnx')),
+        (os.path.join('share', package_name), glob('../weights/*.tflite')),
         (os.path.join('share', package_name), glob('../weights/openvino/*')),
         (os.path.join('share', package_name), glob('../weights/onnx/*')),
         (os.path.join('share', package_name), glob('../weights/tflite/*')),
+        (os.path.join('share', package_name), glob('../weights/tensorrt/*')),
         (os.path.join('share', package_name), glob('./exps/*.py')),
     ],
     install_requires=['setuptools'],
