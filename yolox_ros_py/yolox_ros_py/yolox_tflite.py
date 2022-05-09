@@ -54,12 +54,7 @@ class yolox_cpu(yolox_py):
         )
 
         self.sub = self.create_subscription(Image,"image_raw",self.imageflow_callback, self.qos_image_sub)
-
-        self.pub_detection = self.create_publisher(
-            BoundingBoxes,
-            'bounding_boxes',
-            10
-        )
+        self.pub_detection = self.create_publisher(BoundingBoxes, 'bounding_boxes', 10)
 
     def imageflow_callback(self, msg):
         start = time.time()

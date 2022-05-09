@@ -46,16 +46,10 @@ class yolox_ros(yolox_py):
         
         self.bridge = CvBridge()
         
-        self.pub = self.create_publisher(BoundingBoxes,"yolox/bounding_boxes", 10)
-        # self.pub_image = self.create_publisher(Image,"yolox/image_raw", 10)
-        
+        self.pub = self.create_publisher(BoundingBoxes,"bounding_boxes", 10)
         self.sub = self.create_subscription(Image,"image_raw",self.imageflow_callback, self.qos_image_sub)
 
     def setting_yolox_exp(self) -> None:
-        # set environment variables for distributed training
-        
-        
-
         print('Creating Inference Engine')
         ie = IECore()
         print(f'Reading the self.network: {self.model_path}')
@@ -131,7 +125,6 @@ class yolox_ros(yolox_py):
                     cv2.waitKey(1)
 
             self.pub.publish(bboxes)
-            # self.pub_image.publish(self.bridge.cv2_to_imgmsg(nodetect_image,"bgr8"))
 
         except Exception as e:
             self.get_logger().info(f'Error: {e}')

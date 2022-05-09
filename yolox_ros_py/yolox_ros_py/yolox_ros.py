@@ -124,8 +124,7 @@ class yolox_ros(yolox_py):
         
         self.bridge = CvBridge()
         
-        self.pub = self.create_publisher(BoundingBoxes,"yolox/bounding_boxes", 10)
-        # self.pub_image = self.create_publisher(Image,"yolox/image_raw", 10)
+        self.pub = self.create_publisher(BoundingBoxes,"bounding_boxes", 10)
         
         if (self.sensor_qos_mode):
             self.sub = self.create_subscription(Image,"image_raw",self.imageflow_callback, qos_profile_sensor_data)
@@ -133,8 +132,6 @@ class yolox_ros(yolox_py):
             self.sub = self.create_subscription(Image,"image_raw",self.imageflow_callback, 10)
 
     def setting_yolox_exp(self) -> None:
-        # set environment variables for distributed training
-        # ==============================================================
 
         WEIGHTS_PATH = '../../weights/yolox_nano.pth'
 
@@ -245,9 +242,6 @@ class yolox_ros(yolox_py):
                 bboxes_msg = self.yolox2bboxes_msgs(bboxes, scores, cls, cls_names, msg.header, img_rgb)
 
                 self.pub.publish(bboxes_msg)
-                # msg = self.bridge.cv2_to_imgmsg(img_rgb,"bgr8")
-                # msg.header.frame_id = "camera"
-                # self.pub_image.publish(msg)
 
                 if (self.imshow_isshow):
                     cv2.imshow("YOLOX",result_img_rgb)
