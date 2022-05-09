@@ -5,9 +5,6 @@ from ament_index_python.packages import get_package_share_directory
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
 
-from urllib.request import urlretrieve
-import os
-
 def generate_launch_description():
     yolox_ros_share_dir = get_package_share_directory('yolox_ros_py')
 

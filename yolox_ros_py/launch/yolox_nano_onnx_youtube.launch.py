@@ -7,7 +7,6 @@ from launch.actions import IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 import launch_ros
 
-
 def generate_launch_description():
     yolox_ros_share_dir = get_package_share_directory('yolox_ros_py')
     youtube_publisher_share_dir = get_package_share_directory('youtube_publisher')

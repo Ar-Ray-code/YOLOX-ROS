@@ -10,9 +10,9 @@
 
 | Base            | ROS2 C++ | ROS2 Python |
 | --------------- | -------- | ----------- |
-| CPU             |           | ✅           |
-| CUDA            |           | ✅           |
-| CUDA (FP16)     |           | ✅           |
+| PyTorch         |           | ✅           |
+| PyTorch(CUDA)   |           | ✅           |
+| PyTorch(CUDA-FP16) |           | ✅           |
 | TensorRT (CUDA) |  ✅       |              |
 | OpenVINO        |  ✅       | ✅           |
 | ONNX Runtime    |           | ✅           |
