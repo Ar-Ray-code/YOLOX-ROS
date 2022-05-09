@@ -7,7 +7,6 @@ from launch.actions import IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 import launch_ros
 
-
 def generate_launch_description():
     yolox_ros_share_dir = get_package_share_directory('yolox_ros_py')
     youtube_publisher_share_dir = get_package_share_directory('youtube_publisher')
@@ -37,9 +36,6 @@ def generate_launch_description():
     yolox_onnx = launch_ros.actions.Node(
         package="yolox_ros_py", executable="yolox_onnx",output="screen",
         parameters=[
-            {"image_size/width": 640},
-            {"image_size/height": 360},
-            
             {"input_shape/width": 416},
             {"input_shape/height": 416},
 

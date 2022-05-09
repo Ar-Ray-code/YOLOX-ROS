@@ -7,17 +7,9 @@ from launch.substitutions import LaunchConfiguration
 
 from urllib.request import urlretrieve
 import os
-import time
 
 def generate_launch_description():
     yolox_ros_share_dir = get_package_share_directory('yolox_ros_py')
-
-    print("")
-    print("-------------------------------------------------------")
-    print("Warning : This model is based on YOLOX and is lightweight for RaspberryPi CPU operation. Detection other than human detection may not work correctly.")
-    print("-------------------------------------------------------")
-    print("")
-    time.sleep(1)
 
     video_device = LaunchConfiguration('video_device', default='/dev/video0')
     video_device_arg = DeclareLaunchArgument(
@@ -33,15 +25,15 @@ def generate_launch_description():
             {"video_device": video_device},
         ],
     )
-
-    yolox_tflite = launch_ros.actions.Node(
-        package="yolox_ros_py", executable="yolox_tflite",output="screen",
+    yolox_onnx = launch_ros.actions.Node(
+        package="yolox_ros_py", executable="yolox_onnx",output="screen",
         parameters=[
-            {"model" : yolox_ros_share_dir+"/model.tflite"},
-            {"score_th" : 0.4},
-            {"nms_th" : 0.5},
-            {"input_shape/height" : 192},
-            {"input_shape/width" : 192}
+            {"input_shape/width": 416},
+            {"input_shape/height": 416},
+
+            {"with_p6" : False},
+            {"model_path" : yolox_ros_share_dir+"/yolox_nano.onnx"},
+            {"conf" : 0.3},
         ],
     )
 
@@ -52,6 +44,6 @@ def generate_launch_description():
     return launch.LaunchDescription([
         video_device_arg,
         webcam,
-        yolox_tflite,
+        yolox_onnx,
         # rqt_graph
     ])
