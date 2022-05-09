@@ -36,9 +36,6 @@ def generate_launch_description():
     yolox_onnx = launch_ros.actions.Node(
         package="yolox_ros_py", executable="yolox_onnx",output="screen",
         parameters=[
-            {"image_size/width": 640},
-            {"image_size/height": 360},
-            
             {"input_shape/width": 416},
             {"input_shape/height": 416},
 

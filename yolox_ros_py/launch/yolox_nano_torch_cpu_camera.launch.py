@@ -26,8 +26,6 @@ def generate_launch_description():
     yolox_ros = launch_ros.actions.Node(
         package="yolox_ros_py", executable="yolox_ros",
         parameters=[
-            {"image_size/width": 640},
-            {"image_size/height": 480},
             {"yolox_exp_py" : yolox_ros_share_dir+'/yolox_nano.py'},
             {"device" : 'cpu'},
             {"fp16" : True},

@@ -19,6 +19,8 @@ from yolox.data.datasets import COCO_CLASSES
 from yolox.exp import get_exp
 from yolox.utils import fuse_model, get_model_info, postprocess, setup_logger, vis
 
+from .yolox_ros_py_utils.utils import yolox_py
+
 import rclpy
 from rclpy.node import Node
 
@@ -112,18 +114,18 @@ class Predictor(object):
         
         return vis_res, bboxes, scores, cls, self.cls_names
 
-class yolox_ros(Node):
+class yolox_ros(yolox_py):
     def __init__(self) -> None:
 
         # ROS2 init
-        super().__init__('yolox_ros')
+        super().__init__('yolox_ros', load_params=False)
 
         self.setting_yolox_exp()
         
         self.bridge = CvBridge()
         
         self.pub = self.create_publisher(BoundingBoxes,"yolox/bounding_boxes", 10)
-        self.pub_image = self.create_publisher(Image,"yolox/image_raw", 10)
+        # self.pub_image = self.create_publisher(Image,"yolox/image_raw", 10)
         
         if (self.sensor_qos_mode):
             self.sub = self.create_subscription(Image,"image_raw",self.imageflow_callback, qos_profile_sensor_data)
@@ -132,14 +134,11 @@ class yolox_ros(Node):
 
     def setting_yolox_exp(self) -> None:
         # set environment variables for distributed training
-        
         # ==============================================================
 
         WEIGHTS_PATH = '../../weights/yolox_nano.pth'
 
         self.declare_parameter('imshow_isshow',True)
-
-        # self.declare_parameter('yolo_type','yolox-s')
         self.declare_parameter('yolox_exp_py', '')
 
         self.declare_parameter('fuse',False)
@@ -155,17 +154,12 @@ class yolox_ros(Node):
         self.declare_parameter('threshold', 0.65)
         # --tsize -> resize
         self.declare_parameter('resize', 640)
-
-        # resize input image
-        self.declare_parameter('image_size/width', 640)
-        self.declare_parameter('image_size/height', 480)
         
         self.declare_parameter('sensor_qos_mode', False)
 
         # =============================================================
         self.imshow_isshow = self.get_parameter('imshow_isshow').value
 
-        # yolo_type = self.get_parameter('yolo_type').value
         exp_py = self.get_parameter('yolox_exp_py').value
 
         fuse = self.get_parameter('fuse').value
@@ -178,17 +172,14 @@ class yolox_ros(Node):
         legacy = self.get_parameter('legacy').value
         threshold = self.get_parameter('threshold').value
         
-        resize = self.get_parameter('resize').value
-        self.input_width = self.get_parameter('image_size/width').value
-        self.input_height = self.get_parameter('image_size/height').value
+        input_shape_w = self.get_parameter('resize').value
+        input_shape_h = input_shape_w
 
         self.sensor_qos_mode = self.get_parameter('sensor_qos_mode').value
 
         # ==============================================================
 
         cudnn.benchmark = True
-
-        # exp = get_exp(None, "yolox-s")
         exp = get_exp(exp_py, None)
 
 
@@ -198,7 +189,7 @@ class yolox_ros(Node):
 
         exp.test_conf = conf # test conf
         exp.threshold = threshold # nms threshold
-        exp.test_size = (resize, resize) # Resize size
+        exp.test_size = (input_shape_h, input_shape_w) # test size
 
         model = exp.get_model()
         logger.info("Model Summary: {}".format(get_model_info(model, exp.test_size)))
@@ -244,49 +235,30 @@ class yolox_ros(Node):
         
         self.predictor = Predictor(model, exp, COCO_CLASSES, trt_file, decoder, device, fp16, legacy)
 
-    def yolox2bboxes_msgs(self, bboxes, scores, cls, cls_names, img_header:Header):
-        bboxes_msg = BoundingBoxes()
-        bboxes_msg.header = img_header
-        i = 0
-        for bbox in bboxes:
-            one_box = BoundingBox()
-            one_box.xmin = int(bbox[0])
-            one_box.ymin = int(bbox[1])
-            one_box.xmax = int(bbox[2])
-            one_box.ymax = int(bbox[3])
-            one_box.probability = float(scores[i])
-            one_box.class_id = str(cls_names[int(cls[i])])
-            bboxes_msg.bounding_boxes.append(one_box)
-            i = i+1
-        
-        return bboxes_msg
-
     def imageflow_callback(self,msg:Image) -> None:
         try:
             img_rgb = self.bridge.imgmsg_to_cv2(msg,"bgr8")
-            # resize
-            img_rgb = cv2.resize(img_rgb,(self.input_width,self.input_height))
-
             outputs, img_info = self.predictor.inference(img_rgb)
 
             try:
                 result_img_rgb, bboxes, scores, cls, cls_names = self.predictor.visual(outputs[0], img_info)
-                bboxes = self.yolox2bboxes_msgs(bboxes, scores, cls, cls_names, msg.header)
-                
-                self.pub.publish(bboxes)
-                msg = self.bridge.cv2_to_imgmsg(img_rgb,"bgr8")
-                msg.header.frame_id = "camera"
-                self.pub_image.publish(msg)
+                bboxes_msg = self.yolox2bboxes_msgs(bboxes, scores, cls, cls_names, msg.header, img_rgb)
+
+                self.pub.publish(bboxes_msg)
+                # msg = self.bridge.cv2_to_imgmsg(img_rgb,"bgr8")
+                # msg.header.frame_id = "camera"
+                # self.pub_image.publish(msg)
 
                 if (self.imshow_isshow):
                     cv2.imshow("YOLOX",result_img_rgb)
                     cv2.waitKey(1)
-                
-            except:
+
+            except Exception as e:
                 if (self.imshow_isshow):
                     cv2.imshow("YOLOX",img_rgb)
                     cv2.waitKey(1)
-        except:
+        except Exception as e:
+            logger.error(e)
             pass
 
 def ros_main(args = None):

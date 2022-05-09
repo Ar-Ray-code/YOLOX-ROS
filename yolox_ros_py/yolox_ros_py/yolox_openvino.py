@@ -15,6 +15,8 @@ from yolox.data.data_augment import preproc as preprocess
 from yolox.data.datasets import COCO_CLASSES
 from yolox.utils import multiclass_nms, demo_postprocess, vis
 
+from .yolox_ros_py_utils.utils import yolox_py
+
 # ROS2 =====================================
 import rclpy
 from rclpy.node import Node
@@ -31,11 +33,11 @@ from bboxes_ex_msgs.msg import BoundingBox
 # from darkself.net_ros_msgs.msg import BoundingBoxes
 # from darkself.net_ros_msgs.msg import BoundingBox
 
-class yolox_ros(Node):
+class yolox_ros(yolox_py):
     def __init__(self) -> None:
 
         # ROS2 init
-        super().__init__('yolox_ros')
+        super().__init__('yolox_ros', load_params=True)
 
         self.setting_yolox_exp()
 
@@ -45,43 +47,14 @@ class yolox_ros(Node):
         self.bridge = CvBridge()
         
         self.pub = self.create_publisher(BoundingBoxes,"yolox/bounding_boxes", 10)
-        self.pub_image = self.create_publisher(Image,"yolox/image_raw", 10)
-        if (self.sensor_qos_mode):
-            self.sub = self.create_subscription(Image,"image_raw",self.imageflow_callback, qos_profile_sensor_data)
-        else:
-            self.sub = self.create_subscription(Image,"image_raw",self.imageflow_callback, 10)
+        # self.pub_image = self.create_publisher(Image,"yolox/image_raw", 10)
+        
+        self.sub = self.create_subscription(Image,"image_raw",self.imageflow_callback, self.qos_image_sub)
 
     def setting_yolox_exp(self) -> None:
         # set environment variables for distributed training
         
-        # ==============================================================
-
-        WEIGHTS_PATH = '/home/ubuntu/ros2_ws/install/yolox_ros_py/share/yolox_ros_py/yolox_s.xml'
-
-        self.declare_parameter('imshow_isshow',True)
-
-        self.declare_parameter('model_path', WEIGHTS_PATH)
-        self.declare_parameter('conf', 0.3)
-        self.declare_parameter('device', "CPU")
-
-        self.declare_parameter('image_size/width', 640)
-        self.declare_parameter('image_size/height', 480)
-
-        self.declare_parameter('sensor_qos_mode', False)
-
-        # =============================================================
-        self.imshow_isshow = self.get_parameter('imshow_isshow').value
-
-        self.model_path = self.get_parameter('model_path').value
-        self.conf = self.get_parameter('conf').value
-        self.device = self.get_parameter('device').value
-
-        self.input_image_w = self.get_parameter('image_size/width').value
-        self.input_image_h = self.get_parameter('image_size/height').value
-
-        self.sensor_qos_mode = self.get_parameter('sensor_qos_mode').value
-
-        # ==============================================================
+        
 
         print('Creating Inference Engine')
         ie = IECore()
@@ -101,32 +74,12 @@ class yolox_ros(Node):
         print('Loading the model to the plugin')
         self.exec_net = ie.load_network(network=self.net, device_name=self.device)
 
-
-    def yolox2bboxes_msgs(self, bboxes, scores, cls, cls_names, img_header:Header):
-        bboxes_msg = BoundingBoxes()
-        bboxes_msg.header = img_header
-        i = 0
-        for bbox in bboxes:
-            one_box = BoundingBox()
-            one_box.xmin = int(bbox[0])
-            one_box.ymin = int(bbox[1])
-            one_box.xmax = int(bbox[2])
-            one_box.ymax = int(bbox[3])
-            one_box.probability = float(scores[i])
-            one_box.class_id = str(cls_names[int(cls[i])])
-            bboxes_msg.bounding_boxes.append(one_box)
-            i = i+1
-        
-        return bboxes_msg
-
     def imageflow_callback(self,msg:Image) -> None:
         try:
             # fps start
             start_time = cv2.getTickCount()
             bboxes = BoundingBoxes()
-            img_rgb = self.bridge.imgmsg_to_cv2(msg,"bgr8")
-            # resize
-            origin_img = cv2.resize(img_rgb, (self.input_image_w, self.input_image_h))
+            origin_img = self.bridge.imgmsg_to_cv2(msg,"bgr8")
             # deep copy
             nodetect_image = copy.deepcopy(origin_img)
 
@@ -165,24 +118,20 @@ class yolox_ros(Node):
                 
             # rclpy log FPS
             self.get_logger().info(f'FPS: {1 / time_took}')
-
-            self.get_logger().info(f'Width: {self.input_image_w}, Height: {self.input_image_h}')
             
             try:
-                bboxes = self.yolox2bboxes_msgs(dets[:, :4], final_scores, final_cls_inds, COCO_CLASSES, msg.header)
-                # self.get_logger().info(f'bboxes: {bboxes}')
+                bboxes = self.yolox2bboxes_msgs(dets[:, :4], final_scores, final_cls_inds, COCO_CLASSES, msg.header,  origin_img)
                 if (self.imshow_isshow):
                     cv2.imshow("YOLOX",origin_img)
                     cv2.waitKey(1)
                 
             except:
-                # self.get_logger().info('No object detected')
                 if (self.imshow_isshow):
                     cv2.imshow("YOLOX",origin_img)
                     cv2.waitKey(1)
 
             self.pub.publish(bboxes)
-            self.pub_image.publish(self.bridge.cv2_to_imgmsg(nodetect_image,"bgr8"))
+            # self.pub_image.publish(self.bridge.cv2_to_imgmsg(nodetect_image,"bgr8"))
 
         except Exception as e:
             self.get_logger().info(f'Error: {e}')
