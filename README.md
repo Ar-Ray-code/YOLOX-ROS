@@ -18,11 +18,11 @@
 | ONNX Runtime    |           | ✅           |
 | TFLite          |           | ✅           |
 
-### Raspberry Pi4 🍓 + NCS2 + YOLOX-ROS
+<!-- ### Raspberry Pi4 🍓 + NCS2 + YOLOX-ROS
 
 Good news for studets❗🍓
 
-Check [GitHub Wiki](https://github.com/Ar-Ray-code/YOLOX-ROS/wiki/YOLOX-ROS---Raspbian-(NCS2)) to try YOLOX-ROS.
+Check [GitHub Wiki](https://github.com/Ar-Ray-code/YOLOX-ROS/wiki/YOLOX-ROS---Raspbian-(NCS2)) to try YOLOX-ROS. -->
 
 ## Installation & Demo
 <details>
@@ -151,7 +151,7 @@ Check [this URL](https://github.com/Ar-Ray-code/YOLOX-ROS/tree/main/yolox_ros_cp
 
 ### Web Camera (v4l2-camera)
 
-- [yolox_nano_onnx.launch.py](./yolox_ros_py/launch/yolox_nano_onnx.launch.py)
+- [yolox_nano_onnx.launch.py](./yolox_ros_py/launch/yolox_nano_onnx_camera.launch.py)
 
 ```bash
 ros2 launch yolox_ros_py yolox_nano_onnx.launch.py video_device:=/dev/video0
