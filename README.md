@@ -108,7 +108,7 @@ ros2 launch yolox_ros_py yolox_nano_cpu.launch.py # <- CPU (PyTorch)
 <details>
 <summary>C++</summary>
 
-Check [this URL](https://github.com/Ar-Ray-code/YOLOX-ROS/tree/main/yolox_ros_cpp).
+Check [this URL](./yolox_ros_cpp/README.md).
 
 </details>
 
