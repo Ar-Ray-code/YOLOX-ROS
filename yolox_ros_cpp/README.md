@@ -56,19 +56,19 @@ docker run --rm -it \
 #### TensorRT
 ```bash
 # base image is "nvcr.io/nvidia/pytorch:21.09-py3"
-docker pull fateshelled/tensorrt_yolox_ros:latest
+docker pull swiftfile/tensorrt_yolox_ros:latest
 
 xhost +
 docker run --rm -it \
            --network host \
-           --runtime nvidia \
+           --gpus all \
            --privileged \
            -v $HOME/ros2_ws:/root/ros2_ws \
            -v /tmp/.X11-unix:/tmp/.X11-unix \
            -w /root/ros2_ws \
            -e DISPLAY=$DISPLAY \
            --device /dev/video0:/dev/video0 \
-           fateshelled/tensorrt_yolox_ros:latest \
+           swiftfile/tensorrt_yolox_ros:latest \
            /bin/bash
 ```
 

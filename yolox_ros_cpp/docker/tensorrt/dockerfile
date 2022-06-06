@@ -19,8 +19,14 @@ RUN apt update && \
     apt install -y ros-foxy-ros-base && \
     apt install -y python3-colcon-common-extensions && \
     apt install -y ros-foxy-v4l2-camera && \
+    apt install -y ros-foxy-cv-bridge &&\
+    rm -rf /var/lib/apt/lists/*  &&\
     apt -y clean && \
-    rm -rf /var/lib/apt/lists/*
+    pip install -U pip && \
+    pip install catkin_pkg && \
+    pip install empy && \
+    pip install lark && \     
+    python3 -m pip cache purge
 
 WORKDIR /workspace
 ENV YOLOX_VERSION=0.2.0
