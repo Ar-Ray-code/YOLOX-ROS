@@ -25,11 +25,6 @@ set(ENABLE_TENSORRT OFF)
 # find dependencies
 find_package(ament_cmake REQUIRED)
 find_package(OpenCV REQUIRED)
-find_package(OpenMP)
-if(OpenMP_FOUND)
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-endif()
 
 if(YOLOX_USE_OPENVINO)
   find_package(InferenceEngine)
@@ -139,7 +134,7 @@ install(
   DIRECTORY include/
   DESTINATION include
 )
-    
+
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   # the following line skips the linter which checks for copyrights
