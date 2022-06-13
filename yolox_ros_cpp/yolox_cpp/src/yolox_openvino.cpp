@@ -62,7 +62,8 @@ namespace yolox_cpp{
         generate_grids_and_stride(this->input_w_, this->input_h_, this->strides_, this->grid_strides_);
     }
 
-    std::vector<Object> YoloXOpenVINO::inference(cv::Mat frame){
+    std::vector<Object> YoloXOpenVINO::inference(const cv::Mat& frame)
+    {
         // preprocess
         cv::Mat pr_img = static_resize(frame);
         InferenceEngine::Blob::Ptr imgBlob = infer_request_.GetBlob(input_name_);
@@ -79,12 +80,7 @@ namespace yolox_cpp{
 
         // do inference
         /* Running the request synchronously */
-        try{
-            infer_request_.Infer();
-        }catch  (const std::exception& ex) {
-            std::cerr << ex.what() << std::endl;
-            return {};
-        }
+        infer_request_.Infer();
 
         // Process output
         const InferenceEngine::Blob::Ptr output_blob = infer_request_.GetBlob(output_name_);
@@ -100,7 +96,6 @@ namespace yolox_cpp{
         const float* net_pred = moutputHolder.as<const PrecisionTrait<Precision::FP32>::value_type*>();
 
         float scale = std::min(input_w_ / (frame.cols*1.0), input_h_ / (frame.rows*1.0));
-
         std::vector<Object> objects;
         decode_outputs(net_pred, this->grid_strides_, objects, this->bbox_conf_thresh_, scale, frame.cols, frame.rows);
         return objects;

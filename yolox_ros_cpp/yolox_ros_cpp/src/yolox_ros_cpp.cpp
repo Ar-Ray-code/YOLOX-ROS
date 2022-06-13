@@ -7,8 +7,8 @@ namespace yolox_ros_cpp{
     {}
 
     YoloXNode::YoloXNode(const std::string &node_name, const rclcpp::NodeOptions& options)
-    : rclcpp::Node("yolox_ros_cpp", node_name, options){
-
+    : rclcpp::Node("yolox_ros_cpp", node_name, options)
+    {
         RCLCPP_INFO(this->get_logger(), "initialize");
         this->initializeParameter();
 
@@ -52,13 +52,14 @@ namespace yolox_ros_cpp{
 
     }
 
-    void YoloXNode::initializeParameter(){
+    void YoloXNode::initializeParameter()
+    {
         this->declare_parameter<bool>("imshow_isshow", true);
-        this->declare_parameter<std::string>("model_path", "/root/ros2_ws/src/YOLOX-ROS/weights/tensorrt/YOLOX_outputs/nano/model_trt.engine");
+        this->declare_parameter<std::string>("model_path", "src/YOLOX-ROS/weights/openvino/yolox_tiny.xml");
         this->declare_parameter<float>("conf", 0.3f);
         this->declare_parameter<float>("nms", 0.45f);
-        this->declare_parameter<std::string>("device", "0");
-        this->declare_parameter<std::string>("model_type", "tensorrt");
+        this->declare_parameter<std::string>("device", "CPU");
+        this->declare_parameter<std::string>("model_type", "openvino");
         this->declare_parameter<std::string>("model_version", "0.1.1rc0");
         this->declare_parameter<std::string>("src_image_topic_name", "image_raw");
         this->declare_parameter<std::string>("publish_image_topic_name", "yolox/image_raw");
@@ -86,13 +87,19 @@ namespace yolox_ros_cpp{
         RCLCPP_INFO(this->get_logger(), "Set parameter publish_image_topic_name: '%s'", this->publish_image_topic_name_.c_str());
 
     }
-    void YoloXNode::colorImageCallback(const sensor_msgs::msg::Image::ConstSharedPtr& ptr){
+    void YoloXNode::colorImageCallback(const sensor_msgs::msg::Image::ConstSharedPtr& ptr)
+    {
         auto img = cv_bridge::toCvCopy(ptr, "bgr8");
         cv::Mat frame = img->image;
 
         // fps
         auto now = std::chrono::system_clock::now();
-        auto objects = this->yolox_->inference(frame);
+
+        std::vector<Object> objects = this->yolox_->inference(frame);
+
+        auto end = std::chrono::system_clock::now();
+        auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - now);
+        RCLCPP_INFO(this->get_logger(), "Inference: %f FPS", 1000.0f / elapsed.count());
 
         yolox_cpp::utils::draw_objects(frame, objects);
         if(this->imshow_){
@@ -110,11 +117,9 @@ namespace yolox_ros_cpp{
         pub_img = cv_bridge::CvImage(img->header, "bgr8", frame).toImageMsg();
         this->pub_image_.publish(pub_img);
 
-        auto end = std::chrono::system_clock::now();
-        auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - now);
-        RCLCPP_INFO(this->get_logger(), "fps: %f", 1000.0f / elapsed.count());
     }
-    bboxes_ex_msgs::msg::BoundingBoxes YoloXNode::objects_to_bboxes(cv::Mat frame, std::vector<yolox_cpp::Object> objects, std_msgs::msg::Header header){
+    bboxes_ex_msgs::msg::BoundingBoxes YoloXNode::objects_to_bboxes(cv::Mat frame, std::vector<yolox_cpp::Object> objects, std_msgs::msg::Header header)
+    {
         bboxes_ex_msgs::msg::BoundingBoxes boxes;
         boxes.header = header;
         for(auto obj: objects){
