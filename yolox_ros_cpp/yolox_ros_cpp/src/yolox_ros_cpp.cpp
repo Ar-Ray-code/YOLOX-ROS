@@ -95,7 +95,7 @@ namespace yolox_ros_cpp{
         // fps
         auto now = std::chrono::system_clock::now();
 
-        std::vector<Object> objects = this->yolox_->inference(frame);
+        auto objects = this->yolox_->inference(frame);
 
         auto end = std::chrono::system_clock::now();
         auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - now);
