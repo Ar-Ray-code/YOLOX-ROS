@@ -42,7 +42,7 @@ namespace yolox_cpp{
 
         auto out_dims = this->engine_->getBindingDimensions(1);
         this->output_size_ = 1;
-        for(int j=0;j<out_dims.nbDims;j++) {
+        for(int j=0; j<out_dims.nbDims; ++j) {
             this->output_size_ *= out_dims.d[j];
         }
 
@@ -57,7 +57,9 @@ namespace yolox_cpp{
         // Prepare GridAndStrides
         generate_grids_and_stride(this->input_w_, this->input_h_, this->strides_, this->grid_strides_);
     }
-    std::vector<Object> YoloXTensorRT::inference(cv::Mat frame){
+
+    std::vector<Object> YoloXTensorRT::inference(const cv::Mat& frame)
+    {
         // preprocess
         auto pr_img = static_resize(frame);
         float* input_blob = new float[pr_img.total()*3];
@@ -77,7 +79,8 @@ namespace yolox_cpp{
         return objects;
     }
 
-    void YoloXTensorRT::doInference(float* input, float* output) {
+    void YoloXTensorRT::doInference(float* input, float* output)
+    {
         // Pointers to input and output device buffers to pass to engine.
         // Engine requires exactly IEngine::getNbBindings() number of buffers.
         void* buffers[2];
