@@ -23,7 +23,7 @@ namespace yolox_ros_cpp{
         if(this->model_type_ == "tensorrt"){
             #ifdef ENABLE_TENSORRT
                 RCLCPP_INFO(this->get_logger(), "Model Type is TensorRT");
-                this->yolox_ = std::make_unique<yolox_cpp::YoloXTensorRT>(this->model_path_, this->tenorrt_device_,
+                this->yolox_ = std::make_unique<yolox_cpp::YoloXTensorRT>(this->model_path_, this->tensorrt_device_,
                                                                           this->nms_th_, this->conf_th_, this->model_version_);
             #else
                 RCLCPP_ERROR(this->get_logger(), "yolox_cpp is not built with TensorRT");
