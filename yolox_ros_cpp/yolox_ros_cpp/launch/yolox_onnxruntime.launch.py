@@ -36,7 +36,7 @@ def generate_launch_description():
         ),
         DeclareLaunchArgument(
             "onnxruntime/inter_op_num_threads",
-            default_value="2",
+            default_value="1",
             description="onnxruntime inter_op_num_threads."
         ),
         DeclareLaunchArgument(
