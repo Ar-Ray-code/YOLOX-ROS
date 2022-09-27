@@ -3,12 +3,12 @@
 namespace yolox_cpp{
 
     YoloXONNXRuntime::YoloXONNXRuntime(file_name_t path_to_model,
-                                       int intra_num_threads, int inter_num_threads,
-                                       std::string device, int device_id,
+                                       int intra_op_num_threads, int inter_op_num_threads,
+                                       bool use_cuda, int device_id,
                                        float nms_th, float conf_th, std::string model_version)
     :AbcYoloX(nms_th, conf_th, model_version),
-     intra_num_threads_(intra_num_threads), inter_num_threads_(inter_num_threads),
-     device_(device), device_id_(device_id)
+     intra_op_num_threads_(intra_op_num_threads), inter_op_num_threads_(inter_op_num_threads),
+     use_cuda_(use_cuda), device_id_(device_id)
     {
         try
         {
@@ -22,10 +22,10 @@ namespace yolox_cpp{
             // // the number of threads used to parallelize the execution of the graph (across nodes).
             // session_options.SetExecutionMode(ExecutionMode::ORT_PARALLEL);
 
-            session_options.SetInterOpNumThreads(this->inter_num_threads_);
-            session_options.SetIntraOpNumThreads(this->intra_num_threads_);
+            session_options.SetInterOpNumThreads(this->inter_op_num_threads_);
+            session_options.SetIntraOpNumThreads(this->intra_op_num_threads_);
 
-            if(this->device_ == "cuda")
+            if(this->use_cuda_)
             {
                 OrtCUDAProviderOptions cuda_option;
                 cuda_option.device_id = this->device_id_;

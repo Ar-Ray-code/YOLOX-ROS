@@ -25,9 +25,24 @@ def generate_launch_description():
             description="yolox model version."
         ),
         DeclareLaunchArgument(
-            "device",
-            default_value="CPU",
-            description="model device. CPU, GPU, MYRIAD, etc..."
+            "onnxruntime/use_cuda",
+            default_value="true",
+            description="onnxruntime use cuda."
+        ),
+        DeclareLaunchArgument(
+            "onnxruntime/device_id",
+            default_value="0",
+            description="onnxruntime gpu device id."
+        ),
+        DeclareLaunchArgument(
+            "onnxruntime/inter_op_num_threads",
+            default_value="2",
+            description="onnxruntime inter_op_num_threads."
+        ),
+        DeclareLaunchArgument(
+            "onnxruntime/intra_op_num_threads",
+            default_value="1",
+            description="onnxruntime intra_op_num_threads."
         ),
         DeclareLaunchArgument(
             "conf",
@@ -82,7 +97,10 @@ def generate_launch_description():
                             "model_path": LaunchConfiguration("model_path"),
                             "model_type": "onnxruntime",
                             "model_version": LaunchConfiguration("model_version"),
-                            "device": LaunchConfiguration("device"),
+                            "onnxruntime/use_cuda": LaunchConfiguration("onnxruntime/use_cuda"),
+                            "onnxruntime/device_id": LaunchConfiguration("onnxruntime/device_id"),
+                            "onnxruntime/inter_op_num_threads": LaunchConfiguration("onnxruntime/inter_op_num_threads"),
+                            "onnxruntime/intra_op_num_threads": LaunchConfiguration("onnxruntime/intra_op_num_threads"),
                             "conf": LaunchConfiguration("conf"),
                             "nms": LaunchConfiguration("nms"),
                             "imshow_isshow": LaunchConfiguration("imshow_isshow"),

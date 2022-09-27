@@ -21,8 +21,8 @@ def generate_launch_description():
             description="yolox model path."
         ),
         DeclareLaunchArgument(
-            "device",
-            default_value="'0'",
+            "tensorrt/device",
+            default_value="0",
             description="GPU index. Set in string type. ex '0'"
         ),
         DeclareLaunchArgument(
@@ -84,7 +84,7 @@ def generate_launch_description():
                             "model_path": LaunchConfiguration("model_path"),
                             "model_type": "tensorrt",
                             "model_version": LaunchConfiguration("model_version"),
-                            "device": LaunchConfiguration("device"),
+                            "tensorrt/device": LaunchConfiguration("device"),
                             "conf": LaunchConfiguration("conf"),
                             "nms": LaunchConfiguration("nms"),
                             "imshow_isshow": LaunchConfiguration("imshow_isshow"),
@@ -102,7 +102,7 @@ def generate_launch_description():
     )
 
     return launch.LaunchDescription(
-        launch_args + 
+        launch_args +
         [
             container,
             # rqt

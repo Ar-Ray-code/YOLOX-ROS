@@ -25,7 +25,7 @@ def generate_launch_description():
             description="yolox model version."
         ),
         DeclareLaunchArgument(
-            "device",
+            "openvino/device",
             default_value="CPU",
             description="model device. CPU, GPU, MYRIAD, etc..."
         ),
@@ -82,7 +82,7 @@ def generate_launch_description():
                             "model_path": LaunchConfiguration("model_path"),
                             "model_type": "openvino",
                             "model_version": LaunchConfiguration("model_version"),
-                            "device": LaunchConfiguration("device"),
+                            "openvino/device": LaunchConfiguration("openvino/device"),
                             "conf": LaunchConfiguration("conf"),
                             "nms": LaunchConfiguration("nms"),
                             "imshow_isshow": LaunchConfiguration("imshow_isshow"),

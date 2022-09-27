@@ -17,16 +17,16 @@ namespace yolox_cpp{
     class YoloXONNXRuntime: public AbcYoloX{
         public:
             YoloXONNXRuntime(file_name_t path_to_model,
-                             int intra_num_threads, int inter_num_threadsint=1,
-                             std::string device="cuda", int device_id=0,
+                             int intra_op_num_threads, int inter_op_num_threads=1,
+                             bool use_cuda=true, int device_id=0,
                              float nms_th=0.45, float conf_th=0.3, std::string model_version="0.1.1rc0");
             std::vector<Object> inference(const cv::Mat& frame) override;
 
         private:
-            int inter_num_threads_ = 1;
-            int intra_num_threads_ = 1;
+            int intra_op_num_threads_ = 1;
+            int inter_op_num_threads_ = 1;
             int device_id_ = 0;
-            std::string device_;
+            bool use_cuda_ = true;
 
             Ort::Session session_{nullptr};
             Ort::Env env_{ORT_LOGGING_LEVEL_WARNING, "Default"};
