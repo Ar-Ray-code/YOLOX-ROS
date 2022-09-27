@@ -84,7 +84,7 @@ def generate_launch_description():
                             "model_path": LaunchConfiguration("model_path"),
                             "model_type": "tensorrt",
                             "model_version": LaunchConfiguration("model_version"),
-                            "tensorrt/device": LaunchConfiguration("device"),
+                            "tensorrt/device": LaunchConfiguration("tensorrt/device"),
                             "conf": LaunchConfiguration("conf"),
                             "nms": LaunchConfiguration("nms"),
                             "imshow_isshow": LaunchConfiguration("imshow_isshow"),
