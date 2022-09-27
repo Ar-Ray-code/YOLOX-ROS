@@ -11,5 +11,9 @@
     #include "yolox_tensorrt.hpp"
 #endif
 
+#ifdef ENABLE_ONNXRUNTIME
+    #include "yolox_onnxruntime.hpp"
+#endif
+
 
 #endif

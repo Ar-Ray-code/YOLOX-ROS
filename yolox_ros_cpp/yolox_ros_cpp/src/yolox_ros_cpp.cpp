@@ -38,7 +38,18 @@ namespace yolox_ros_cpp{
                 RCLCPP_ERROR(this->get_logger(), "yolox_cpp is not built with OpenVINO");
                 rclcpp::shutdown();
             #endif
+        }else if(this->model_type_ == "onnxruntime"){
+            #ifdef ENABLE_ONNXRUNTIME
+                RCLCPP_INFO(this->get_logger(), "Model Type is ONNXRuntime");
+                this->yolox_ = std::make_unique<yolox_cpp::YoloXONNXRuntime>(this->model_path_, 1, 1);//,
+                                                                            //  this->device_, 0
+                                                                            //  this->nms_th_, this->conf_th_, this->model_version_);
+            #else
+                RCLCPP_ERROR(this->get_logger(), "yolox_cpp is not built with ONNXRuntime");
+                rclcpp::shutdown();
+            #endif
         }
+        RCLCPP_INFO(this->get_logger(), "model loaded");
 
         this->sub_image_ = image_transport::create_subscription(
             this, this->src_image_topic_name_,
