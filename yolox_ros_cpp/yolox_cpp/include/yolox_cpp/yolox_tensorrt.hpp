@@ -34,7 +34,8 @@ namespace yolox_cpp{
     class YoloXTensorRT: public AbcYoloX{
         public:
             YoloXTensorRT(file_name_t path_to_engine, int device=0,
-                          float nms_th=0.45, float conf_th=0.3, std::string model_version="0.1.1rc0");
+                          float nms_th=0.45, float conf_th=0.3, std::string model_version="0.1.1rc0",
+                          int num_classes=80);
             std::vector<Object> inference(const cv::Mat& frame) override;
 
         private:

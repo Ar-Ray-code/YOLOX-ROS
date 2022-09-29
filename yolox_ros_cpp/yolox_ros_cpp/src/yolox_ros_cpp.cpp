@@ -20,11 +20,23 @@ namespace yolox_ros_cpp{
             cv::namedWindow(this->WINDOW_NAME_, cv::WINDOW_AUTOSIZE);
         }
 
+        if(this->class_labels_path_!="")
+        {
+            RCLCPP_INFO(this->get_logger(), "read class labels from '%s'", this->class_labels_path_.c_str());
+            this->class_names_ = utils::read_class_labels_file(this->class_labels_path_);
+        }
+        else
+        {
+            this->class_names_ = COCO_CLASSES;
+        }
+        RCLCPP_INFO(this->get_logger(), "NUM CLASSES: %d", this->class_names_.size());
+
         if(this->model_type_ == "tensorrt"){
             #ifdef ENABLE_TENSORRT
                 RCLCPP_INFO(this->get_logger(), "Model Type is TensorRT");
                 this->yolox_ = std::make_unique<yolox_cpp::YoloXTensorRT>(this->model_path_, this->tensorrt_device_,
-                                                                          this->nms_th_, this->conf_th_, this->model_version_);
+                                                                          this->nms_th_, this->conf_th_, this->model_version_,
+                                                                          this->class_names_.size());
             #else
                 RCLCPP_ERROR(this->get_logger(), "yolox_cpp is not built with TensorRT");
                 rclcpp::shutdown();
@@ -33,7 +45,8 @@ namespace yolox_ros_cpp{
             #ifdef ENABLE_OPENVINO
                 RCLCPP_INFO(this->get_logger(), "Model Type is OpenVINO");
                 this->yolox_ = std::make_unique<yolox_cpp::YoloXOpenVINO>(this->model_path_, this->openvino_device_,
-                                                                          this->nms_th_, this->conf_th_, this->model_version_);
+                                                                          this->nms_th_, this->conf_th_, this->model_version_,
+                                                                          this->class_names_.size());
             #else
                 RCLCPP_ERROR(this->get_logger(), "yolox_cpp is not built with OpenVINO");
                 rclcpp::shutdown();
@@ -46,7 +59,8 @@ namespace yolox_ros_cpp{
                                                                              this->onnxruntime_inter_op_num_threads_,
                                                                              this->onnxruntime_use_cuda_, this->onnxruntime_device_id_,
                                                                              this->onnxruntime_use_parallel_,
-                                                                             this->nms_th_, this->conf_th_, this->model_version_
+                                                                             this->nms_th_, this->conf_th_, this->model_version_,
+                                                                             this->class_names_.size()
                                                                             );
             #else
                 RCLCPP_ERROR(this->get_logger(), "yolox_cpp is not built with ONNXRuntime");
@@ -71,6 +85,7 @@ namespace yolox_ros_cpp{
     {
         this->declare_parameter<bool>("imshow_isshow", true);
         this->declare_parameter<std::string>("model_path", "src/YOLOX-ROS/weights/openvino/yolox_tiny.xml");
+        this->declare_parameter<std::string>("class_labels_path", "");
         this->declare_parameter<float>("conf", 0.3f);
         this->declare_parameter<float>("nms", 0.45f);
         this->declare_parameter<int>("tensorrt/device", 0);
@@ -88,6 +103,7 @@ namespace yolox_ros_cpp{
 
         this->get_parameter("imshow_isshow", this->imshow_);
         this->get_parameter("model_path", this->model_path_);
+        this->get_parameter("class_labels_path", this->class_labels_path_);
         this->get_parameter("conf", this->conf_th_);
         this->get_parameter("nms", this->nms_th_);
         this->get_parameter("tensorrt/device", this->tensorrt_device_);
@@ -105,6 +121,7 @@ namespace yolox_ros_cpp{
 
         RCLCPP_INFO(this->get_logger(), "Set parameter imshow_isshow: %i", this->imshow_);
         RCLCPP_INFO(this->get_logger(), "Set parameter model_path: '%s'", this->model_path_.c_str());
+        RCLCPP_INFO(this->get_logger(), "Set parameter class_labels_path: '%s'", this->class_labels_path_.c_str());
         RCLCPP_INFO(this->get_logger(), "Set parameter conf: %f", this->conf_th_);
         RCLCPP_INFO(this->get_logger(), "Set parameter nms: %f", this->nms_th_);
         RCLCPP_INFO(this->get_logger(), "Set parameter tensorrt/device: %i", this->tensorrt_device_);
@@ -132,7 +149,7 @@ namespace yolox_ros_cpp{
         auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - now);
         RCLCPP_INFO(this->get_logger(), "Inference: %f FPS", 1000.0f / elapsed.count());
 
-        yolox_cpp::utils::draw_objects(frame, objects);
+        yolox_cpp::utils::draw_objects(frame, objects, this->class_names_);
         if(this->imshow_){
             cv::imshow(this->WINDOW_NAME_, frame);
             auto key = cv::waitKey(1);

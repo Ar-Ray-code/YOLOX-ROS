@@ -5,8 +5,9 @@ namespace yolox_cpp{
     YoloXONNXRuntime::YoloXONNXRuntime(file_name_t path_to_model,
                                        int intra_op_num_threads, int inter_op_num_threads,
                                        bool use_cuda, int device_id, bool use_parallel,
-                                       float nms_th, float conf_th, std::string model_version)
-    :AbcYoloX(nms_th, conf_th, model_version),
+                                       float nms_th, float conf_th, std::string model_version,
+                                       int num_classes)
+    :AbcYoloX(nms_th, conf_th, model_version, num_classes),
      intra_op_num_threads_(intra_op_num_threads), inter_op_num_threads_(inter_op_num_threads),
      use_cuda_(use_cuda), device_id_(device_id), use_parallel_(use_parallel)
     {

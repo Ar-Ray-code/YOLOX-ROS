@@ -4,8 +4,10 @@ namespace yolox_cpp{
     using namespace InferenceEngine;
 
     YoloXOpenVINO::YoloXOpenVINO(file_name_t path_to_model, std::string device_name,
-                                 float nms_th, float conf_th, std::string model_version)
-    :AbcYoloX(nms_th, conf_th, model_version), device_name_(device_name)
+                                 float nms_th, float conf_th, std::string model_version,
+                                 int num_classes)
+    :AbcYoloX(nms_th, conf_th, model_version, num_classes),
+     device_name_(device_name)
     {
         // Step 1. Initialize inference engine core
         std::cout << "Initialize Inference engine core" << std::endl;

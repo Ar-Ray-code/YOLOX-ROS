@@ -20,6 +20,11 @@ def generate_launch_description():
             description="yolox model path."
         ),
         DeclareLaunchArgument(
+            "class_labels_path",
+            default_value="''",
+            description="if use custom model, set class name labels. "
+        ),
+        DeclareLaunchArgument(
             "model_version",
             default_value="0.1.1rc0",
             description="yolox model version."
@@ -100,6 +105,7 @@ def generate_launch_description():
                         name='yolox_ros_cpp',
                         parameters=[{
                             "model_path": LaunchConfiguration("model_path"),
+                            "class_labels_path": LaunchConfiguration("class_labels_path"),
                             "model_type": "onnxruntime",
                             "model_version": LaunchConfiguration("model_version"),
                             "onnxruntime/use_cuda": LaunchConfiguration("onnxruntime/use_cuda"),

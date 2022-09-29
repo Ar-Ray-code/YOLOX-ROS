@@ -21,6 +21,11 @@ def generate_launch_description():
             description="yolox model path."
         ),
         DeclareLaunchArgument(
+            "class_labels_path",
+            default_value="''",
+            description="if use custom model, set class name labels. "
+        ),
+        DeclareLaunchArgument(
             "tensorrt/device",
             default_value="0",
             description="GPU index. Set in string type. ex '0'"
@@ -82,6 +87,7 @@ def generate_launch_description():
                         name='yolox_ros_cpp',
                         parameters=[{
                             "model_path": LaunchConfiguration("model_path"),
+                            "class_labels_path": LaunchConfiguration("class_labels_path"),
                             "model_type": "tensorrt",
                             "model_version": LaunchConfiguration("model_version"),
                             "tensorrt/device": LaunchConfiguration("tensorrt/device"),

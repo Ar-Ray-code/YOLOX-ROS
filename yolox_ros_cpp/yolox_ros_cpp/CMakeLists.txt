@@ -95,6 +95,7 @@ install(TARGETS yolox_ros_cpp_components
 
 install(DIRECTORY
   launch
+  labels
   ../../weights
   DESTINATION share/${PROJECT_NAME}
 )

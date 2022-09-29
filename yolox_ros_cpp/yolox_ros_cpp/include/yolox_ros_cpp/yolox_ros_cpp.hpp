@@ -39,6 +39,8 @@ namespace yolox_ros_cpp{
         int onnxruntime_inter_op_num_threads_;
         float conf_th_;
         float nms_th_;
+        std::vector<std::string> class_names_;
+        std::string class_labels_path_;
 
         std::string src_image_topic_name_;
         std::string publish_image_topic_name_;

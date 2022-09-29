@@ -196,6 +196,7 @@ ros2 launch yolox_ros_cpp yolox_onnxruntime.launch.py
 ### Parameter
 #### OpenVINO example
 - `model_path`: ./install/yolox_ros_cpp/share/yolox_ros_cpp/weights/openvino/yolox_nano.xml
+- `class_labels_path`: ''
 - `model_version`: 0.1.1rc0
 - `openvino/device`: CPU
 - `conf`: 0.3
@@ -208,6 +209,7 @@ ros2 launch yolox_ros_cpp yolox_onnxruntime.launch.py
 
 #### TensorRT example.
 - `model_path`: ./install/yolox_ros_cpp/share/yolox_ros_cpp/weights/tensorrt/yolox_nano.trt
+- `class_labels_path`: ''
 - `model_version`: 0.1.1rc0
 - `tensorrt/device`: 0
 - `conf`: 0.3
@@ -220,12 +222,13 @@ ros2 launch yolox_ros_cpp yolox_onnxruntime.launch.py
 
 #### ONNXRuntime example.
 - `model_path`: ./install/yolox_ros_cpp/share/yolox_ros_cpp/weights/onnx/yolox_nano.onnx
+- `class_labels_path`: ''
 - `model_version`: 0.1.1rc0
 - `onnxruntime/use_cuda`: true
 - `onnxruntime/use_parallel`: false
 - `onnxruntime/device_id`: 0
 - `onnxruntime/inter_op_num_threads`: 1
-  - if use_parallel is true, the number of threads used to parallelize the execution of the graph (across nodes).
+  - if `onnxruntime/use_parallel` is true, the number of threads used to parallelize the execution of the graph (across nodes).
 - `onnxruntime/intra_op_num_threads`: 1
   - the number of threads to use to run the model
 - `conf`: 0.3
