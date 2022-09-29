@@ -25,6 +25,11 @@ def generate_launch_description():
             description="if use custom model, set class name labels. "
         ),
         DeclareLaunchArgument(
+            "num_classes",
+            default_value="80",
+            description="num classes."
+        ),
+        DeclareLaunchArgument(
             "model_version",
             default_value="0.1.1rc0",
             description="yolox model version."
@@ -81,6 +86,7 @@ def generate_launch_description():
                         parameters=[{
                             "model_path": LaunchConfiguration("model_path"),
                             "class_labels_path": LaunchConfiguration("class_labels_path"),
+                            "num_classes": LaunchConfiguration("num_classes"),
                             "model_type": "openvino",
                             "model_version": LaunchConfiguration("model_version"),
                             "openvino/device": "MYRIAD",
