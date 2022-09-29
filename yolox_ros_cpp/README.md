@@ -11,6 +11,8 @@
 
 ※ Either one of OpenVINO or TensorRT or ONNXRuntime is required.
 
+※ ONNXRuntime support CPU or CUDA execute provider.
+
 ※ Model convert script is not supported OpenVINO 2022.*
 
 ※ YOLOX is not required.
@@ -196,7 +198,9 @@ ros2 launch yolox_ros_cpp yolox_onnxruntime.launch.py
 ### Parameter
 #### OpenVINO example
 - `model_path`: ./install/yolox_ros_cpp/share/yolox_ros_cpp/weights/openvino/yolox_nano.xml
-- `class_labels_path`: ''
+- `class_labels_path`: ""
+  - if not set, use coco_names.
+  - See [here](https://github.com/fateshelled/YOLOX-ROS/blob/dev_cpp/yolox_ros_cpp/yolox_ros_cpp/labels/coco_names.txt) for label format.
 - `model_version`: 0.1.1rc0
 - `openvino/device`: CPU
 - `conf`: 0.3
@@ -209,7 +213,7 @@ ros2 launch yolox_ros_cpp yolox_onnxruntime.launch.py
 
 #### TensorRT example.
 - `model_path`: ./install/yolox_ros_cpp/share/yolox_ros_cpp/weights/tensorrt/yolox_nano.trt
-- `class_labels_path`: ''
+- `class_labels_path`: ""
 - `model_version`: 0.1.1rc0
 - `tensorrt/device`: 0
 - `conf`: 0.3
@@ -222,7 +226,7 @@ ros2 launch yolox_ros_cpp yolox_onnxruntime.launch.py
 
 #### ONNXRuntime example.
 - `model_path`: ./install/yolox_ros_cpp/share/yolox_ros_cpp/weights/onnx/yolox_nano.onnx
-- `class_labels_path`: ''
+- `class_labels_path`: ""
 - `model_version`: 0.1.1rc0
 - `onnxruntime/use_cuda`: true
 - `onnxruntime/use_parallel`: false
