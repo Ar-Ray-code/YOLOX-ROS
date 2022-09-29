@@ -218,8 +218,8 @@ ros2 launch yolox_ros_cpp yolox_onnxruntime.launch.py
 - `publish_boundingbox_topic_name`: yolox/bounding_boxes
 
 
-#### TensorRT example.
-- `model_path`: ./install/yolox_ros_cpp/share/yolox_ros_cpp/weights/tensorrt/yolox_nano.trt
+#### ONNXRuntime example.
+- `model_path`: ./install/yolox_ros_cpp/share/yolox_ros_cpp/weights/onnx/yolox_nano.onnx
 - `model_version`: 0.1.1rc0
 - `onnxruntime/use_cuda`: true
 - `onnxruntime/device_id`: 0
