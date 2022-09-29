@@ -35,14 +35,19 @@ def generate_launch_description():
             description="onnxruntime gpu device id."
         ),
         DeclareLaunchArgument(
+            "onnxruntime/use_parallel",
+            default_value="false",
+            description="if use_parallel is true, you can set inter_op_num_threads."
+        ),
+        DeclareLaunchArgument(
             "onnxruntime/inter_op_num_threads",
             default_value="1",
-            description="onnxruntime inter_op_num_threads."
+            description="control the number of threads used to parallelize the execution of the graph (across nodes)."
         ),
         DeclareLaunchArgument(
             "onnxruntime/intra_op_num_threads",
             default_value="1",
-            description="onnxruntime intra_op_num_threads."
+            description="ontrols the number of threads to use to run the model."
         ),
         DeclareLaunchArgument(
             "conf",
@@ -99,6 +104,7 @@ def generate_launch_description():
                             "model_version": LaunchConfiguration("model_version"),
                             "onnxruntime/use_cuda": LaunchConfiguration("onnxruntime/use_cuda"),
                             "onnxruntime/device_id": LaunchConfiguration("onnxruntime/device_id"),
+                            "onnxruntime/use_parallel": LaunchConfiguration("onnxruntime/use_parallel"),
                             "onnxruntime/inter_op_num_threads": LaunchConfiguration("onnxruntime/inter_op_num_threads"),
                             "onnxruntime/intra_op_num_threads": LaunchConfiguration("onnxruntime/intra_op_num_threads"),
                             "conf": LaunchConfiguration("conf"),

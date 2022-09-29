@@ -45,6 +45,7 @@ namespace yolox_ros_cpp{
                                                                              this->onnxruntime_intra_op_num_threads_,
                                                                              this->onnxruntime_inter_op_num_threads_,
                                                                              this->onnxruntime_use_cuda_, this->onnxruntime_device_id_,
+                                                                             this->onnxruntime_use_parallel_,
                                                                              this->nms_th_, this->conf_th_, this->model_version_
                                                                             );
             #else
@@ -76,6 +77,7 @@ namespace yolox_ros_cpp{
         this->declare_parameter<std::string>("openvino/device", "CPU");
         this->declare_parameter<bool>("onnxruntime/use_cuda", true);
         this->declare_parameter<int>("onnxruntime/device_id", 0);
+        this->declare_parameter<bool>("onnxruntime/use_parallel", false);
         this->declare_parameter<int>("onnxruntime/inter_op_num_threads", 1);
         this->declare_parameter<int>("onnxruntime/intra_op_num_threads", 1);
         this->declare_parameter<std::string>("model_type", "openvino");
@@ -92,6 +94,7 @@ namespace yolox_ros_cpp{
         this->get_parameter("openvino/device", this->openvino_device_);
         this->get_parameter("onnxruntime/use_cuda", this->onnxruntime_use_cuda_);
         this->get_parameter("onnxruntime/device_id", this->onnxruntime_device_id_);
+        this->get_parameter("onnxruntime/use_parallel", this->onnxruntime_use_parallel_);
         this->get_parameter("onnxruntime/inter_op_num_threads", this->onnxruntime_inter_op_num_threads_);
         this->get_parameter("onnxruntime/intra_op_num_threads", this->onnxruntime_intra_op_num_threads_);
         this->get_parameter("model_type", this->model_type_);
@@ -108,6 +111,7 @@ namespace yolox_ros_cpp{
         RCLCPP_INFO(this->get_logger(), "Set parameter openvino/device: %s", this->openvino_device_.c_str());
         RCLCPP_INFO(this->get_logger(), "Set parameter onnxruntime/use_cuda: %i", this->onnxruntime_use_cuda_);
         RCLCPP_INFO(this->get_logger(), "Set parameter onnxruntime/device_id: %i", this->onnxruntime_device_id_);
+        RCLCPP_INFO(this->get_logger(), "Set parameter onnxruntime/use_parallel: %i", this->onnxruntime_use_parallel_);
         RCLCPP_INFO(this->get_logger(), "Set parameter model_type: '%s'", this->model_type_.c_str());
         RCLCPP_INFO(this->get_logger(), "Set parameter model_version: '%s'", this->model_version_.c_str());
         RCLCPP_INFO(this->get_logger(), "Set parameter src_image_topic_name: '%s'", this->src_image_topic_name_.c_str());

@@ -18,7 +18,7 @@ namespace yolox_cpp{
         public:
             YoloXONNXRuntime(file_name_t path_to_model,
                              int intra_op_num_threads, int inter_op_num_threads=1,
-                             bool use_cuda=true, int device_id=0,
+                             bool use_cuda=true, int device_id=0, bool use_parallel=false,
                              float nms_th=0.45, float conf_th=0.3, std::string model_version="0.1.1rc0");
             std::vector<Object> inference(const cv::Mat& frame) override;
 
@@ -27,6 +27,7 @@ namespace yolox_cpp{
             int inter_op_num_threads_ = 1;
             int device_id_ = 0;
             bool use_cuda_ = true;
+            bool use_parallel_ = false;
 
             Ort::Session session_{nullptr};
             Ort::Env env_{ORT_LOGGING_LEVEL_WARNING, "Default"};

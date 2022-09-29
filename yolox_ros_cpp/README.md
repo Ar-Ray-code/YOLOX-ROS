@@ -222,9 +222,12 @@ ros2 launch yolox_ros_cpp yolox_onnxruntime.launch.py
 - `model_path`: ./install/yolox_ros_cpp/share/yolox_ros_cpp/weights/onnx/yolox_nano.onnx
 - `model_version`: 0.1.1rc0
 - `onnxruntime/use_cuda`: true
+- `onnxruntime/use_parallel`: false
 - `onnxruntime/device_id`: 0
 - `onnxruntime/inter_op_num_threads`: 1
+  - if use_parallel is true, the number of threads used to parallelize the execution of the graph (across nodes).
 - `onnxruntime/intra_op_num_threads`: 1
+  - the number of threads to use to run the model
 - `conf`: 0.3
 - `nms`: 0.45
 - `imshow_isshow`: true

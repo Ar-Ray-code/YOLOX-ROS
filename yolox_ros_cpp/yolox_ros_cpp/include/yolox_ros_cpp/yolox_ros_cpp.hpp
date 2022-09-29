@@ -34,6 +34,7 @@ namespace yolox_ros_cpp{
         std::string openvino_device_;
         bool onnxruntime_use_cuda_;
         int onnxruntime_device_id_;
+        bool onnxruntime_use_parallel_;
         int onnxruntime_intra_op_num_threads_;
         int onnxruntime_inter_op_num_threads_;
         float conf_th_;
