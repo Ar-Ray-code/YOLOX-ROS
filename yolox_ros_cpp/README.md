@@ -91,6 +91,24 @@ docker run --rm -it \
            /bin/bash
 ```
 
+#### ONNXRuntime
+```bash
+# base image is "nvcr.io/nvidia/cuda:11.4.2-cudnn8-devel-ubuntu20.04"
+docker pull fateshelled/onnxruntime_yolox_ros:latest
+
+xhost +
+docker run --rm -it \
+           --network host \
+           --gpus all \
+           --privileged \
+           -v $HOME/ros2_ws:/root/ros2_ws \
+           -v /tmp/.X11-unix:/tmp/.X11-unix \
+           -w /root/ros2_ws \
+           -e DISPLAY=$DISPLAY \
+           --device /dev/video0:/dev/video0 \
+           fateshelled/onnxruntime_yolox_ros:latest \
+           /bin/bash
+```
 
 ### Clone YOLOX-ROS
 ```bash
