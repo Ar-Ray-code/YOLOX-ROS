@@ -23,11 +23,11 @@ namespace yolox_ros_cpp{
         if(this->class_labels_path_!="")
         {
             RCLCPP_INFO(this->get_logger(), "read class labels from '%s'", this->class_labels_path_.c_str());
-            this->class_names_ = utils::read_class_labels_file(this->class_labels_path_);
+            this->class_names_ = yolox_cpp::utils::read_class_labels_file(this->class_labels_path_);
         }
         else
         {
-            this->class_names_ = COCO_CLASSES;
+            this->class_names_ = yolox_cpp::COCO_CLASSES;
         }
 
         if(this->model_type_ == "tensorrt"){
