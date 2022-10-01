@@ -1,0 +1,81 @@
+ARG BASE_TAG=11.4.2-cudnn8-devel-ubuntu20.04
+FROM nvcr.io/nvidia/cuda:${BASE_TAG}
+ENV	 DEBIAN_FRONTEND=noninteractive
+
+ENV PATH /usr/local/nvidia/bin:/usr/local/cuda/bin:${PATH}
+RUN apt update && \
+    apt install -y python3-dev python3-pip \
+                   ca-certificates g++ gcc make git aria2 && \
+    apt -y clean && \
+    rm -rf /var/lib/apt/lists/* && \
+    aria2c -q -d /tmp -o cmake-3.21.0-linux-x86_64.tar.gz https://github.com/Kitware/CMake/releases/download/v3.21.0/cmake-3.21.0-linux-x86_64.tar.gz && \
+    tar -zxf /tmp/cmake-3.21.0-linux-x86_64.tar.gz --strip=1 -C /usr
+RUN python3 -m pip install -U pip && \
+    python3 -m pip install -U numpy setuptools wheel && \
+    python3 -m pip cache purge
+
+WORKDIR /workdir
+RUN git clone --depth 1 --recursive https://github.com/microsoft/onnxruntime -b v1.12.1 && \
+    cd onnxruntime && \
+    ./build.sh --cudnn_home /usr/lib/x86_64-linux-gnu/ \
+               --cuda_home /usr/local/cuda \
+               --use_cuda \
+               --config RelWithDebInfo \
+               --build_shared_lib \
+               --parallel \
+               --build_wheel \
+               --skip_tests && \
+    cd build/Linux/RelWithDebInfo && \
+    make install && \
+    python3 -m pip install dist/*.whl && \
+    rm -r /workdir/onnxruntime
+
+# Install ROS2
+RUN apt update && apt install locales && \
+    locale-gen en_US en_US.UTF-8 && \
+    update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8 && \
+    apt -y clean && \
+    rm -rf /var/lib/apt/lists/*
+ENV LANG=en_US.UTF-8
+
+RUN apt update && \
+    apt install -y curl gnupg2 lsb-release && \
+    curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key  -o /usr/share/keyrings/ros-archive-keyring.gpg && \
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/ros2.list > /dev/null && \
+    sed -i -e 's/ubuntu .* main/ubuntu focal main/g' /etc/apt/sources.list.d/ros2.list && \
+    apt update && \
+    apt install -y ros-foxy-ros-base \
+                   python3-colcon-common-extensions \
+                   ros-foxy-v4l2-camera \
+                   ros-foxy-cv-bridge \
+                   ros-foxy-rqt-graph \
+                   ros-foxy-rqt-image-view && \
+    rm -rf /var/lib/apt/lists/*  &&\
+    apt -y clean && \
+    pip install -U pip && \
+    pip install catkin_pkg && \
+    pip install empy && \
+    pip install lark && \
+    python3 -m pip cache purge
+
+WORKDIR /workdir
+ENV YOLOX_VERSION=0.3.0
+RUN git clone --depth 1 https://github.com/Megvii-BaseDetection/YOLOX -b $YOLOX_VERSION && \
+    cd YOLOX && \
+    # python3 -m pip install -r requirements.txt && \
+    python3 -m pip install -U numpy \
+                              torch>=1.7 \
+                              opencv_python \
+                              loguru \
+                              tqdm \
+                              torchvision \
+                              thop \
+                              ninja \
+                              tabulate && \
+    python3 -m pip install --no-deps . && \
+    python3 -m pip cache purge
+
+COPY ./ros_entrypoint.sh /ros_entrypoint.sh
+RUN echo "source /ros_entrypoint.sh" >> /root/.bashrc
+# ENTRYPOINT ["/ros_entrypoint.sh"]
+CMD ["bash"]
