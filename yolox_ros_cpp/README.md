@@ -138,6 +138,7 @@ cd ~/ros2_ws
 #### ONNXRuntime
 ```bash
 cd ~/ros2_ws
+source /opt/ros/foxy/setup.bash
 
 # Download onnx model
 ./src/YOLOX-ROS/weights/onnx/download.bash yolox_nano
@@ -159,6 +160,7 @@ cd ~/ros2_ws
 # source /opt/intel/openvino_2021/bin/setupvars.sh
 
 cd ~/ros2_ws
+source /opt/ros/foxy/setup.bash
 colcon build --symlink-install
 source ./install/setup.bash
 ```
