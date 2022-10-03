@@ -15,7 +15,7 @@
 | PyTorch(CUDA-FP16) |           | ✅           |
 | TensorRT (CUDA) |  ✅       |              |
 | OpenVINO        |  ✅       | ✅           |
-| ONNX Runtime    |           | ✅           |
+| ONNX Runtime    |  ✅       | ✅           |
 | TFLite          |           | ✅           |
 
 <!-- ### Raspberry Pi4 🍓 + NCS2 + YOLOX-ROS
