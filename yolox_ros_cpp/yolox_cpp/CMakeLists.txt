@@ -15,12 +15,16 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 # build option
-option(YOLOX_USE_OPENVINO  "Use OpenVINO"  ON)
-option(YOLOX_USE_TENSORRT  "Use TensorRT"  ON)
+option(YOLOX_USE_OPENVINO    "Use OpenVINO"  ON)
+option(YOLOX_USE_TENSORRT    "Use TensorRT"  ON)
+option(YOLOX_USE_ONNXRUNTIME "Use ONNXRuntime"  ON)
 
 set(ENABLE_OPENVINO OFF)
 set(ENABLE_TENSORRT OFF)
+set(ENABLE_ONNXRUNTIME OFF)
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
@@ -41,17 +45,44 @@ if(YOLOX_USE_TENSORRT)
   find_library(NVPARSERS NAMES nvparsers)
   find_library(NVONNXPARSER NAMES nvonnxparser)
   find_library(NVONNXPARSERRUNTIME NAMES nvonnxparser_runtime)
+  if(NOT CUDA_FOUND)
+    message(WARNING " CUDA ${CUDA_FOUND}")
+  endif()
+  if(NOT NVINFER)
+    message(WARNING " NVINFER ${NVINFER}")
+  endif()
+  if(NOT NVINFERPLUGIN)
+    message(WARNING " NVINFERPLUGIN ${NVINFERPLUGIN}")
+  endif()
+  if(NOT NVPARSERS)
+    message(WARNING " NVPARSERS ${NVPARSERS}")
+  endif()
+  if(NOT NVONNXPARSER)
+    message(WARNING " NVONNXPARSER ${NVONNXPARSER}")
+  endif()
+  # message(WARNING " NVONNXPARSERRUNTIME ${NVONNXPARSERRUNTIME}") #not use
   if( CUDA_FOUND AND NVINFER AND NVINFERPLUGIN AND NVPARSERS AND NVONNXPARSER )
     set(ENABLE_TENSORRT ON)
     set(SRC ${SRC} src/yolox_tensorrt.cpp)
   endif()
 endif()
+if(YOLOX_USE_ONNXRUNTIME)
+  find_library(ONNXRUNTIME NAMES onnxruntime)
+  if(NOT ONNXRUNTIME)
+    message(WARNING " ONNXRUNTIME ${ONNXRUNTIME}")
+  endif()
+  if(ONNXRUNTIME)
+    set(ENABLE_ONNXRUNTIME ON)
+    set(SRC ${SRC} src/yolox_onnxruntime.cpp)
+  endif()
+endif()
 
 message(STATUS " ENABLE_OPENVINO: ${ENABLE_OPENVINO}")
 message(STATUS " ENABLE_TENSORRT: ${ENABLE_TENSORRT}")
+message(STATUS " ENABLE_ONNXRUNTIME: ${ENABLE_ONNXRUNTIME}")
 
-if(NOT ENABLE_OPENVINO AND NOT ENABLE_TENSORRT)
-  message(WARNING "skip building yolox_cpp, no OpenVINO and TensorRT found")
+if(NOT ENABLE_OPENVINO AND NOT ENABLE_TENSORRT AND NOT ENABLE_ONNXRUNTIME)
+  message(WARNING "skip building yolox_cpp, no OpenVINO, TensorRT and ONNXRuntime found")
   return()
 endif()
 
@@ -96,6 +127,12 @@ if(ENABLE_TENSORRT)
     CUDA
   )
 endif()
+if(ENABLE_ONNXRUNTIME)
+  target_link_libraries(yolox_cpp
+    onnxruntime
+  )
+endif()
+
 
 
 if(NOT WIN32)

@@ -7,8 +7,11 @@
 - OpenCV 4.x
 - OpenVINO 2021.*
 - TensorRT 8.x *
+- ONNXRuntime *
 
-※ Either one of OpenVINO or TensorRT is required.
+※ Either one of OpenVINO or TensorRT or ONNXRuntime is required.
+
+※ ONNXRuntime support CPU or CUDA execute provider.
 
 ※ Model convert script is not supported OpenVINO 2022.*
 
@@ -88,6 +91,24 @@ docker run --rm -it \
            /bin/bash
 ```
 
+#### ONNXRuntime
+```bash
+# base image is "nvcr.io/nvidia/cuda:11.4.2-cudnn8-devel-ubuntu20.04"
+docker pull fateshelled/onnxruntime_yolox_ros:latest
+
+xhost +
+docker run --rm -it \
+           --network host \
+           --gpus all \
+           --privileged \
+           -v $HOME/ros2_ws:/root/ros2_ws \
+           -v /tmp/.X11-unix:/tmp/.X11-unix \
+           -w /root/ros2_ws \
+           -e DISPLAY=$DISPLAY \
+           --device /dev/video0:/dev/video0 \
+           fateshelled/onnxruntime_yolox_ros:latest \
+           /bin/bash
+```
 
 ### Clone YOLOX-ROS
 ```bash
@@ -96,7 +117,7 @@ git clone --recursive https://github.com/fateshelled/YOLOX-ROS -b dev_cpp
 ```
 
 
-### Model Convert
+### Model Convert or Download
 #### OpenVINO
 ```bash
 cd ~/ros2_ws
@@ -112,6 +133,15 @@ cd ~/ros2_ws
 # Download onnx model and convert to TensorRT engine.
 # 1st arg is model name. 2nd is workspace size.
 ./src/YOLOX-ROS/weights/tensorrt/convert.bash yolox_nano 16
+```
+
+#### ONNXRuntime
+```bash
+cd ~/ros2_ws
+source /opt/ros/foxy/setup.bash
+
+# Download onnx model
+./src/YOLOX-ROS/weights/onnx/download.bash yolox_nano
 ```
 
 #### PINTO_model_zoo
@@ -130,6 +160,7 @@ cd ~/ros2_ws
 # source /opt/intel/openvino_2021/bin/setupvars.sh
 
 cd ~/ros2_ws
+source /opt/ros/foxy/setup.bash
 colcon build --symlink-install
 source ./install/setup.bash
 ```
@@ -178,11 +209,21 @@ If you want to show image with bounding box drawn, subscribe from host jetson or
 ros2 launch yolox_ros_cpp yolox_tensorrt_jetson.launch.py
 ```
 
+#### ONNXRuntime
+```bash
+# run YOLOX_nano
+ros2 launch yolox_ros_cpp yolox_onnxruntime.launch.py
+```
+
 ### Parameter
 #### OpenVINO example
 - `model_path`: ./install/yolox_ros_cpp/share/yolox_ros_cpp/weights/openvino/yolox_nano.xml
+- `class_labels_path`: ""
+  - if not set, use coco_names.
+  - See [here](https://github.com/fateshelled/YOLOX-ROS/blob/dev_cpp/yolox_ros_cpp/yolox_ros_cpp/labels/coco_names.txt) for label format.
+- `num_classes`: 80
 - `model_version`: 0.1.1rc0
-- `device`: CPU
+- `openvino/device`: CPU
 - `conf`: 0.3
 - `nms`: 0.45
 - `imshow_isshow`: true
@@ -193,8 +234,10 @@ ros2 launch yolox_ros_cpp yolox_tensorrt_jetson.launch.py
 
 #### TensorRT example.
 - `model_path`: ./install/yolox_ros_cpp/share/yolox_ros_cpp/weights/tensorrt/yolox_nano.trt
+- `class_labels_path`: ""
+- `num_classes`: 80
 - `model_version`: 0.1.1rc0
-- `device`: "0"
+- `tensorrt/device`: 0
 - `conf`: 0.3
 - `nms`: 0.45
 - `imshow_isshow`: true
@@ -202,7 +245,26 @@ ros2 launch yolox_ros_cpp yolox_tensorrt_jetson.launch.py
 - `publish_image_topic_name`: yolox/image_raw
 - `publish_boundingbox_topic_name`: yolox/bounding_boxes
 
-`device` is GPU id. Must be specified as a `string` type.
+
+#### ONNXRuntime example.
+- `model_path`: ./install/yolox_ros_cpp/share/yolox_ros_cpp/weights/onnx/yolox_nano.onnx
+- `class_labels_path`: ""
+- `num_classes`: 80
+- `model_version`: 0.1.1rc0
+- `onnxruntime/use_cuda`: true
+- `onnxruntime/use_parallel`: false
+- `onnxruntime/device_id`: 0
+- `onnxruntime/inter_op_num_threads`: 1
+  - if `onnxruntime/use_parallel` is true, the number of threads used to parallelize the execution of the graph (across nodes).
+- `onnxruntime/intra_op_num_threads`: 1
+  - the number of threads to use to run the model
+- `conf`: 0.3
+- `nms`: 0.45
+- `imshow_isshow`: true
+- `src_image_topic_name`: image_raw
+- `publish_image_topic_name`: yolox/image_raw
+- `publish_boundingbox_topic_name`: yolox/bounding_boxes
+
 
 ### Reference
 Reference from YOLOX demo code.

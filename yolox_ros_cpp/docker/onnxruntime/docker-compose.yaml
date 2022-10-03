@@ -1,0 +1,22 @@
+version: '3.4'
+services:
+    yolox_ros:
+        container_name: yolox_onnxruntime
+        # build:
+        #     context: .
+        #     args:
+        #         - BASE_TAB=11.4.2-cudnn8-devel-ubuntu20.04
+        image: fateshelled/onnxruntime_yolox_ros:latest
+        network_mode: host
+        runtime: nvidia
+        environment:
+            - DISPLAY=$DISPLAY
+        volumes:
+            - $HOME/ros2_ws:/root/ros2_ws
+            - /tmp/.X11-unix:/tmp/.X11-unix
+        devices:
+            - "/dev/video0:/dev/video0"
+        working_dir: /root/ros2_ws
+        tty: true
+        command: bash
+

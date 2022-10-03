@@ -8,7 +8,6 @@ from launch_ros.actions import ComposableNodeContainer
 from launch_ros.descriptions import ComposableNode
 
 def generate_launch_description():
-
     launch_args = [
         DeclareLaunchArgument(
             "video_device",
@@ -17,7 +16,7 @@ def generate_launch_description():
         ),
         DeclareLaunchArgument(
             "model_path",
-            default_value="./install/yolox_ros_cpp/share/yolox_ros_cpp/weights/tensorrt/yolox_nano.trt",
+            default_value="./install/yolox_ros_cpp/share/yolox_ros_cpp/weights/onnx/yolox_nano.onnx",
             description="yolox model path."
         ),
         DeclareLaunchArgument(
@@ -31,14 +30,34 @@ def generate_launch_description():
             description="num classes."
         ),
         DeclareLaunchArgument(
-            "tensorrt/device",
-            default_value="0",
-            description="GPU index. Set in string type. ex '0'"
-        ),
-        DeclareLaunchArgument(
             "model_version",
             default_value="0.1.1rc0",
             description="yolox model version."
+        ),
+        DeclareLaunchArgument(
+            "onnxruntime/use_cuda",
+            default_value="true",
+            description="onnxruntime use cuda."
+        ),
+        DeclareLaunchArgument(
+            "onnxruntime/device_id",
+            default_value="0",
+            description="onnxruntime gpu device id."
+        ),
+        DeclareLaunchArgument(
+            "onnxruntime/use_parallel",
+            default_value="false",
+            description="if use_parallel is true, you can set inter_op_num_threads."
+        ),
+        DeclareLaunchArgument(
+            "onnxruntime/inter_op_num_threads",
+            default_value="1",
+            description="control the number of threads used to parallelize the execution of the graph (across nodes)."
+        ),
+        DeclareLaunchArgument(
+            "onnxruntime/intra_op_num_threads",
+            default_value="1",
+            description="ontrols the number of threads to use to run the model."
         ),
         DeclareLaunchArgument(
             "conf",
@@ -84,8 +103,7 @@ def generate_launch_description():
                         parameters=[{
                             "video_device": LaunchConfiguration("video_device"),
                             "image_size": [640,480]
-                        }]
-                    ),
+                        }]),
                     ComposableNode(
                         package='yolox_ros_cpp',
                         plugin='yolox_ros_cpp::YoloXNode',
@@ -94,9 +112,13 @@ def generate_launch_description():
                             "model_path": LaunchConfiguration("model_path"),
                             "class_labels_path": LaunchConfiguration("class_labels_path"),
                             "num_classes": LaunchConfiguration("num_classes"),
-                            "model_type": "tensorrt",
+                            "model_type": "onnxruntime",
                             "model_version": LaunchConfiguration("model_version"),
-                            "tensorrt/device": LaunchConfiguration("tensorrt/device"),
+                            "onnxruntime/use_cuda": LaunchConfiguration("onnxruntime/use_cuda"),
+                            "onnxruntime/device_id": LaunchConfiguration("onnxruntime/device_id"),
+                            "onnxruntime/use_parallel": LaunchConfiguration("onnxruntime/use_parallel"),
+                            "onnxruntime/inter_op_num_threads": LaunchConfiguration("onnxruntime/inter_op_num_threads"),
+                            "onnxruntime/intra_op_num_threads": LaunchConfiguration("onnxruntime/intra_op_num_threads"),
                             "conf": LaunchConfiguration("conf"),
                             "nms": LaunchConfiguration("nms"),
                             "imshow_isshow": LaunchConfiguration("imshow_isshow"),
@@ -104,19 +126,19 @@ def generate_launch_description():
                             "publish_image_topic_name": LaunchConfiguration("publish_image_topic_name"),
                             "publish_boundingbox_topic_name": LaunchConfiguration("publish_boundingbox_topic_name"),
                         }],
-                    ),
+                        ),
                 ],
                 output='screen',
         )
 
     rqt = launch_ros.actions.Node(
-            package="rqt_graph", executable="rqt_graph",
+        package="rqt_graph", executable="rqt_graph",
     )
 
     return launch.LaunchDescription(
         launch_args +
         [
             container,
-            # rqt
+            # rqt_graph,
         ]
     )

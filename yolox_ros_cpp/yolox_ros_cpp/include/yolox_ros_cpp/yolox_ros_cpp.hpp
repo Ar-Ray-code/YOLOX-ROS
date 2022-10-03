@@ -30,11 +30,18 @@ namespace yolox_ros_cpp{
         std::string model_path_;
         std::string model_type_;
         std::string model_version_;
-        std::string device_;
+        int tensorrt_device_;
+        std::string openvino_device_;
+        bool onnxruntime_use_cuda_;
+        int onnxruntime_device_id_;
+        bool onnxruntime_use_parallel_;
+        int onnxruntime_intra_op_num_threads_;
+        int onnxruntime_inter_op_num_threads_;
         float conf_th_;
         float nms_th_;
-        int image_width_;
-        int image_height_;
+        int num_classes_;
+        std::vector<std::string> class_names_;
+        std::string class_labels_path_;
 
         std::string src_image_topic_name_;
         std::string publish_image_topic_name_;

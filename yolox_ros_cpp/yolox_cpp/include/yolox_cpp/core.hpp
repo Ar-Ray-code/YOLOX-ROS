@@ -29,17 +29,19 @@ namespace yolox_cpp{
         public:
             AbcYoloX(){}
             AbcYoloX(float nms_th=0.45, float conf_th=0.3,
-                     std::string model_version="0.1.1rc0")
+                     std::string model_version="0.1.1rc0",
+                     int num_classes=80)
             :nms_thresh_(nms_th), bbox_conf_thresh_(conf_th),
-             model_version_(model_version)
-            {}
+             model_version_(model_version), num_classes_(num_classes)
+            {
+            }
             virtual std::vector<Object> inference(const cv::Mat& frame) = 0;
         protected:
             int input_w_;
             int input_h_;
             float nms_thresh_;
             float bbox_conf_thresh_;
-            int num_classes_ = 80;
+            int num_classes_;
             std::string model_version_;
             const std::vector<float> mean_ = {0.485, 0.456, 0.406};
             const std::vector<float> std_ = {0.229, 0.224, 0.225};

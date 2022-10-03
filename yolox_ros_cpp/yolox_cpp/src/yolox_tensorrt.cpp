@@ -3,8 +3,9 @@
 namespace yolox_cpp{
 
     YoloXTensorRT::YoloXTensorRT(file_name_t path_to_engine, int device,
-                                 float nms_th, float conf_th, std::string model_version)
-    :AbcYoloX(nms_th, conf_th, model_version),
+                                 float nms_th, float conf_th, std::string model_version,
+                                 int num_classes)
+    :AbcYoloX(nms_th, conf_th, model_version, num_classes),
      DEVICE_(device)
     {
         cudaSetDevice(this->DEVICE_);
