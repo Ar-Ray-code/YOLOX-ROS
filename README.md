@@ -94,9 +94,9 @@ Connect your web camera.
 ```bash
 source /opt/ros/foxy/setup.bash
 source ~/ros2_ws/install/local_setup.bash
-ros2 launch yolox_ros_py yolox_nano_cpu.launch.py # <- CPU (PyTorch)
-# ros2 launch yolox_ros_py yolox_nano.launch.py # <- GPU (PyTorch)
-# ros2 launch yolox_ros_py yolox_nano_onnx.launch.py # <- ONNXRuntime
+ros2 launch yolox_ros_py yolox_nano_torch_cpu_camera.launch.py # <- CPU (PyTorch)
+# ros2 launch yolox_ros_py yolox_nano_torch_gpu_camera.launch.py # <- GPU (PyTorch)
+# ros2 launch yolox_ros_py yolox_nano_onnx_camera.launch.py # <- ONNXRuntime
 
 # OpenVINO -------------------------------------
 # source /opt/intel/openvino_2021/bin/setupvars.sh
