@@ -51,6 +51,9 @@ git clone https://github.com/Ar-Ray-code/yolox_ros.git --recursive
 
 ### STEP 2 : YOLOX Installation (yolox_ros_py)
 
+For more information, see the [YOLOX](https://github.com/Megvii-BaseDetection/YOLOX#quick-start) installation documentation.
+
+
 ```bash
 pip3 install yolox
 ```
