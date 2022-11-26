@@ -148,8 +148,10 @@ source /opt/ros/foxy/setup.bash
 - Support PINTO_model_zoo model
 - Download model using the following script.
   - https://github.com/PINTO0309/PINTO_model_zoo/blob/main/132_YOLOX/download_nano.sh
+  - `curl -s https://raw.githubusercontent.com/PINTO0309/PINTO_model_zoo/main/132_YOLOX/download_nano.sh | bash`
+  
 - ONNX model copy to weight dir
-  - `cp saved_model_yolox_nano_480x640/yolox_nano_480x640.onnx src/YOLOX-ROS/weight/onnx/`
+  - `cp resouces_new/saved_model_yolox_nano_480x640/yolox_nano_480x640.onnx ./src/YOLOX-ROS/weights/onnx/`
 - Convert to TensorRT engine
   - `./src/YOLOX-ROS/weights/tensorrt/convert.bash yolox_nano_480x640`
 
