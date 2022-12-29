@@ -215,6 +215,7 @@ This is build script when tflite built as above.
 ```bash
 # build with tflite
 colcon build --symlink-install \
+  --packages-up-to yolox_ros_cpp \
   --cmake-args \
     -DYOLOX_USE_TFLITE=ON \
     -DTFLITE_LIB_PATH=${workspace}/tflite_build/libtensorflow-lite.so \
