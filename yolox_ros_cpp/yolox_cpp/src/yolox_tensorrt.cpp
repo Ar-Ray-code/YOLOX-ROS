@@ -103,7 +103,7 @@ namespace yolox_cpp{
 
         // DMA input batch data to device, infer on the batch asynchronously, and DMA output back to host
         CHECK(cudaMemcpyAsync(buffers[this->inputIndex_], input, 3 * this->input_h_ * this->input_w_ * sizeof(float), cudaMemcpyHostToDevice, stream));
-        context_->enqueue(1, buffers, stream, nullptr);
+        context_->enqueueV2(buffers, stream, nullptr);
         CHECK(cudaMemcpyAsync(output, buffers[this->outputIndex_], this->output_size_ * sizeof(float), cudaMemcpyDeviceToHost, stream));
         cudaStreamSynchronize(stream);
 
