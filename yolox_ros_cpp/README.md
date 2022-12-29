@@ -201,7 +201,6 @@ cmake ../tensorflow_src/tensorflow/lite \
   -DCMAKE_BUILD_TYPE=Release
 
 make -j"$(nproc)"
-sudo make install
 ```
 
 ##### build ros package with tflite
