@@ -214,7 +214,7 @@ colcon build --symlink-install \
   --cmake-args \
     -DYOLOX_USE_TFLITE=ON \
     -DTFLITE_LIB_PATH=${workspace}/tflite_build/libtensorflow-lite.so \
-    -DTFLITE_INCLUDE_DIR=${workspace}/tensorflow/ \
+    -DTFLITE_INCLUDE_DIR=${workspace}/tensorflow_src \
     -DABSEIL_CPP_ICLUDE_DIR=${workspace}/tflite_build/abseil-cpp \
     -DFLATBUFFERS_INCLUDE_DIR=${workspace}/tflite_build/flatbuffers/include
 ```
@@ -271,6 +271,9 @@ ros2 launch yolox_ros_cpp yolox_onnxruntime.launch.py
 
 #### Tensorflow Lite
 ```bash
+# add libtensorflow-lite.so directory path to `LD_LIBRARY_PATH`
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${workspace}/tflite_build
+
 # run Person Detection Model
 ros2 launch yolox_ros_cpp yolox_tflite.launch.py
 ```
