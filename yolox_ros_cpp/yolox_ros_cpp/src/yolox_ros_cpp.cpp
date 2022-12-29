@@ -65,6 +65,17 @@ namespace yolox_ros_cpp{
                 RCLCPP_ERROR(this->get_logger(), "yolox_cpp is not built with ONNXRuntime");
                 rclcpp::shutdown();
             #endif
+        }else if(this->model_type_ == "tflite"){
+            #ifdef ENABLE_TFLITE
+                RCLCPP_INFO(this->get_logger(), "Model Type is tflite");
+                this->yolox_ = std::make_unique<yolox_cpp::YoloXTflite>(this->model_path_, this->tflite_num_threads_,
+                                                                        this->nms_th_, this->conf_th_, this->model_version_,
+                                                                        this->num_classes_, this->is_nchw_
+                                                                        );
+            #else
+                RCLCPP_ERROR(this->get_logger(), "yolox_cpp is not built with tflite");
+                rclcpp::shutdown();
+            #endif
         }
         RCLCPP_INFO(this->get_logger(), "model loaded");
 
@@ -83,9 +94,10 @@ namespace yolox_ros_cpp{
     void YoloXNode::initializeParameter()
     {
         this->declare_parameter<bool>("imshow_isshow", true);
-        this->declare_parameter<std::string>("model_path", "src/YOLOX-ROS/weights/openvino/yolox_tiny.xml");
+        this->declare_parameter<std::string>("model_path", "./install/yolox_ros_cpp/share/yolox_ros_cpp/weights/tflite/model.tflite");
+        this->declare_parameter<int>("num_classes", 1);
+        this->declare_parameter<bool>("is_nchw", true);
         this->declare_parameter<std::string>("class_labels_path", "");
-        this->declare_parameter<int>("num_classes", 80);
         this->declare_parameter<float>("conf", 0.3f);
         this->declare_parameter<float>("nms", 0.45f);
         this->declare_parameter<int>("tensorrt/device", 0);
@@ -95,7 +107,8 @@ namespace yolox_ros_cpp{
         this->declare_parameter<bool>("onnxruntime/use_parallel", false);
         this->declare_parameter<int>("onnxruntime/inter_op_num_threads", 1);
         this->declare_parameter<int>("onnxruntime/intra_op_num_threads", 1);
-        this->declare_parameter<std::string>("model_type", "openvino");
+        this->declare_parameter<int>("tflite/num_threads", 1);
+        this->declare_parameter<std::string>("model_type", "tflite");
         this->declare_parameter<std::string>("model_version", "0.1.1rc0");
         this->declare_parameter<std::string>("src_image_topic_name", "image_raw");
         this->declare_parameter<std::string>("publish_image_topic_name", "yolox/image_raw");
@@ -105,6 +118,7 @@ namespace yolox_ros_cpp{
         this->get_parameter("model_path", this->model_path_);
         this->get_parameter("class_labels_path", this->class_labels_path_);
         this->get_parameter("num_classes", this->num_classes_);
+        this->get_parameter("is_nchw", this->is_nchw_);
         this->get_parameter("conf", this->conf_th_);
         this->get_parameter("nms", this->nms_th_);
         this->get_parameter("tensorrt/device", this->tensorrt_device_);
@@ -113,7 +127,7 @@ namespace yolox_ros_cpp{
         this->get_parameter("onnxruntime/device_id", this->onnxruntime_device_id_);
         this->get_parameter("onnxruntime/use_parallel", this->onnxruntime_use_parallel_);
         this->get_parameter("onnxruntime/inter_op_num_threads", this->onnxruntime_inter_op_num_threads_);
-        this->get_parameter("onnxruntime/intra_op_num_threads", this->onnxruntime_intra_op_num_threads_);
+        this->get_parameter("tflite/num_threads", this->tflite_num_threads_);
         this->get_parameter("model_type", this->model_type_);
         this->get_parameter("model_version", this->model_version_);
         this->get_parameter("src_image_topic_name", this->src_image_topic_name_);
@@ -124,6 +138,7 @@ namespace yolox_ros_cpp{
         RCLCPP_INFO(this->get_logger(), "Set parameter model_path: '%s'", this->model_path_.c_str());
         RCLCPP_INFO(this->get_logger(), "Set parameter class_labels_path: '%s'", this->class_labels_path_.c_str());
         RCLCPP_INFO(this->get_logger(), "Set parameter num_classes: %i", this->num_classes_);
+        RCLCPP_INFO(this->get_logger(), "Set parameter is_nchw: %i", this->is_nchw_);
         RCLCPP_INFO(this->get_logger(), "Set parameter conf: %f", this->conf_th_);
         RCLCPP_INFO(this->get_logger(), "Set parameter nms: %f", this->nms_th_);
         RCLCPP_INFO(this->get_logger(), "Set parameter tensorrt/device: %i", this->tensorrt_device_);
@@ -131,6 +146,9 @@ namespace yolox_ros_cpp{
         RCLCPP_INFO(this->get_logger(), "Set parameter onnxruntime/use_cuda: %i", this->onnxruntime_use_cuda_);
         RCLCPP_INFO(this->get_logger(), "Set parameter onnxruntime/device_id: %i", this->onnxruntime_device_id_);
         RCLCPP_INFO(this->get_logger(), "Set parameter onnxruntime/use_parallel: %i", this->onnxruntime_use_parallel_);
+        RCLCPP_INFO(this->get_logger(), "Set parameter onnxruntime/inter_op_num_threads: %i", this->onnxruntime_inter_op_num_threads_);
+        RCLCPP_INFO(this->get_logger(), "Set parameter onnxruntime/intra_op_num_threads: %i", this->onnxruntime_intra_op_num_threads_);
+        RCLCPP_INFO(this->get_logger(), "Set parameter tflite/num_threads: %i", this->tflite_num_threads_);
         RCLCPP_INFO(this->get_logger(), "Set parameter model_type: '%s'", this->model_type_.c_str());
         RCLCPP_INFO(this->get_logger(), "Set parameter model_version: '%s'", this->model_version_.c_str());
         RCLCPP_INFO(this->get_logger(), "Set parameter src_image_topic_name: '%s'", this->src_image_topic_name_.c_str());

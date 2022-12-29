@@ -61,11 +61,12 @@ namespace yolox_cpp{
                 return out;
             }
 
+            // for NCHW
             void blobFromImage(const cv::Mat& img, float *blob_data)
             {
-                int channels = 3;
-                int img_h = img.rows;
-                int img_w = img.cols;
+                size_t channels = 3;
+                size_t img_h = img.rows;
+                size_t img_w = img.cols;
                 if(this->model_version_=="0.1.0"){
                     for (size_t c = 0; c < channels; ++c)
                     {
@@ -87,6 +88,32 @@ namespace yolox_cpp{
                             {
                                 blob_data[c * img_w * img_h + h * img_w + w] = (float)img.ptr<cv::Vec3b>(h)[w][c]; // 0.1.1rc0 or later
                             }
+                        }
+                    }
+                }
+            }
+
+            // for NHWC
+            void blobFromImage_nhwc(const cv::Mat& img, float *blob_data)
+            {
+                size_t channels = 3;
+                size_t img_h = img.rows;
+                size_t img_w = img.cols;
+                if(this->model_version_=="0.1.0"){
+                    for (size_t i = 0; i < img_h * img_w; ++i)
+                    {
+                        for (size_t c = 0; c < channels; ++c)
+                        {
+                            blob_data[i * channels + c] =
+                                ((float)img.data[i * channels + c] / 255.0 - this->mean_[c]) / this->std_[c];
+                        }
+                    }
+                }else{
+                    for (size_t i = 0; i < img_h * img_w; ++i)
+                    {
+                        for (size_t c = 0; c < channels; ++c)
+                        {
+                            blob_data[i * channels + c] = (float)img.data[i * channels + c]; // 0.1.1rc0 or later
                         }
                     }
                 }

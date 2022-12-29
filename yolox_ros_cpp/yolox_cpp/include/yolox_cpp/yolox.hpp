@@ -15,5 +15,9 @@
     #include "yolox_onnxruntime.hpp"
 #endif
 
+#ifdef ENABLE_TFLITE
+    #include "yolox_tflite.hpp"
+#endif
+
 
 #endif
