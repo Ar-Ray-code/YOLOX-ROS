@@ -16,6 +16,8 @@
 
 ※ Tensorflow Lite support XNNPACK Delegate only.
 
+※ Tensorflow Lite support float model and does not support integer model.
+
 ※ Model convert script is not supported OpenVINO 2022.*
 
 ※ YOLOX is not required.
@@ -164,9 +166,12 @@ cd ~/ros2_ws
   
 - ONNX model copy to weight dir
   - `cp resouces_new/saved_model_yolox_nano_480x640/yolox_nano_480x640.onnx ./src/YOLOX-ROS/weights/onnx/`
+
 - Convert to TensorRT engine
   - `./src/YOLOX-ROS/weights/tensorrt/convert.bash yolox_nano_480x640`
 
+- tflite model copy to weight dir
+  - `cp resouces_new/saved_model_yolox_nano_480x640/model_float32.tflite ./src/YOLOX-ROS/weights/tflite/`
 
 ### build packages
 ```bash
@@ -275,6 +280,13 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${workspace}/tflite_build
 
 # run Person Detection Model
 ros2 launch yolox_ros_cpp yolox_tflite.launch.py
+
+# run PINTO_model_zoo model
+ros2 launch yolox_ros_cpp yolox_tflite.launch.py \
+    model_path:=install/yolox_ros_cpp/share/yolox_ros_cpp/weights/tflite/model_float32.tflite \
+    model_version:=0.1.0 \
+    num_classes:=80 \
+    is_nchw:=false
 ```
 
 ### Parameter
@@ -335,7 +347,7 @@ ros2 launch yolox_ros_cpp yolox_tflite.launch.py
 - `p6`: false
 - `is_nchw`: true
 - `class_labels_path`: ""
-- `num_classes`: 80
+- `num_classes`: 1
 - `model_version`: 0.1.1rc0
 - `tflite/num_threads`: 1
 - `conf`: 0.3
