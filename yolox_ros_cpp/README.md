@@ -280,6 +280,7 @@ ros2 launch yolox_ros_cpp yolox_tflite.launch.py
 ### Parameter
 #### OpenVINO example
 - `model_path`: ./install/yolox_ros_cpp/share/yolox_ros_cpp/weights/openvino/yolox_nano.xml
+- `p6`: false
 - `class_labels_path`: ""
   - if not set, use coco_names.
   - See [here](https://github.com/fateshelled/YOLOX-ROS/blob/dev_cpp/yolox_ros_cpp/yolox_ros_cpp/labels/coco_names.txt) for label format.
@@ -296,6 +297,7 @@ ros2 launch yolox_ros_cpp yolox_tflite.launch.py
 
 #### TensorRT example.
 - `model_path`: ./install/yolox_ros_cpp/share/yolox_ros_cpp/weights/tensorrt/yolox_nano.trt
+- `p6`: false
 - `class_labels_path`: ""
 - `num_classes`: 80
 - `model_version`: 0.1.1rc0
@@ -310,6 +312,7 @@ ros2 launch yolox_ros_cpp yolox_tflite.launch.py
 
 #### ONNXRuntime example.
 - `model_path`: ./install/yolox_ros_cpp/share/yolox_ros_cpp/weights/onnx/yolox_nano.onnx
+- `p6`: false
 - `class_labels_path`: ""
 - `num_classes`: 80
 - `model_version`: 0.1.1rc0
@@ -329,6 +332,7 @@ ros2 launch yolox_ros_cpp yolox_tflite.launch.py
 
 #### Tensorflow Lite example.
 - `model_path`: ./install/yolox_ros_cpp/share/yolox_ros_cpp/weights/tflite/model.tflite
+- `p6`: false
 - `is_nchw`: true
 - `class_labels_path`: ""
 - `num_classes`: 80

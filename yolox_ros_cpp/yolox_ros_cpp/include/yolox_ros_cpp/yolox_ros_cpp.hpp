@@ -42,6 +42,7 @@ namespace yolox_ros_cpp{
         float nms_th_;
         int num_classes_;
         bool is_nchw_;
+        bool p6_;
         std::vector<std::string> class_names_;
         std::string class_labels_path_;
 

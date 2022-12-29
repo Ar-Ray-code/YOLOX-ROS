@@ -5,8 +5,8 @@ namespace yolox_cpp
 
     YoloXTflite::YoloXTflite(file_name_t path_to_model, int num_threads,
                              float nms_th, float conf_th, std::string model_version,
-                             int num_classes, bool is_nchw)
-        : AbcYoloX(nms_th, conf_th, model_version, num_classes), is_nchw_(is_nchw)
+                             int num_classes, bool p6, bool is_nchw)
+        : AbcYoloX(nms_th, conf_th, model_version, num_classes, p6), is_nchw_(is_nchw)
     {
         TfLiteStatus status;
         this->model_ = tflite::FlatBufferModel::BuildFromFile(path_to_model.c_str());
@@ -129,7 +129,14 @@ namespace yolox_cpp
         }
 
         // Prepare GridAndStrides
-        generate_grids_and_stride(this->input_w_, this->input_h_, this->strides_, this->grid_strides_);
+        if(this->p6_)
+        {
+            generate_grids_and_stride(this->input_w_, this->input_h_, this->strides_p6_, this->grid_strides_);
+        }
+        else
+        {
+            generate_grids_and_stride(this->input_w_, this->input_h_, this->strides_, this->grid_strides_);
+        }
     }
     YoloXTflite::~YoloXTflite()
     {
