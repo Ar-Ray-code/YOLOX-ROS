@@ -8,10 +8,13 @@
 - OpenVINO 2021.*
 - TensorRT 8.x *
 - ONNXRuntime *
+- Tensorflow Lite *
 
-※ Either one of OpenVINO or TensorRT or ONNXRuntime is required.
+※ Either one of OpenVINO or TensorRT or ONNXRuntime or Tensorflow Lite is required.
 
 ※ ONNXRuntime support CPU or CUDA execute provider.
+
+※ Tensorflow Lite support XNNPACK Delegate only.
 
 ※ Model convert script is not supported OpenVINO 2022.*
 
@@ -144,6 +147,15 @@ source /opt/ros/foxy/setup.bash
 ./src/YOLOX-ROS/weights/onnx/download.bash yolox_nano
 ```
 
+#### Tensorflow Lite
+```bash
+cd ~/ros2_ws
+
+# Download tflite Person Detection model
+# https://github.com/Kazuhito00/Person-Detection-using-RaspberryPi-CPU/
+./src/YOLOX-ROS/weights/tflite/download_model.bash
+```
+
 #### PINTO_model_zoo
 - Support PINTO_model_zoo model
 - Download model using the following script.
@@ -165,6 +177,46 @@ cd ~/ros2_ws
 source /opt/ros/foxy/setup.bash
 colcon build --symlink-install
 source ./install/setup.bash
+```
+
+
+#### build yolox_ros_cpp with tflite
+
+##### build tflite
+https://www.tensorflow.org/lite/guide/build_cmake
+
+Below is an example build script.
+Please change `${workspace}` as appropriate for your environment.
+```bash
+cd ${workspace}
+git clone https://github.com/tensorflow/tensorflow.git tensorflow_src
+mkdir tflite_build
+cd tflite_build
+
+cmake ../tensorflow_src/tensorflow/lite \
+  -DBUILD_SHARED_LIBS=ON \
+  -DTFLITE_ENABLE_INSTALL=OFF \
+  -DTFLITE_ENABLE_XNNPACK=ON \
+  -DTFLITE_ENABLE_RUY=OFF \
+  -DCMAKE_BUILD_TYPE=Release
+
+make -j"$(nproc)"
+sudo make install
+```
+
+##### build ros package with tflite
+
+This is build script when tflite built as above.
+
+```bash
+# build with tflite
+colcon build --symlink-install \
+  --cmake-args \
+    -DYOLOX_USE_TFLITE=ON \
+    -DTFLITE_LIB_PATH=${workspace}/tflite_build/libtensorflow-lite.so \
+    -DTFLITE_INCLUDE_DIR=${workspace}/tensorflow/ \
+    -DABSEIL_CPP_ICLUDE_DIR=${workspace}/tflite_build/abseil-cpp \
+    -DFLATBUFFERS_INCLUDE_DIR=${workspace}/tflite_build/flatbuffers/include
 ```
 
 ### Run
@@ -217,6 +269,12 @@ ros2 launch yolox_ros_cpp yolox_tensorrt_jetson.launch.py
 ros2 launch yolox_ros_cpp yolox_onnxruntime.launch.py
 ```
 
+#### Tensorflow Lite
+```bash
+# run Person Detection Model
+ros2 launch yolox_ros_cpp yolox_tflite.launch.py
+```
+
 ### Parameter
 #### OpenVINO example
 - `model_path`: ./install/yolox_ros_cpp/share/yolox_ros_cpp/weights/openvino/yolox_nano.xml
@@ -229,9 +287,9 @@ ros2 launch yolox_ros_cpp yolox_onnxruntime.launch.py
 - `conf`: 0.3
 - `nms`: 0.45
 - `imshow_isshow`: true
-- `src_image_topic_name`: image_raw
-- `publish_image_topic_name`: yolox/image_raw
-- `publish_boundingbox_topic_name`: yolox/bounding_boxes
+- `src_image_topic_name`: /image_raw
+- `publish_image_topic_name`: /yolox/image_raw
+- `publish_boundingbox_topic_name`: /yolox/bounding_boxes
 
 
 #### TensorRT example.
@@ -243,9 +301,9 @@ ros2 launch yolox_ros_cpp yolox_onnxruntime.launch.py
 - `conf`: 0.3
 - `nms`: 0.45
 - `imshow_isshow`: true
-- `src_image_topic_name`: image_raw
-- `publish_image_topic_name`: yolox/image_raw
-- `publish_boundingbox_topic_name`: yolox/bounding_boxes
+- `src_image_topic_name`: /image_raw
+- `publish_image_topic_name`: /yolox/image_raw
+- `publish_boundingbox_topic_name`: /yolox/bounding_boxes
 
 
 #### ONNXRuntime example.
@@ -263,9 +321,23 @@ ros2 launch yolox_ros_cpp yolox_onnxruntime.launch.py
 - `conf`: 0.3
 - `nms`: 0.45
 - `imshow_isshow`: true
-- `src_image_topic_name`: image_raw
-- `publish_image_topic_name`: yolox/image_raw
-- `publish_boundingbox_topic_name`: yolox/bounding_boxes
+- `src_image_topic_name`: /image_raw
+- `publish_image_topic_name`: /yolox/image_raw
+- `publish_boundingbox_topic_name`: /yolox/bounding_boxes
+
+#### Tensorflow Lite example.
+- `model_path`: ./install/yolox_ros_cpp/share/yolox_ros_cpp/weights/tflite/model.tflite
+- `is_nchw`: true
+- `class_labels_path`: ""
+- `num_classes`: 80
+- `model_version`: 0.1.1rc0
+- `tflite/num_threads`: 1
+- `conf`: 0.3
+- `nms`: 0.45
+- `imshow_isshow`: true
+- `src_image_topic_name`: /image_raw
+- `publish_image_topic_name`: /yolox/image_raw
+- `publish_boundingbox_topic_name`: /yolox/bounding_boxes
 
 
 ### Reference
