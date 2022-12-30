@@ -8,6 +8,8 @@
 
 ## Supported List
 
+> rclcpp is recommended due to its extended support.
+
 | Base            | ROS2 C++ | ROS2 Python |
 | --------------- | -------- | ----------- |
 | PyTorch         |           | ✅           |
