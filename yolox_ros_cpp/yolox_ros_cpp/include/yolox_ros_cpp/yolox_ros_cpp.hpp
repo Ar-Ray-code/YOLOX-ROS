@@ -37,9 +37,12 @@ namespace yolox_ros_cpp{
         bool onnxruntime_use_parallel_;
         int onnxruntime_intra_op_num_threads_;
         int onnxruntime_inter_op_num_threads_;
+        int tflite_num_threads_;
         float conf_th_;
         float nms_th_;
         int num_classes_;
+        bool is_nchw_;
+        bool p6_;
         std::vector<std::string> class_names_;
         std::string class_labels_path_;
 

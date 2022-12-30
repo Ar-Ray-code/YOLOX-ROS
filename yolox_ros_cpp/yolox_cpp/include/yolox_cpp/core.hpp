@@ -30,9 +30,9 @@ namespace yolox_cpp{
             AbcYoloX(){}
             AbcYoloX(float nms_th=0.45, float conf_th=0.3,
                      std::string model_version="0.1.1rc0",
-                     int num_classes=80)
+                     int num_classes=80, bool p6=false)
             :nms_thresh_(nms_th), bbox_conf_thresh_(conf_th),
-             model_version_(model_version), num_classes_(num_classes)
+             model_version_(model_version), num_classes_(num_classes), p6_(p6)
             {
             }
             virtual std::vector<Object> inference(const cv::Mat& frame) = 0;
@@ -42,10 +42,12 @@ namespace yolox_cpp{
             float nms_thresh_;
             float bbox_conf_thresh_;
             int num_classes_;
+            bool p6_;
             std::string model_version_;
             const std::vector<float> mean_ = {0.485, 0.456, 0.406};
             const std::vector<float> std_ = {0.229, 0.224, 0.225};
             const std::vector<int> strides_ = {8, 16, 32};
+            const std::vector<int> strides_p6_ = {8, 16, 32, 64};
             std::vector<GridAndStride> grid_strides_;
 
             cv::Mat static_resize(const cv::Mat& img)
@@ -61,11 +63,12 @@ namespace yolox_cpp{
                 return out;
             }
 
+            // for NCHW
             void blobFromImage(const cv::Mat& img, float *blob_data)
             {
-                int channels = 3;
-                int img_h = img.rows;
-                int img_w = img.cols;
+                size_t channels = 3;
+                size_t img_h = img.rows;
+                size_t img_w = img.cols;
                 if(this->model_version_=="0.1.0"){
                     for (size_t c = 0; c < channels; ++c)
                     {
@@ -87,6 +90,32 @@ namespace yolox_cpp{
                             {
                                 blob_data[c * img_w * img_h + h * img_w + w] = (float)img.ptr<cv::Vec3b>(h)[w][c]; // 0.1.1rc0 or later
                             }
+                        }
+                    }
+                }
+            }
+
+            // for NHWC
+            void blobFromImage_nhwc(const cv::Mat& img, float *blob_data)
+            {
+                size_t channels = 3;
+                size_t img_h = img.rows;
+                size_t img_w = img.cols;
+                if(this->model_version_=="0.1.0"){
+                    for (size_t i = 0; i < img_h * img_w; ++i)
+                    {
+                        for (size_t c = 0; c < channels; ++c)
+                        {
+                            blob_data[i * channels + c] =
+                                ((float)img.data[i * channels + c] / 255.0 - this->mean_[c]) / this->std_[c];
+                        }
+                    }
+                }else{
+                    for (size_t i = 0; i < img_h * img_w; ++i)
+                    {
+                        for (size_t c = 0; c < channels; ++c)
+                        {
+                            blob_data[i * channels + c] = (float)img.data[i * channels + c]; // 0.1.1rc0 or later
                         }
                     }
                 }

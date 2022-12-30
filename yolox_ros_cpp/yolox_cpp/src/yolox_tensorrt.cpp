@@ -4,8 +4,8 @@ namespace yolox_cpp{
 
     YoloXTensorRT::YoloXTensorRT(file_name_t path_to_engine, int device,
                                  float nms_th, float conf_th, std::string model_version,
-                                 int num_classes)
-    :AbcYoloX(nms_th, conf_th, model_version, num_classes),
+                                 int num_classes, bool p6)
+    :AbcYoloX(nms_th, conf_th, model_version, num_classes, p6),
      DEVICE_(device)
     {
         cudaSetDevice(this->DEVICE_);
@@ -56,7 +56,14 @@ namespace yolox_cpp{
         assert(this->engine_->getBindingDataType(this->outputIndex_) == nvinfer1::DataType::kFLOAT);
 
         // Prepare GridAndStrides
-        generate_grids_and_stride(this->input_w_, this->input_h_, this->strides_, this->grid_strides_);
+        if(this->p6_)
+        {
+            generate_grids_and_stride(this->input_w_, this->input_h_, this->strides_p6_, this->grid_strides_);
+        }
+        else
+        {
+            generate_grids_and_stride(this->input_w_, this->input_h_, this->strides_, this->grid_strides_);
+        }
     }
 
     std::vector<Object> YoloXTensorRT::inference(const cv::Mat& frame)
@@ -96,7 +103,7 @@ namespace yolox_cpp{
 
         // DMA input batch data to device, infer on the batch asynchronously, and DMA output back to host
         CHECK(cudaMemcpyAsync(buffers[this->inputIndex_], input, 3 * this->input_h_ * this->input_w_ * sizeof(float), cudaMemcpyHostToDevice, stream));
-        context_->enqueue(1, buffers, stream, nullptr);
+        context_->enqueueV2(buffers, stream, nullptr);
         CHECK(cudaMemcpyAsync(output, buffers[this->outputIndex_], this->output_size_ * sizeof(float), cudaMemcpyDeviceToHost, stream));
         cudaStreamSynchronize(stream);
 

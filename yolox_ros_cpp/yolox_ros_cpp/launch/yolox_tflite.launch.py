@@ -16,7 +16,7 @@ def generate_launch_description():
         ),
         DeclareLaunchArgument(
             "model_path",
-            default_value="./install/yolox_ros_cpp/share/yolox_ros_cpp/weights/onnx/yolox_nano.onnx",
+            default_value="./install/yolox_ros_cpp/share/yolox_ros_cpp/weights/tflite/model.tflite",
             description="yolox model path."
         ),
         DeclareLaunchArgument(
@@ -25,13 +25,18 @@ def generate_launch_description():
             description="with p6."
         ),
         DeclareLaunchArgument(
+            "is_nchw",
+            default_value="true",
+            description="model input shape is NCHW or NWHC."
+        ),
+        DeclareLaunchArgument(
             "class_labels_path",
             default_value="''",
             description="if use custom model, set class name labels. "
         ),
         DeclareLaunchArgument(
             "num_classes",
-            default_value="80",
+            default_value="1",
             description="num classes."
         ),
         DeclareLaunchArgument(
@@ -40,29 +45,9 @@ def generate_launch_description():
             description="yolox model version."
         ),
         DeclareLaunchArgument(
-            "onnxruntime/use_cuda",
-            default_value="true",
-            description="onnxruntime use cuda."
-        ),
-        DeclareLaunchArgument(
-            "onnxruntime/device_id",
-            default_value="0",
-            description="onnxruntime gpu device id."
-        ),
-        DeclareLaunchArgument(
-            "onnxruntime/use_parallel",
-            default_value="false",
-            description="if use_parallel is true, you can set inter_op_num_threads."
-        ),
-        DeclareLaunchArgument(
-            "onnxruntime/inter_op_num_threads",
+            "tflite/num_threads",
             default_value="1",
-            description="control the number of threads used to parallelize the execution of the graph (across nodes)."
-        ),
-        DeclareLaunchArgument(
-            "onnxruntime/intra_op_num_threads",
-            default_value="1",
-            description="ontrols the number of threads to use to run the model."
+            description="tflite num_threads."
         ),
         DeclareLaunchArgument(
             "conf",
@@ -118,13 +103,10 @@ def generate_launch_description():
                             "p6": LaunchConfiguration("p6"),
                             "class_labels_path": LaunchConfiguration("class_labels_path"),
                             "num_classes": LaunchConfiguration("num_classes"),
-                            "model_type": "onnxruntime",
+                            "is_nchw": LaunchConfiguration("is_nchw"),
+                            "model_type": "tflite",
                             "model_version": LaunchConfiguration("model_version"),
-                            "onnxruntime/use_cuda": LaunchConfiguration("onnxruntime/use_cuda"),
-                            "onnxruntime/device_id": LaunchConfiguration("onnxruntime/device_id"),
-                            "onnxruntime/use_parallel": LaunchConfiguration("onnxruntime/use_parallel"),
-                            "onnxruntime/inter_op_num_threads": LaunchConfiguration("onnxruntime/inter_op_num_threads"),
-                            "onnxruntime/intra_op_num_threads": LaunchConfiguration("onnxruntime/intra_op_num_threads"),
+                            "tflite/num_threads": LaunchConfiguration("tflite/num_threads"),
                             "conf": LaunchConfiguration("conf"),
                             "nms": LaunchConfiguration("nms"),
                             "imshow_isshow": LaunchConfiguration("imshow_isshow"),
@@ -137,14 +119,9 @@ def generate_launch_description():
                 output='screen',
         )
 
-    rqt = launch_ros.actions.Node(
-        package="rqt_graph", executable="rqt_graph",
-    )
-
     return launch.LaunchDescription(
         launch_args +
         [
             container,
-            # rqt_graph,
         ]
     )

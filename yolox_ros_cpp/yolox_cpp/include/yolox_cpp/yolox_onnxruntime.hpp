@@ -20,7 +20,7 @@ namespace yolox_cpp{
                              int intra_op_num_threads, int inter_op_num_threads=1,
                              bool use_cuda=true, int device_id=0, bool use_parallel=false,
                              float nms_th=0.45, float conf_th=0.3, std::string model_version="0.1.1rc0",
-                             int num_classes=80);
+                             int num_classes=80, bool p6=false);
             std::vector<Object> inference(const cv::Mat& frame) override;
 
         private:

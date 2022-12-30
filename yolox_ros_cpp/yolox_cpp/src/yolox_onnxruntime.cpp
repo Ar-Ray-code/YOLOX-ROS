@@ -6,8 +6,8 @@ namespace yolox_cpp{
                                        int intra_op_num_threads, int inter_op_num_threads,
                                        bool use_cuda, int device_id, bool use_parallel,
                                        float nms_th, float conf_th, std::string model_version,
-                                       int num_classes)
-    :AbcYoloX(nms_th, conf_th, model_version, num_classes),
+                                       int num_classes, bool p6)
+    :AbcYoloX(nms_th, conf_th, model_version, num_classes, p6),
      intra_op_num_threads_(intra_op_num_threads), inter_op_num_threads_(inter_op_num_threads),
      use_cuda_(use_cuda), device_id_(device_id), use_parallel_(use_parallel)
     {
@@ -48,7 +48,8 @@ namespace yolox_cpp{
 
         // Allocate input memory buffer
         std::cout << "input:" << std::endl;
-        this->input_name_ = this->session_.GetInputName(0, ort_alloc);
+        this->input_name_ = std::string(this->session_.GetInputNameAllocated(0, ort_alloc).get());
+        // this->input_name_ = this->session_.GetInputName(0, ort_alloc);
         std::cout << " name: " << this->input_name_ << std::endl;
         auto input_info = this->session_.GetInputTypeInfo(0);
         auto input_shape_info = input_info.GetTensorTypeAndShapeInfo();
@@ -77,7 +78,8 @@ namespace yolox_cpp{
 
         // Allocate output memory buffer
         std::cout << "outputs" << std::endl;
-        this->output_name_ = this->session_.GetOutputName(0, ort_alloc);
+        this->output_name_ = std::string(this->session_.GetOutputNameAllocated(0, ort_alloc).get());
+        // this->output_name_ = this->session_.GetOutputName(0, ort_alloc);
         std::cout << " name: " << this->output_name_ << std::endl;
 
         auto output_info = this->session_.GetOutputTypeInfo(0);
@@ -104,7 +106,14 @@ namespace yolox_cpp{
         this->output_buffer_.emplace_back(std::move(output_buffer));
 
         // Prepare GridAndStrides
-        generate_grids_and_stride(this->input_w_, this->input_h_, this->strides_, this->grid_strides_);
+        if(this->p6_)
+        {
+            generate_grids_and_stride(this->input_w_, this->input_h_, this->strides_p6_, this->grid_strides_);
+        }
+        else
+        {
+            generate_grids_and_stride(this->input_w_, this->input_h_, this->strides_, this->grid_strides_);
+        }
     }
 
     std::vector<Object> YoloXONNXRuntime::inference(const cv::Mat& frame)
