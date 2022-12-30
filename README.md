@@ -11,12 +11,10 @@
 | Base            | ROS2 C++ | ROS2 Python |
 | --------------- | -------- | ----------- |
 | PyTorch         |           | ✅           |
-| PyTorch(CUDA)   |           | ✅           |
-| PyTorch(CUDA-FP16) |           | ✅           |
 | TensorRT (CUDA) |  ✅       |              |
 | OpenVINO        |  ✅       | ✅           |
 | ONNX Runtime    |  ✅       | ✅           |
-| TFLite          |           | ✅           |
+| TFLite          |  ✅       | ✅           |
 
 <!-- ### Raspberry Pi4 🍓 + NCS2 + YOLOX-ROS
 
@@ -223,6 +221,7 @@ ros2 launch yolox_ros_py yolox_nano_onnx_youtube.launch.py
 - [Ar-Ray](https://github.com/Ar-Ray-code)
 - [fateshelled](https://github.com/fateshelled)
 - [Kazuhito00](https://github.com/Kazuhito00)
+- [swiftfile](https://github.com/swiftfile)
 
 <br>
 
