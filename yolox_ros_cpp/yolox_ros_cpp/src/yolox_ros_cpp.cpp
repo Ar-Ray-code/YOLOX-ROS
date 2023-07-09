@@ -81,7 +81,7 @@ namespace yolox_ros_cpp
 #ifdef ENABLE_TFLITE
             RCLCPP_INFO(this->get_logger(), "Model Type is tflite");
             this->yolox_ = std::make_unique<yolox_cpp::YoloXTflite>(
-                this->params_.model_path, this->params_.tflite_num_threads_,
+                this->params_.model_path, this->params_.tflite_num_threads,
                 this->params_.nms, this->params_.conf, this->params_.model_version,
                 this->params_.num_classes, this->params_.p6, this->params_.is_nchw);
 #else

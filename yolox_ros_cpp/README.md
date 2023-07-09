@@ -10,11 +10,11 @@
 
 ※ Either one of OpenVINO or TensorRT or ONNXRuntime or Tensorflow Lite is required.
 
-<!-- ※ ONNXRuntime support CPU or CUDA execute provider.
+<!-- ※ ONNXRuntime support CPU or CUDA execute provider. -->
 
 ※ Tensorflow Lite support XNNPACK Delegate only.
 
-※ Tensorflow Lite support float model and does not support integer model. -->
+※ Tensorflow Lite support float model and does not support integer model.
 
 ※ Model convert script is not supported OpenVINO 2022.*
 
@@ -144,12 +144,11 @@ cd ~/ros2_ws
 ./src/YOLOX-ROS/weights/tensorrt/convert.bash yolox_tiny 16
 ```
 
-<!-- #### Tensorflow Lite
+#### Tensorflow Lite
 ```bash
 cd ~/ros2_ws
 
-# Download tflite Person Detection model
-# https://github.com/Kazuhito00/Person-Detection-using-RaspberryPi-CPU/
+# Download tflite Person Detection model: https://github.com/Kazuhito00/Person-Detection-using-RaspberryPi-CPU/
 ./src/YOLOX-ROS/weights/tflite/download_model.bash
 ```
 
@@ -166,33 +165,10 @@ cd ~/ros2_ws
   - `./src/YOLOX-ROS/weights/tensorrt/convert.bash yolox_tiny_480x640`
 
 - tflite model copy to weight dir
-  - `cp resouces_new/saved_model_yolox_tiny_480x640/model_float32.tflite ./src/YOLOX-ROS/weights/tflite/` -->
+  - `cp resouces_new/saved_model_yolox_tiny_480x640/model_float32.tflite ./src/YOLOX-ROS/weights/tflite/`
 
 
-
-
-<!-- #### build yolox_ros_cpp with tflite
-
-##### build tflite
-https://www.tensorflow.org/lite/guide/build_cmake
-
-Below is an example build script.
-Please change `${workspace}` as appropriate for your environment.
-```bash
-cd ${workspace}
-git clone https://github.com/tensorflow/tensorflow.git tensorflow_src
-mkdir tflite_build
-cd tflite_build
-
-cmake ../tensorflow_src/tensorflow/lite \
-  -DBUILD_SHARED_LIBS=ON \
-  -DTFLITE_ENABLE_INSTALL=OFF \
-  -DTFLITE_ENABLE_XNNPACK=ON \
-  -DTFLITE_ENABLE_RUY=OFF \
-  -DCMAKE_BUILD_TYPE=Release
-
-make -j"$(nproc)"
-``` -->
+<br>
 
 ## Build
 
@@ -213,21 +189,42 @@ source /opt/ros/humble/setup.bash
 colcon build --cmake-args -DYOLOX_USE_TENSORRT=ON
 ```
 
-<!-- ##### build ros package with tflite
+### TFLite
 
-This is build script when tflite built as above.
+**TFLite build**
+
+https://www.tensorflow.org/lite/guide/build_cmake
+
+Below is an example build script.
+Please change `${WORKSPACE}` as appropriate for your environment.
+```bash
+export WORKSPACE=${HOME}/ws_tflite
+mkdir -p ${WORKSPACE}
+cd ${WORKSPACE}
+git clone https://github.com/tensorflow/tensorflow.git tensorflow_src
+mkdir tflite_build
+cd tflite_build
+
+cmake ../tensorflow_src/tensorflow/lite \
+  -DBUILD_SHARED_LIBS=ON \
+  -DTFLITE_ENABLE_INSTALL=OFF \
+  -DTFLITE_ENABLE_XNNPACK=ON \
+  -DTFLITE_ENABLE_RUY=OFF \
+  -DCMAKE_BUILD_TYPE=Release
+
+make -j"$(nproc)"
+```
 
 ```bash
-# build with tflite
-colcon build --symlink-install \
-  --packages-up-to yolox_ros_cpp \
-  --cmake-args \
-    -DYOLOX_USE_TFLITE=ON \
-    -DTFLITE_LIB_PATH=${workspace}/tflite_build/libtensorflow-lite.so \
-    -DTFLITE_INCLUDE_DIR=${workspace}/tensorflow_src \
-    -DABSEIL_CPP_ICLUDE_DIR=${workspace}/tflite_build/abseil-cpp \
-    -DFLATBUFFERS_INCLUDE_DIR=${workspace}/tflite_build/flatbuffers/include
-``` -->
+colcon build --cmake-args \
+  -DYOLOX_USE_TFLITE=ON \
+  -DTFLITE_LIB_PATH=${WORKSPACE}/tflite_build \
+  -DTFLITE_INCLUDE_DIR=${WORKSPACE}/tensorflow_src/ \
+  -DABSEIL_CPP_ICLUDE_DIR=${WORKSPACE}/tflite_build/abseil-cpp \
+  -DFLATBUFFERS_INCLUDE_DIR=${WORKSPACE}/tflite_build/flatbuffers/include
+```
+
+<br>
 
 ## Run
 
@@ -272,28 +269,24 @@ If you want to show image with bounding box drawn, subscribe from host jetson or
 # run yolox_tiny
 ros2 launch yolox_ros_cpp yolox_tensorrt_jetson.launch.py
 ```
-<!-- 
-### ONNXRuntime
+
+<!-- ### ONNXRuntime
 ```bash
 # run yolox_tiny
 ros2 launch yolox_ros_cpp yolox_onnxruntime.launch.py
-```
+``` -->
 
 ### Tensorflow Lite
 ```bash
-# add libtensorflow-lite.so directory path to `LD_LIBRARY_PATH`
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${workspace}/tflite_build
-
-# run Person Detection Model
 ros2 launch yolox_ros_cpp yolox_tflite.launch.py
 
-# run PINTO_model_zoo model
-ros2 launch yolox_ros_cpp yolox_tflite.launch.py \
-    model_path:=install/yolox_ros_cpp/share/yolox_ros_cpp/weights/tflite/model_float32.tflite \
-    model_version:=0.1.0 \
-    num_classes:=80 \
-    is_nchw:=false
-``` -->
+# # run PINTO_model_zoo model
+# ros2 launch yolox_ros_cpp yolox_tflite.launch.py \
+#     model_path:=install/yolox_ros_cpp/share/yolox_ros_cpp/weights/tflite/model_float32.tflite \
+#     model_version:=0.1.0 \
+#     num_classes:=80 \
+#     is_nchw:=false
+```
 
 ### Parameter
 

@@ -16,7 +16,7 @@ def generate_launch_description():
         ),
         DeclareLaunchArgument(
             "model_path",
-            default_value="./install/yolox_ros_cpp/share/yolox_ros_cpp/weights/tflite/model.tflite",
+            default_value="./src/YOLOX-ROS/weights/tflite/model.tflite",
             description="yolox model path."
         ),
         DeclareLaunchArgument(

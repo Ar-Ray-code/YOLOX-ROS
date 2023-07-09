@@ -53,6 +53,14 @@ if(YOLOX_USE_TENSORRT)
   set(TARGET_DPENDENCIES CUDA)
 endif()
 
+# tflite
+if(YOLOX_USE_TFLITE)
+  set(ENABLE_TFLITE ON)
+  set(TARGET_SRC src/yolox_tflite.cpp)
+  set(INCLUDES ${INCLUDES} ${TFLITE_INCLUDE_DIR})
+  set(INCLUDES ${INCLUDES} ${ABSEIL_CPP_ICLUDE_DIR})
+  set(INCLUDES ${INCLUDES} ${FLATBUFFERS_INCLUDE_DIR})
+endif()
 
 configure_file(
   "${PROJECT_SOURCE_DIR}/include/yolox_cpp/config.h.in"
@@ -65,12 +73,14 @@ ament_export_dependencies(${TARGET_DPENDENCIES})
 
 
 if (YOLOX_USE_TENSORRT)
-  target_link_libraries(yolox_cpp
-    nvinfer
-    nvinfer_plugin
-    nvparsers
-    nvonnxparser
-  )
+  target_link_libraries(yolox_cpp ${TARGET_LIBS})
+endif()
+
+if (YOLOX_USE_TFLITE)
+  target_include_directories(yolox_cpp PUBLIC ${INCLUDES})
+  target_link_libraries(yolox_cpp ${TFLITE_LIB_PATH}/libtensorflow-lite.so)
+  ament_export_include_directories(${INCLUDES})
+  install(DIRECTORY ${TFLITE_LIB_PATH}/ DESTINATION lib)
 endif()
 
 
