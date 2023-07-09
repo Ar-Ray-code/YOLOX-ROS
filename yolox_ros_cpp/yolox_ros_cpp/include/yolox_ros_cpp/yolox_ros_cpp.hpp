@@ -21,7 +21,7 @@ namespace yolox_ros_cpp{
     class YoloXNode : public rclcpp::Node
     {
     public:
-        YoloXNode(const rclcpp::NodeOptions& options);
+        YoloXNode(const rclcpp::NodeOptions&);
 
     protected:
         std::shared_ptr<yolox_parameters::ParamListener> param_listener_;
@@ -34,11 +34,11 @@ namespace yolox_ros_cpp{
         std::vector<std::string> class_names_;
 
         image_transport::Subscriber sub_image_;
-        void colorImageCallback(const sensor_msgs::msg::Image::ConstSharedPtr& ptr);
+        void colorImageCallback(const sensor_msgs::msg::Image::ConstSharedPtr&);
 
         rclcpp::Publisher<bboxes_ex_msgs::msg::BoundingBoxes>::SharedPtr pub_bboxes_;
         image_transport::Publisher pub_image_;
 
-        bboxes_ex_msgs::msg::BoundingBoxes objects_to_bboxes(cv::Mat frame, std::vector<yolox_cpp::Object> objects, std_msgs::msg::Header header);
+        bboxes_ex_msgs::msg::BoundingBoxes objects_to_bboxes(cv::Mat, std::vector<yolox_cpp::Object>, std_msgs::msg::Header);
     };
 }
