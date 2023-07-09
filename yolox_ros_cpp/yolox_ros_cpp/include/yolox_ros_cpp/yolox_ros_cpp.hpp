@@ -1,21 +1,20 @@
-#ifndef _YOLOX_ROS_CPP_YOLOX_ROS_CPP_HPP
-#define _YOLOX_ROS_CPP_YOLOX_ROS_CPP_HPP
-#include <math.h>
+#pragma once
+
+#include <cmath>
 #include <chrono>
 
+#include <image_transport/image_transport.hpp>
+#include <cv_bridge/cv_bridge.h>
 #include <rclcpp/rclcpp.hpp>
 #include <rclcpp_components/register_node_macro.hpp>
 
-#include "yolox_param/yolox_param.hpp"
-
-#include <cv_bridge/cv_bridge.h>
-#include <image_transport/image_transport.hpp>
 
 #include "bboxes_ex_msgs/msg/bounding_box.hpp"
 #include "bboxes_ex_msgs/msg/bounding_boxes.hpp"
 
 #include "yolox_cpp/yolox.hpp"
 #include "yolox_cpp/utils.hpp"
+#include "yolox_param/yolox_param.hpp"
 
 namespace yolox_ros_cpp{
 
@@ -43,4 +42,3 @@ namespace yolox_ros_cpp{
         bboxes_ex_msgs::msg::BoundingBoxes objects_to_bboxes(cv::Mat frame, std::vector<yolox_cpp::Object> objects, std_msgs::msg::Header header);
     };
 }
-#endif
