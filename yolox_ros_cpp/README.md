@@ -25,7 +25,7 @@
 
 
 
-<details>
+<!-- <details>
 <summary>Execute with docker</summary>
 
 
@@ -117,7 +117,7 @@ docker run --rm -it \
            /bin/bash
 ```
 
-</details>
+</details> -->
 
 ## Clone YOLOX-ROS
 ```bash
@@ -296,7 +296,10 @@ ros2 launch yolox_ros_cpp yolox_tflite.launch.py \
 ``` -->
 
 ### Parameter
-#### OpenVINO example
+
+<details>
+<summary>OpenVINO example</summary>
+
 - `model_path`: ./install/yolox_ros_cpp/share/yolox_ros_cpp/weights/openvino/yolox_tiny.xml
 - `p6`: false
 - `class_labels_path`: ""
@@ -312,8 +315,12 @@ ros2 launch yolox_ros_cpp yolox_tflite.launch.py \
 - `publish_image_topic_name`: /yolox/image_raw
 - `publish_boundingbox_topic_name`: /yolox/bounding_boxes
 
+</details>
 
-#### TensorRT example.
+
+<details>
+<summary>TensorRT example</summary>
+
 - `model_path`: ./install/yolox_ros_cpp/share/yolox_ros_cpp/weights/tensorrt/yolox_tiny.trt
 - `p6`: false
 - `class_labels_path`: ""
@@ -327,8 +334,12 @@ ros2 launch yolox_ros_cpp yolox_tflite.launch.py \
 - `publish_image_topic_name`: /yolox/image_raw
 - `publish_boundingbox_topic_name`: /yolox/bounding_boxes
 
+</details>
 
-#### ONNXRuntime example.
+<details>
+<summary>ONNXRuntime example</summary>
+
+
 - `model_path`: ./install/yolox_ros_cpp/share/yolox_ros_cpp/weights/onnx/yolox_tiny.onnx
 - `p6`: false
 - `class_labels_path`: ""
@@ -348,7 +359,11 @@ ros2 launch yolox_ros_cpp yolox_tflite.launch.py \
 - `publish_image_topic_name`: /yolox/image_raw
 - `publish_boundingbox_topic_name`: /yolox/bounding_boxes
 
-#### Tensorflow Lite example.
+</details>
+
+<details>
+<summary>Tensorflow Lite example</summary>
+
 - `model_path`: ./install/yolox_ros_cpp/share/yolox_ros_cpp/weights/tflite/model.tflite
 - `p6`: false
 - `is_nchw`: true
@@ -363,8 +378,9 @@ ros2 launch yolox_ros_cpp yolox_tflite.launch.py \
 - `publish_image_topic_name`: /yolox/image_raw
 - `publish_boundingbox_topic_name`: /yolox/bounding_boxes
 
+</details>
 
-### Reference
+## Reference
 Reference from YOLOX demo code.
 - https://github.com/Megvii-BaseDetection/YOLOX/blob/5183a6716404bae497deb142d2c340a45ffdb175/demo/OpenVINO/cpp/yolox_openvino.cpp
 - https://github.com/Megvii-BaseDetection/YOLOX/tree/5183a6716404bae497deb142d2c340a45ffdb175/demo/TensorRT/cpp
