@@ -1,6 +1,6 @@
 # YOLOX-ROS
 
-[YOLOX](https://github.com/Megvii-BaseDetection/YOLOX) + ROS2 Foxy demo
+[YOLOX](https://github.com/Megvii-BaseDetection/YOLOX) + ROS2 Humble demo
 
 ![yolox_s_result](https://github.com/Ar-Ray-code/RenderTexture2ROS2Image/blob/main/images_for_readme/unity-demo.gif?raw=true)
 
@@ -10,13 +10,12 @@
 
 > rclcpp is recommended due to its extended support.
 
-| Base            | ROS2 C++ | ROS2 Python |
-| --------------- | -------- | ----------- |
-| PyTorch         |           | ✅           |
-| TensorRT (CUDA) |  ✅       |              |
-| OpenVINO        |  ✅       | ✅           |
-| ONNX Runtime    |  ✅       | ✅           |
-| TFLite          |  ✅       | ✅           |
+| Base            | ROS2 C++ |
+| --------------- | -------- |
+| TensorRT (CUDA) |  ✅       |
+| OpenVINO        |  ✅       |
+| ONNX Runtime    |         |
+| TFLite          |         |
 
 <!-- ### Raspberry Pi4 🍓 + NCS2 + YOLOX-ROS
 
@@ -25,88 +24,6 @@ Good news for studets❗🍓
 Check [GitHub Wiki](https://github.com/Ar-Ray-code/YOLOX-ROS/wiki/YOLOX-ROS---Raspbian-(NCS2)) to try YOLOX-ROS. -->
 
 ## Installation & Demo
-<details>
-<summary>Python (PyTorch)</summary>
-
-## Requirements
-
-- ROS2 Foxy
-- OpenCV 4
-- Python 3.8 (Ubuntu 20.04 Default)
-- PyTorch >= v1.7
-- [YOLOX v0.3.0](https://github.com/Megvii-BaseDetection/YOLOX)
-- [bbox_ex_msgs](https://github.com/Ar-Ray-code/bbox_ex_msgs)
-
-## Installation
-
-Install the dependent packages based on all tutorials.
-
-### STEP 1 : Download from GitHub
-
-```bash
-mkdir -p ~/ros2_ws/src
-cd ~/ros2_ws/src
-git clone https://github.com/Ar-Ray-code/yolox_ros.git --recursive
-```
-
-### STEP 2 : YOLOX Installation (yolox_ros_py)
-
-For more information, see the [YOLOX](https://github.com/Megvii-BaseDetection/YOLOX#quick-start) installation documentation.
-
-
-```bash
-pip3 install yolox
-```
-
-### STEP 3 : Install YOLOX-ROS
-
-```bash
-source /opt/ros/foxy/setup.bash
-sudo apt install ros-foxy-v4l2-camera
-# source /opt/intel/openvino_2021/bin/setupvars.sh # <- Using OpenVINO
-colcon build --symlink-install # weights (YOLOX-Nano) files will be installed automatically.
-```
-
-**Automatic download weights**
-
-- yolox_nano.onnx by [Megvii-BaseDetection/YOLOX](https://github.com/Megvii-BaseDetection/YOLOX)
-- yolox_nano.pth by [Megvii-BaseDetection/YOLOX](https://github.com/Megvii-BaseDetection/YOLOX)
-- model.onnx by [Kazuhito00](https://github.com/Kazuhito00/Person-Detection-using-RaspberryPi-CPU)
-- model.tflite by [Kazuhito00](https://github.com/Kazuhito00/Person-Detection-using-RaspberryPi-CPU)
-
-### (Step 3) Using CUDA
-
-If you have NVIDIA Graphics, you can run YOLOX-ROS on GPU.
-
-**Additional installing lists**
-
-- NVIDIA Graphics Driver
-- CUDA toolkit (11.0)
-- torch+cuda
-
-```bash
-source /opt/ros/foxy/setup.bash
-sudo apt install ros-foxy-v4l2-camera
-colcon build --symlink-install # weights (YOLOX-Nano) files will be installed automatically.
-```
-
-### Step : Demo
-
-Connect your web camera.
-
-```bash
-source /opt/ros/foxy/setup.bash
-source ~/ros2_ws/install/local_setup.bash
-ros2 launch yolox_ros_py yolox_nano_torch_cpu_camera.launch.py # <- CPU (PyTorch)
-# ros2 launch yolox_ros_py yolox_nano_torch_gpu_camera.launch.py # <- GPU (PyTorch)
-# ros2 launch yolox_ros_py yolox_nano_onnx_camera.launch.py # <- ONNXRuntime
-
-# OpenVINO -------------------------------------
-# source /opt/intel/openvino_2021/bin/setupvars.sh
-# ros2 launch yolox_ros_py yolox_nano_openvino.launch.py
-```
-
-</details>
 
 <details>
 <summary>C++</summary>
@@ -147,6 +64,7 @@ Check [this URL](./yolox_ros_cpp/README.md).
 
 <br>
 
+<!--
 ## YOLOX-ROS + ?
 
 <details>
@@ -198,7 +116,7 @@ ros2 launch yolox_ros_py yolox_nano_onnx_youtube.launch.py
 
 ![](./images_for_readme/yolox_ydl.png)
 
-</details>
+</details> -->
 
 <br>
 

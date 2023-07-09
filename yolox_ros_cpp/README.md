@@ -3,20 +3,20 @@
 ## Usage
 
 ### Requirements
-- ROS2 Foxy
+- ROS2 Humble
 - OpenCV 4.x
 - OpenVINO 2021.*
 - TensorRT 8.x *
-- ONNXRuntime *
-- Tensorflow Lite *
+<!-- - ONNXRuntime * -->
+<!-- - Tensorflow Lite * -->
 
 ※ Either one of OpenVINO or TensorRT or ONNXRuntime or Tensorflow Lite is required.
 
-※ ONNXRuntime support CPU or CUDA execute provider.
+<!-- ※ ONNXRuntime support CPU or CUDA execute provider.
 
 ※ Tensorflow Lite support XNNPACK Delegate only.
 
-※ Tensorflow Lite support float model and does not support integer model.
+※ Tensorflow Lite support float model and does not support integer model. -->
 
 ※ Model convert script is not supported OpenVINO 2022.*
 
@@ -25,7 +25,11 @@
 ※ Jetson + TensorRT docker support (Jetpack 4.6 r32.6.1). Tested with Jetson Nano 4GB.
 
 
-### Execute with docker
+
+
+<details>
+<summary>Execute with docker</summary>
+
 
 #### OpenVINO
 ```bash
@@ -115,12 +119,13 @@ docker run --rm -it \
            /bin/bash
 ```
 
+</details>
+
 ### Clone YOLOX-ROS
 ```bash
 cd ~/ros2_ws/src
-git clone --recursive https://github.com/fateshelled/YOLOX-ROS -b dev_cpp
+git clone --recursive https://github.com/Ar-Ray-code/YOLOX-ROS -b humble
 ```
-
 
 ### Model Convert or Download
 #### OpenVINO
@@ -128,7 +133,7 @@ git clone --recursive https://github.com/fateshelled/YOLOX-ROS -b dev_cpp
 cd ~/ros2_ws
 
 # Download onnx file and convert to IR format.
-./src/YOLOX-ROS/weights/openvino/install.bash yolox_nano
+./src/YOLOX-ROS/weights/openvino/install.bash yolox_tiny
 ```
 
 #### TensorRT
@@ -137,7 +142,7 @@ cd ~/ros2_ws
 
 # Download onnx model and convert to TensorRT engine.
 # 1st arg is model name. 2nd is workspace size.
-./src/YOLOX-ROS/weights/tensorrt/convert.bash yolox_nano 16
+./src/YOLOX-ROS/weights/tensorrt/convert.bash yolox_tiny 16
 ```
 
 #### ONNXRuntime
@@ -146,10 +151,10 @@ cd ~/ros2_ws
 source /opt/ros/foxy/setup.bash
 
 # Download onnx model
-./src/YOLOX-ROS/weights/onnx/download.bash yolox_nano
+./src/YOLOX-ROS/weights/onnx/download.bash yolox_tiny
 ```
 
-#### Tensorflow Lite
+<!-- #### Tensorflow Lite
 ```bash
 cd ~/ros2_ws
 
@@ -165,27 +170,18 @@ cd ~/ros2_ws
   - `curl -s https://raw.githubusercontent.com/PINTO0309/PINTO_model_zoo/main/132_YOLOX/download_nano.sh | bash`
   
 - ONNX model copy to weight dir
-  - `cp resouces_new/saved_model_yolox_nano_480x640/yolox_nano_480x640.onnx ./src/YOLOX-ROS/weights/onnx/`
+  - `cp resouces_new/saved_model_yolox_tiny_480x640/yolox_tiny_480x640.onnx ./src/YOLOX-ROS/weights/onnx/`
 
 - Convert to TensorRT engine
-  - `./src/YOLOX-ROS/weights/tensorrt/convert.bash yolox_nano_480x640`
+  - `./src/YOLOX-ROS/weights/tensorrt/convert.bash yolox_tiny_480x640`
 
 - tflite model copy to weight dir
-  - `cp resouces_new/saved_model_yolox_nano_480x640/model_float32.tflite ./src/YOLOX-ROS/weights/tflite/`
-
-### build packages
-```bash
-# # If use openvino
-# source /opt/intel/openvino_2021/bin/setupvars.sh
-
-cd ~/ros2_ws
-source /opt/ros/foxy/setup.bash
-colcon build --symlink-install
-source ./install/setup.bash
-```
+  - `cp resouces_new/saved_model_yolox_tiny_480x640/model_float32.tflite ./src/YOLOX-ROS/weights/tflite/` -->
 
 
-#### build yolox_ros_cpp with tflite
+
+
+<!-- #### build yolox_ros_cpp with tflite
 
 ##### build tflite
 https://www.tensorflow.org/lite/guide/build_cmake
@@ -206,9 +202,28 @@ cmake ../tensorflow_src/tensorflow/lite \
   -DCMAKE_BUILD_TYPE=Release
 
 make -j"$(nproc)"
+``` -->
+
+### Build
+
+#### OpenVINO
+
+```bash
+# build with openvino
+source /opt/ros/humble/setup.bash
+source /opt/intel/openvino_2021/bin/setupvars.sh
+colcon build --cmake-args -DYOLOX_USE_OPENVINO=ON
 ```
 
-##### build ros package with tflite
+#### TensorRT
+
+```bash
+# build with tensorrt
+source /opt/ros/humble/setup.bash
+colcon build --cmake-args -DYOLOX_USE_TENSORRT=ON
+```
+
+<!-- ##### build ros package with tflite
 
 This is build script when tflite built as above.
 
@@ -222,13 +237,13 @@ colcon build --symlink-install \
     -DTFLITE_INCLUDE_DIR=${workspace}/tensorflow_src \
     -DABSEIL_CPP_ICLUDE_DIR=${workspace}/tflite_build/abseil-cpp \
     -DFLATBUFFERS_INCLUDE_DIR=${workspace}/tflite_build/flatbuffers/include
-```
+``` -->
 
 ### Run
 
 #### OpenVINO
 ```bash
-# run YOLOX_nano
+# run yolox_tiny
 ros2 launch yolox_ros_cpp yolox_openvino.launch.py
 
 # run other model
@@ -238,7 +253,7 @@ ros2 launch yolox_ros_cpp yolox_openvino.launch.py \
 # run PINTO_model_zoo model
 # This model is converted from version 0.1.0.
 ros2 launch yolox_ros_cpp yolox_openvino.launch.py \
-    model_path:=install/yolox_ros_cpp/share/yolox_ros_cpp/weights/onnx/yolox_nano_480x640.onnx \
+    model_path:=install/yolox_ros_cpp/share/yolox_ros_cpp/weights/onnx/yolox_tiny_480x640.onnx \
     model_version:="0.1.0"
 
 # run YOLOX-tiny with NCS2
@@ -248,13 +263,13 @@ ros2 launch yolox_ros_cpp yolox_openvino_ncs2.launch.py
 
 #### TensorRT
 ```bash
-# run YOLOX_nano
+# run yolox_tiny
 ros2 launch yolox_ros_cpp yolox_tensorrt.launch.py
 
 # run PINTO_model_zoo model
 # This model is converted from version 0.1.0.
 ros2 launch yolox_ros_cpp yolox_tensorrt.launch.py \
-    model_path:=install/yolox_ros_cpp/share/yolox_ros_cpp/weights/tensorrt/yolox_nano_480x640.trt \
+    model_path:=install/yolox_ros_cpp/share/yolox_ros_cpp/weights/tensorrt/yolox_tiny_480x640.trt \
     model_version:="0.1.0"
 
 ```
@@ -264,13 +279,13 @@ Jetson docker container cannot display GUI.
 If you want to show image with bounding box drawn, subscribe from host jetson or other PC.
 
 ```bash
-# run YOLOX_nano
+# run yolox_tiny
 ros2 launch yolox_ros_cpp yolox_tensorrt_jetson.launch.py
 ```
 
 #### ONNXRuntime
 ```bash
-# run YOLOX_nano
+# run yolox_tiny
 ros2 launch yolox_ros_cpp yolox_onnxruntime.launch.py
 ```
 
@@ -292,7 +307,7 @@ ros2 launch yolox_ros_cpp yolox_tflite.launch.py \
 
 ### Parameter
 #### OpenVINO example
-- `model_path`: ./install/yolox_ros_cpp/share/yolox_ros_cpp/weights/openvino/yolox_nano.xml
+- `model_path`: ./install/yolox_ros_cpp/share/yolox_ros_cpp/weights/openvino/yolox_tiny.xml
 - `p6`: false
 - `class_labels_path`: ""
   - if not set, use coco_names.
@@ -309,7 +324,7 @@ ros2 launch yolox_ros_cpp yolox_tflite.launch.py \
 
 
 #### TensorRT example.
-- `model_path`: ./install/yolox_ros_cpp/share/yolox_ros_cpp/weights/tensorrt/yolox_nano.trt
+- `model_path`: ./install/yolox_ros_cpp/share/yolox_ros_cpp/weights/tensorrt/yolox_tiny.trt
 - `p6`: false
 - `class_labels_path`: ""
 - `num_classes`: 80
@@ -324,7 +339,7 @@ ros2 launch yolox_ros_cpp yolox_tflite.launch.py \
 
 
 #### ONNXRuntime example.
-- `model_path`: ./install/yolox_ros_cpp/share/yolox_ros_cpp/weights/onnx/yolox_nano.onnx
+- `model_path`: ./install/yolox_ros_cpp/share/yolox_ros_cpp/weights/onnx/yolox_tiny.onnx
 - `p6`: false
 - `class_labels_path`: ""
 - `num_classes`: 80
