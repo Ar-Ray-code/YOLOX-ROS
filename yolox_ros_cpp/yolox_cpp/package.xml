@@ -8,7 +8,7 @@
   <license>Apache-2.0 License</license>
   <author email="53618876+fateshelled@users.noreply.github.com">fateshelled</author>
 
-  <buildtool_depend>ament_cmake</buildtool_depend>
+  <buildtool_depend>ament_cmake_auto</buildtool_depend>
 
   <depend>OpenCV</depend>
 
