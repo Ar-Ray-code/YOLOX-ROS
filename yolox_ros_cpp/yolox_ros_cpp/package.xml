@@ -19,6 +19,7 @@
   <depend>sensor_msgs</depend>
   <depend>bboxes_ex_msgs</depend>
   <depend>yolox_cpp</depend>
+  <depend>yolox_param</depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>

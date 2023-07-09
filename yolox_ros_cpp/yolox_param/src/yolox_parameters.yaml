@@ -1,0 +1,85 @@
+yolox_parameters:
+  imshow_isshow:
+    type: bool
+    description: "Enable or disable imshow."
+    default_value: false
+  model_path:
+    type: string
+    description: "Path to the model file."
+    default_value: "./install/yolox_ros_cpp/share/yolox_ros_cpp/weights/tflite/model.tflite"
+  class_labels_path:
+    type: string
+    description: "Path to the class labels file."
+    default_value: ""
+  num_classes:
+    type: int
+    description: "Number of classes."
+    default_value: 1
+  is_nchw:
+    type: bool
+    description: "Enable or disable NCHW."
+    default_value: true
+  p6:
+    type: bool
+    description: "Enable or disable P6."
+    default_value: false
+  conf:
+    type: double
+    description: "Confidence threshold."
+    default_value: 0.3
+  nms:
+    type: double
+    description: "NMS threshold."
+    default_value: 0.45
+  tensorrt_device:
+    type: int
+    description: "TensorRT device."
+    default_value: 0
+  openvino_device:
+    type: string
+    description: "OpenVINO device."
+    default_value: "CPU"
+  onnxruntime_use_cuda:
+    type: bool
+    description: "Enable or disable CUDA."
+    default_value: true
+  onnxruntime_device_id:
+    type: int
+    description: "ONNXRuntime device ID."
+    default_value: 0
+  onnxruntime_use_parallel:
+    type: bool
+    description: "Enable or disable parallel."
+    default_value: false
+  onnxruntime_inter_op_num_threads:
+    type: int
+    description: "ONNXRuntime inter op num threads."
+    default_value: 1
+  onnxruntime_intra_op_num_threads:
+    type: int
+    description: "ONNXRuntime intra op num threads."
+    default_value: 1
+  tflite_num_threads:
+    type: int
+    description: "TFLite num threads."
+    default_value: 1
+  model_type:
+    type: string
+    description: "Model type."
+    default_value: "tflite"
+  model_version:
+    type: string
+    description: "Model version."
+    default_value: "0.1.1rc0"
+  src_image_topic_name:
+    type: string
+    description: "Source image topic name."
+    default_value: "image_raw"
+  publish_image_topic_name:
+    type: string
+    description: "Publish image topic name."
+    default_value: "yolox/image_raw"
+  publish_boundingbox_topic_name:
+    type: string
+    description: "Publish bounding box topic name."
+    default_value: "yolox/bounding_boxes"
