@@ -1,8 +1,6 @@
 # YOLOX-ROS-CPP
 
-## Usage
-
-### Requirements
+## Requirements
 - ROS2 Humble
 - OpenCV 4.x
 - OpenVINO 2021.*
@@ -121,37 +119,29 @@ docker run --rm -it \
 
 </details>
 
-### Clone YOLOX-ROS
+## Clone YOLOX-ROS
 ```bash
 cd ~/ros2_ws/src
 git clone --recursive https://github.com/Ar-Ray-code/YOLOX-ROS -b humble
 ```
 
-### Model Convert or Download
-#### OpenVINO
+## Model Convert or Download
+### OpenVINO・ONNXRuntime
 ```bash
 cd ~/ros2_ws
 
+./src/YOLOX-ROS/weights/onnx/install.bash yolox_tiny
 # Download onnx file and convert to IR format.
-./src/YOLOX-ROS/weights/openvino/install.bash yolox_tiny
+# ./src/YOLOX-ROS/weights/openvino/install.bash yolox_tiny
 ```
 
-#### TensorRT
+### TensorRT
 ```bash
 cd ~/ros2_ws
 
 # Download onnx model and convert to TensorRT engine.
 # 1st arg is model name. 2nd is workspace size.
 ./src/YOLOX-ROS/weights/tensorrt/convert.bash yolox_tiny 16
-```
-
-#### ONNXRuntime
-```bash
-cd ~/ros2_ws
-source /opt/ros/foxy/setup.bash
-
-# Download onnx model
-./src/YOLOX-ROS/weights/onnx/download.bash yolox_tiny
 ```
 
 <!-- #### Tensorflow Lite
@@ -204,9 +194,9 @@ cmake ../tensorflow_src/tensorflow/lite \
 make -j"$(nproc)"
 ``` -->
 
-### Build
+## Build
 
-#### OpenVINO
+### OpenVINO
 
 ```bash
 # build with openvino
@@ -215,7 +205,7 @@ source /opt/intel/openvino_2021/bin/setupvars.sh
 colcon build --cmake-args -DYOLOX_USE_OPENVINO=ON
 ```
 
-#### TensorRT
+### TensorRT
 
 ```bash
 # build with tensorrt
@@ -239,9 +229,9 @@ colcon build --symlink-install \
     -DFLATBUFFERS_INCLUDE_DIR=${workspace}/tflite_build/flatbuffers/include
 ``` -->
 
-### Run
+## Run
 
-#### OpenVINO
+### OpenVINO
 ```bash
 # run yolox_tiny
 ros2 launch yolox_ros_cpp yolox_openvino.launch.py
@@ -261,7 +251,7 @@ ros2 launch yolox_ros_cpp yolox_openvino_ncs2.launch.py
 
 ```
 
-#### TensorRT
+### TensorRT
 ```bash
 # run yolox_tiny
 ros2 launch yolox_ros_cpp yolox_tensorrt.launch.py
@@ -274,7 +264,7 @@ ros2 launch yolox_ros_cpp yolox_tensorrt.launch.py \
 
 ```
 
-#### Jetson + TensorRT
+### Jetson + TensorRT
 Jetson docker container cannot display GUI.
 If you want to show image with bounding box drawn, subscribe from host jetson or other PC.
 
@@ -282,14 +272,14 @@ If you want to show image with bounding box drawn, subscribe from host jetson or
 # run yolox_tiny
 ros2 launch yolox_ros_cpp yolox_tensorrt_jetson.launch.py
 ```
-
-#### ONNXRuntime
+<!-- 
+### ONNXRuntime
 ```bash
 # run yolox_tiny
 ros2 launch yolox_ros_cpp yolox_onnxruntime.launch.py
 ```
 
-#### Tensorflow Lite
+### Tensorflow Lite
 ```bash
 # add libtensorflow-lite.so directory path to `LD_LIBRARY_PATH`
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${workspace}/tflite_build
@@ -303,7 +293,7 @@ ros2 launch yolox_ros_cpp yolox_tflite.launch.py \
     model_version:=0.1.0 \
     num_classes:=80 \
     is_nchw:=false
-```
+``` -->
 
 ### Parameter
 #### OpenVINO example
