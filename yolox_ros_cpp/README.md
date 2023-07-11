@@ -5,8 +5,8 @@
 - OpenCV 4.x
 - OpenVINO 2021.*
 - TensorRT 8.x *
-<!-- - ONNXRuntime * -->
-<!-- - Tensorflow Lite * -->
+- ONNXRuntime *
+- Tensorflow Lite *
 
 ※ Either one of OpenVINO or TensorRT or ONNXRuntime or Tensorflow Lite is required.
 
@@ -230,34 +230,30 @@ colcon build --cmake-args \
 
 ### OpenVINO
 ```bash
-# run yolox_tiny
 ros2 launch yolox_ros_cpp yolox_openvino.launch.py
 
-# run other model
-ros2 launch yolox_ros_cpp yolox_openvino.launch.py \
-    model_path:=install/yolox_ros_cpp/share/yolox_ros_cpp/weights/openvino/yolox_s.xml
+## run other model
+# ros2 launch yolox_ros_cpp yolox_openvino.launch.py \
+#     model_path:=install/yolox_ros_cpp/share/yolox_ros_cpp/weights/openvino/yolox_s.xml
 
-# run PINTO_model_zoo model
-# This model is converted from version 0.1.0.
-ros2 launch yolox_ros_cpp yolox_openvino.launch.py \
-    model_path:=install/yolox_ros_cpp/share/yolox_ros_cpp/weights/onnx/yolox_tiny_480x640.onnx \
-    model_version:="0.1.0"
+## run PINTO_model_zoo model (version 0.1.0)
+# ros2 launch yolox_ros_cpp yolox_openvino.launch.py \
+#     model_path:=install/yolox_ros_cpp/share/yolox_ros_cpp/weights/onnx/yolox_tiny_480x640.onnx \
+#     model_version:="0.1.0"
 
-# run YOLOX-tiny with NCS2
-ros2 launch yolox_ros_cpp yolox_openvino_ncs2.launch.py
+## run YOLOX-tiny with NCS2
+# ros2 launch yolox_ros_cpp yolox_openvino_ncs2.launch.py
 
 ```
 
 ### TensorRT
 ```bash
-# run yolox_tiny
 ros2 launch yolox_ros_cpp yolox_tensorrt.launch.py
 
-# run PINTO_model_zoo model
-# This model is converted from version 0.1.0.
-ros2 launch yolox_ros_cpp yolox_tensorrt.launch.py \
-    model_path:=install/yolox_ros_cpp/share/yolox_ros_cpp/weights/tensorrt/yolox_tiny_480x640.trt \
-    model_version:="0.1.0"
+## run PINTO_model_zoo model (version 0.1.0)
+# ros2 launch yolox_ros_cpp yolox_tensorrt.launch.py \
+#     model_path:=install/yolox_ros_cpp/share/yolox_ros_cpp/weights/tensorrt/yolox_tiny_480x640.trt \
+#     model_version:="0.1.0"
 
 ```
 
@@ -280,7 +276,7 @@ ros2 launch yolox_ros_cpp yolox_onnxruntime.launch.py
 ```bash
 ros2 launch yolox_ros_cpp yolox_tflite.launch.py
 
-# # run PINTO_model_zoo model
+# # run PINTO_model_zoo model (version 0.1.0)
 # ros2 launch yolox_ros_cpp yolox_tflite.launch.py \
 #     model_path:=install/yolox_ros_cpp/share/yolox_ros_cpp/weights/tflite/model_float32.tflite \
 #     model_version:=0.1.0 \

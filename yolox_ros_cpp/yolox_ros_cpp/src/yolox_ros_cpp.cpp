@@ -65,9 +65,9 @@ namespace yolox_ros_cpp
             RCLCPP_INFO(this->get_logger(), "Model Type is ONNXRuntime");
             this->yolox_ = std::make_unique<yolox_cpp::YoloXONNXRuntime>(
                 this->params_.model_path,
-                this->params_.onnxruntime_intra_op_num_threads_,
-                this->params_.onnxruntime_inter_op_num_threads_,
-                this->params_.onnxruntime_use_cuda_, this->params_.onnxruntime_device_id,
+                this->params_.onnxruntime_intra_op_num_threads,
+                this->params_.onnxruntime_inter_op_num_threads,
+                this->params_.onnxruntime_use_cuda, this->params_.onnxruntime_device_id,
                 this->params_.onnxruntime_use_parallel,
                 this->params_.nms, this->params_.conf, this->params_.model_version,
                 this->params_.num_classes, this->params_.p6);

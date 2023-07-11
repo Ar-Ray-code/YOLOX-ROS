@@ -62,6 +62,14 @@ if(YOLOX_USE_TFLITE)
   set(INCLUDES ${INCLUDES} ${FLATBUFFERS_INCLUDE_DIR})
 endif()
 
+# onnxruntime
+if(YOLOX_USE_ONNXRUNTIME)
+  find_library(ONNXRUNTIME NAMES onnxruntime)
+  set(ENABLE_ONNXRUNTIME ON)
+  set(TARGET_SRC src/yolox_onnxruntime.cpp)
+  # set(TARGET_DPENDENCIES )
+endif()
+
 configure_file(
   "${PROJECT_SOURCE_DIR}/include/yolox_cpp/config.h.in"
   "${PROJECT_SOURCE_DIR}/include/yolox_cpp/config.h"
@@ -81,6 +89,10 @@ if (YOLOX_USE_TFLITE)
   target_link_libraries(yolox_cpp ${TFLITE_LIB_PATH}/libtensorflow-lite.so)
   ament_export_include_directories(${INCLUDES})
   install(DIRECTORY ${TFLITE_LIB_PATH}/ DESTINATION lib)
+endif()
+
+if (YOLOX_USE_ONNXRUNTIME)
+  target_link_libraries(yolox_cpp onnxruntime)
 endif()
 
 
