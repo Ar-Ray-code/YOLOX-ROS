@@ -67,7 +67,6 @@ if(YOLOX_USE_ONNXRUNTIME)
   find_library(ONNXRUNTIME NAMES onnxruntime)
   set(ENABLE_ONNXRUNTIME ON)
   set(TARGET_SRC src/yolox_onnxruntime.cpp)
-  # set(TARGET_DPENDENCIES )
 endif()
 
 configure_file(

@@ -14,8 +14,8 @@
 | --------------- | -------- |
 | TensorRT (CUDA) |  ✅       |
 | OpenVINO        |  ✅       |
-| ONNX Runtime    |         |
-| TFLite          |         |
+| ONNX Runtime    |  ✅       |
+| TFLite          |  ✅       |
 
 <!-- ### Raspberry Pi4 🍓 + NCS2 + YOLOX-ROS
 
@@ -23,16 +23,11 @@ Good news for studets❗🍓
 
 Check [GitHub Wiki](https://github.com/Ar-Ray-code/YOLOX-ROS/wiki/YOLOX-ROS---Raspbian-(NCS2)) to try YOLOX-ROS. -->
 
-## Installation & Demo
-
-<details>
-<summary>C++</summary>
+## Installation & Demo (C++)
 
 Check [this URL](./yolox_ros_cpp/README.md).
 
-</details>
-
-<br></br>
+<br>
 
 ## Topic
 
