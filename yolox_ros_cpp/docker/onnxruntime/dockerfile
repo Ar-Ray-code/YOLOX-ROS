@@ -1,4 +1,4 @@
-ARG BASE_TAG=12.2.0-devel-ubuntu22.04
+ARG BASE_TAG=12.1.0-cudnn8-devel-ubuntu22.04
 FROM nvcr.io/nvidia/cuda:${BASE_TAG}
 ENV	 DEBIAN_FRONTEND=noninteractive
 
