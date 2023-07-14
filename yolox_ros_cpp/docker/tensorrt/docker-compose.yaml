@@ -2,11 +2,12 @@ version: '3.4'
 services:
     yolox_ros:
         container_name: yolox_tensorrt
-        # build:
-        #     context: .
-        #     args:
-        #         - BASE_TAB=21.09-py3
-        image: fateshelled/tensorrt_yolox_ros:latest
+        build:
+            context: .
+            args:
+                - TENSORRT_VERSION=8.6
+                - CUDNN_VERSION=8.8
+                - PYTHON_VERSION=3.10
         network_mode: host
         runtime: nvidia
         environment:

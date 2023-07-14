@@ -1,5 +1,54 @@
-ARG BASE_TAG=21.09-py3
-FROM nvcr.io/nvidia/pytorch:${BASE_TAG}
+# pytorch/TensorRT/docker/Dockerfile
+# Base image starts with CUDA
+ARG BASE_IMG=nvidia/cuda:12.1.1-devel-ubuntu22.04
+FROM ${BASE_IMG} as base
+ENV BASE_IMG=nvidia/cuda:12.1.1-devel-ubuntu22.04
+
+ARG TENSORRT_VERSION
+ENV TENSORRT_VERSION=${TENSORRT_VERSION}
+RUN test -n "$TENSORRT_VERSION" || (echo "No tensorrt version specified, please use --build-arg TENSORRT_VERSION=x.y to specify a version." && exit 1)
+ARG CUDNN_VERSION
+ENV CUDNN_VERSION=${CUDNN_VERSION}
+RUN test -n "$CUDNN_VERSION" || (echo "No cudnn version specified, please use --build-arg CUDNN_VERSION=x.y to specify a version." && exit 1)
+
+ARG PYTHON_VERSION=3.10
+ENV PYTHON_VERSION=${PYTHON_VERSION}
+
+ARG USE_CXX11_ABI
+ENV USE_CXX11=${USE_CXX11_ABI}
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install basic dependencies
+RUN apt-get update
+RUN apt install -y build-essential manpages-dev wget zlib1g software-properties-common git libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget ca-certificates curl llvm libncurses5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev mecab-ipadic-utf8
+
+# Install PyEnv and desired Python version
+ENV HOME="/root"
+ENV PYENV_DIR="$HOME/.pyenv"
+ENV PATH="$PYENV_DIR/shims:$PYENV_DIR/bin:$PATH"
+RUN wget -L https://github.com/pyenv/pyenv-installer/raw/master/bin/pyenv-installer &&\
+    chmod 755 pyenv-installer &&\
+    bash pyenv-installer &&\
+    eval "$(pyenv init -)"
+
+RUN pyenv install -v ${PYTHON_VERSION}
+RUN pyenv global ${PYTHON_VERSION}
+
+# Install CUDNN + TensorRT + dependencies
+RUN wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/cuda-ubuntu2204.pin
+RUN mv cuda-ubuntu2204.pin /etc/apt/preferences.d/cuda-repository-pin-600
+RUN apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/7fa2af80.pub
+RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 536F8F1DE80F6A35
+RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys A4B469963BF863CC
+RUN add-apt-repository "deb https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/ /"
+RUN apt-get update
+RUN apt-get install -y libcudnn8=${CUDNN_VERSION}* libcudnn8-dev=${CUDNN_VERSION}*
+
+RUN apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/3bf863cc.pub
+RUN add-apt-repository "deb https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/ /"
+RUN apt-get update
+
+RUN apt-get install -y libnvinfer8=${TENSORRT_VERSION}.* libnvinfer-plugin8=${TENSORRT_VERSION}.* libnvinfer-dev=${TENSORRT_VERSION}.* libnvinfer-plugin-dev=${TENSORRT_VERSION}.* libnvonnxparsers8=${TENSORRT_VERSION}.* libnvonnxparsers-dev=${TENSORRT_VERSION}.* libnvparsers8=${TENSORRT_VERSION}.*  libnvparsers-dev=${TENSORRT_VERSION}.*
 
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -11,29 +60,25 @@ RUN apt update && apt install locales && \
 ENV LANG=en_US.UTF-8
 
 RUN apt update && \
-    apt install -y curl gnupg2 lsb-release && \
-    curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key  -o /usr/share/keyrings/ros-archive-keyring.gpg && \
+    apt install -y git wget curl gnupg2 lsb-release && \
+    curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg && \
     echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/ros2.list > /dev/null && \
-    sed -i -e 's/ubuntu .* main/ubuntu focal main/g' /etc/apt/sources.list.d/ros2.list && \
+    sed -i -e 's/ubuntu .* main/ubuntu jammy main/g' /etc/apt/sources.list.d/ros2.list && \
     apt update && \
-    apt install -y ros-foxy-ros-base && \
-    apt install -y python3-colcon-common-extensions && \
-    apt install -y ros-foxy-v4l2-camera && \
-    apt install -y ros-foxy-cv-bridge &&\
+    apt install -y ros-dev-tools \
+                    ros-humble-cv-bridge \
+                    ros-humble-generate-parameter-library \
+                    ros-humble-parameter-traits \
+                    ros-humble-ros-base \
+                    ros-humble-rqt-image-view \
+                    ros-humble-v4l2-camera && \
+    apt -y clean && \
     rm -rf /var/lib/apt/lists/*  &&\
     apt -y clean && \
     pip install -U pip && \
     pip install catkin_pkg && \
     pip install empy && \
     pip install lark && \     
-    python3 -m pip cache purge
-
-WORKDIR /workspace
-ENV YOLOX_VERSION=0.2.0
-RUN git clone https://github.com/Megvii-BaseDetection/YOLOX -b $YOLOX_VERSION && \
-    cd YOLOX && \
-    python3 -m pip install -r requirements.txt && \
-    python3 setup.py install && \
     python3 -m pip cache purge
 
 COPY ./ros_entrypoint.sh /ros_entrypoint.sh
