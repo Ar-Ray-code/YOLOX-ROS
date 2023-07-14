@@ -44,12 +44,13 @@ RUN apt update && \
     echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/ros2.list > /dev/null && \
     sed -i -e 's/ubuntu .* main/ubuntu jammy main/g' /etc/apt/sources.list.d/ros2.list && \
     apt update && \
-    apt install -y ros-humble-ros-base \
-                   ros-humble-v4l2-camera \
-                   ros-humble-cv-bridge \
-                   ros-humble-rqt-image-view \
-                   ros-humble-parameter-traits \
-                   ros-dev-tools && \
+    apt install -y ros-dev-tools \
+                    ros-humble-cv-bridge \
+                    ros-humble-generate-parameter-library \
+                    ros-humble-parameter-traits \
+                    ros-humble-ros-base \
+                    ros-humble-rqt-image-view \
+                    ros-humble-v4l2-camera && \
     apt -y clean && \
     rm -rf /var/lib/apt/lists/* && \
     pip install -U pip && \

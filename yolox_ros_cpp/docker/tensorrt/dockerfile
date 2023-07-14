@@ -73,12 +73,11 @@ RUN apt update && \
                     ros-humble-rqt-image-view \
                     ros-humble-v4l2-camera && \
     apt -y clean && \
-    rm -rf /var/lib/apt/lists/*  &&\
-    apt -y clean && \
+    rm -rf /var/lib/apt/lists/* && \
     pip install -U pip && \
     pip install catkin_pkg && \
     pip install empy && \
-    pip install lark && \     
+    pip install lark && \
     python3 -m pip cache purge
 
 COPY ./ros_entrypoint.sh /ros_entrypoint.sh
