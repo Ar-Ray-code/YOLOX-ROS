@@ -1,4 +1,4 @@
-ARG BASE_TAG=12.1.0-cudnn8-devel-ubuntu22.04
+ARG BASE_TAG=11.7.1-cudnn8-devel-ubuntu22.04
 FROM nvcr.io/nvidia/cuda:${BASE_TAG}
 ENV	 DEBIAN_FRONTEND=noninteractive
 
@@ -22,12 +22,9 @@ RUN git clone --depth 1 --recursive https://github.com/microsoft/onnxruntime -b 
                --use_cuda \
                --config RelWithDebInfo \
                --build_shared_lib \
-               --parallel \
-               --build_wheel \
                --skip_tests && \
     cd build/Linux/RelWithDebInfo && \
     make install && \
-    python3 -m pip install dist/*.whl && \
     rm -r /workdir/onnxruntime
 
 # Install ROS2
