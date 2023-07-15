@@ -18,6 +18,12 @@ option(YOLOX_USE_OPENVINO    "Use OpenVINO"  OFF)
 option(YOLOX_USE_TENSORRT    "Use TensorRT"  OFF)
 option(YOLOX_USE_ONNXRUNTIME "Use ONNXRuntime"  OFF)
 option(YOLOX_USE_TFLITE      "Use tflite"  OFF)
+option(JETSON                "Use Jetson"  OFF)
+
+if(JETSON)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I/usr/include/aarch64-linux-gnu/ -L/usr/lib/aarch64-linux-gnu/")
+  set(YOLOX_USE_TENSORRT ON)
+endif()
 
 if(NOT YOLOX_USE_OPENVINO AND NOT YOLOX_USE_TENSORRT AND NOT YOLOX_USE_ONNXRUNTIME AND NOT YOLOX_USE_TFLITE)
   message(FATAL_ERROR "YOLOX_USE_OPENVINO, YOLOX_USE_TENSORRT, YOLOX_USE_ONNXRUNTIME, YOLOX_USE_TFLITE must be ON at least one")
