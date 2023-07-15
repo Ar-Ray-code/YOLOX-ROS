@@ -7,6 +7,7 @@
 - TensorRT 8.x *
 - ONNXRuntime *
 - Tensorflow Lite *
+- **CUDA 11**
 
 ※ Either one of OpenVINO or TensorRT or ONNXRuntime or Tensorflow Lite is required.
 
@@ -18,106 +19,8 @@
 
 ※ Model convert script is not supported OpenVINO 2022.*
 
-※ YOLOX is not required.
+※ Don't use CUDA 12
 
-※ Jetson + TensorRT docker support (Jetpack 4.6 r32.6.1). Tested with Jetson Nano 4GB.
-
-
-
-
-<!-- <details>
-<summary>Execute with docker</summary>
-
-
-#### OpenVINO
-```bash
-# base image is "openvino/ubuntu20_dev:2021.4.1_20210416"
-docker pull fateshelled/openvino_yolox_ros:latest
-
-xhost +
-docker run --rm -it \
-           --network host \
-           --privileged \
-           --user openvino \
-           -v $HOME/ros2_ws:/home/openvino/ros2_ws \
-           -v /tmp/.X11-unix:/tmp/.X11-unix \
-           -w /home/openvino/ros2_ws \
-           -e DISPLAY=$DISPLAY \
-           --device /dev/video0:/dev/video0 \
-           fateshelled/openvino_yolox_ros:latest /bin/bash
-
-# If use NCS2, mount "/dev/bus/usb".
-xhost +
-docker run --rm -it \
-           --network host \
-           --privileged \
-           --user openvino \
-           -v $HOME/ros2_ws:/home/openvino/ros2_ws \
-           -v /tmp/.X11-unix:/tmp/.X11-unix \
-           -w /home/openvino/ros2_ws \
-           -v /dev/bus/usb:/dev/bus/usb
-           -e DISPLAY=$DISPLAY \
-           --device /dev/video0:/dev/video0 \
-           fateshelled/openvino_yolox_ros:latest \
-           /bin/bash
-
-```
-
-#### TensorRT
-```bash
-# base image is "nvcr.io/nvidia/pytorch:21.09-py3"
-docker pull swiftfile/tensorrt_yolox_ros:latest
-
-xhost +
-docker run --rm -it \
-           --network host \
-           --gpus all \
-           --privileged \
-           -v $HOME/ros2_ws:/root/ros2_ws \
-           -v /tmp/.X11-unix:/tmp/.X11-unix \
-           -w /root/ros2_ws \
-           -e DISPLAY=$DISPLAY \
-           --device /dev/video0:/dev/video0 \
-           swiftfile/tensorrt_yolox_ros:latest \
-           /bin/bash
-```
-
-#### Jetson + TensorRT
-```bash
-# base image is "dustynv/ros:foxy-ros-base-l4t-r32.6.1"
-docker pull fateshelled/jetson_yolox_ros:foxy-ros-base-l4t-r32.6.1
-
-# This image cannot display GUI.
-docker run --rm -it \
-           --network host \
-           --runtime nvidia \
-           -v $HOME/ros2_ws:/root/ros2_ws \
-           -w /root/ros2_ws \
-           --device /dev/video0:/dev/video0 \
-           fateshelled/jetson_yolox_ros:foxy-ros-base-l4t-r32.6.1 \
-           /bin/bash
-```
-
-#### ONNXRuntime
-```bash
-# base image is "nvcr.io/nvidia/cuda:11.4.2-cudnn8-devel-ubuntu20.04"
-docker pull fateshelled/onnxruntime_yolox_ros:latest
-
-xhost +
-docker run --rm -it \
-           --network host \
-           --gpus all \
-           --privileged \
-           -v $HOME/ros2_ws:/root/ros2_ws \
-           -v /tmp/.X11-unix:/tmp/.X11-unix \
-           -w /root/ros2_ws \
-           -e DISPLAY=$DISPLAY \
-           --device /dev/video0:/dev/video0 \
-           fateshelled/onnxruntime_yolox_ros:latest \
-           /bin/bash
-```
-
-</details> -->
 
 ## Clone YOLOX-ROS
 ```bash

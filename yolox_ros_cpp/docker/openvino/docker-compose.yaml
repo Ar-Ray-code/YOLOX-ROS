@@ -1,15 +1,14 @@
 version: '3.4'
 services:
-    yolox_ros:
+    yolox_ros_openvino:
         container_name: yolox_openvino
-        # build:
-        #     context: .
-        image: fateshelled/openvino_yolox_ros:latest
+        build:
+            context: .
         network_mode: host
         environment:
             - DISPLAY=$DISPLAY
         volumes:
-            - $HOME/ros2_ws:/root/ros2_ws
+            - ../../../:/root/ros2_ws/src
             - /tmp/.X11-unix:/tmp/.X11-unix
         devices:
             - "/dev/video0:/dev/video0"
