@@ -39,6 +39,9 @@ yolox_parameters:
     type: string
     description: "OpenVINO device."
     default_value: "CPU"
+    validation: {
+      one_of<>: [["CPU", "GPU", "MYRIAD"]]
+    }
   onnxruntime_use_cuda:
     type: bool
     description: "Enable or disable CUDA."
