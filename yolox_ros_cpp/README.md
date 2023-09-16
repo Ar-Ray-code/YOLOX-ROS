@@ -33,9 +33,9 @@ git clone --recursive https://github.com/Ar-Ray-code/YOLOX-ROS -b humble
 ```bash
 cd ~/ros2_ws
 
-./src/YOLOX-ROS/weights/onnx/install.bash yolox_tiny
+./src/YOLOX-ROS/weights/onnx/download.bash yolox_tiny
 # Download onnx file and convert to IR format.
-# ./src/YOLOX-ROS/weights/openvino/install.bash yolox_tiny
+# ./src/YOLOX-ROS/weights/openvino/download.bash yolox_tiny
 ```
 
 ### TensorRT
