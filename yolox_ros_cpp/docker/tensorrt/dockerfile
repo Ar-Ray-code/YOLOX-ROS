@@ -76,7 +76,7 @@ RUN apt update && \
     rm -rf /var/lib/apt/lists/* && \
     pip install -U pip && \
     pip install catkin_pkg && \
-    pip install empy && \
+    pip install empy==3.3.4 && \
     pip install lark && \
     python3 -m pip cache purge
 
