@@ -1,6 +1,6 @@
 __pycache__/
 weights/*.tar
-weights/*.pth
+# weights/*.pth
 YOLOX_outputs/
 *.pth
 *.onnx
