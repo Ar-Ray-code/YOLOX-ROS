@@ -91,10 +91,13 @@ namespace yolox_ros_cpp
         }
         RCLCPP_INFO(this->get_logger(), "model loaded");
 
-        this->sub_image_ = image_transport::create_subscription(
+        rclcpp::QoS qos_profile(1);  // Queue depth of 1
+this->sub_image_ = image_transport::create_subscription(
             this, this->params_.src_image_topic_name,
             std::bind(&YoloXNode::colorImageCallback, this, std::placeholders::_1),
-            "raw");
+            "raw",
+            qos_profile.get_rmw_qos_profile());
+
 
         if (this->params_.use_bbox_ex_msgs) {
             this->pub_bboxes_ = this->create_publisher<bboxes_ex_msgs::msg::BoundingBoxes>(
@@ -112,64 +115,59 @@ namespace yolox_ros_cpp
     }
 
     void YoloXNode::colorImageCallback(const sensor_msgs::msg::Image::ConstSharedPtr &ptr)
+{
+    auto img = cv_bridge::toCvShare(ptr, "bgr8");
+
+    auto now = std::chrono::system_clock::now();
+    auto objects = this->yolox_->inference(img->image);  // Use img->image
+    auto end = std::chrono::system_clock::now();
+
+    auto elapsed = std::chrono::duration_cast<std::chrono::microseconds>(end - now);
+    RCLCPP_INFO(this->get_logger(), "Inference time: %5ld us", elapsed.count());
+
+    if (this->params_.imshow_isshow)
     {
-        auto img = cv_bridge::toCvCopy(ptr, "bgr8");
-        cv::Mat frame = img->image;
-
-        auto now = std::chrono::system_clock::now();
-        auto objects = this->yolox_->inference(frame);
-        auto end = std::chrono::system_clock::now();
-
-        auto elapsed = std::chrono::duration_cast<std::chrono::microseconds>(end - now);
-        RCLCPP_INFO(this->get_logger(), "Inference time: %5ld us", elapsed.count());
-
-        yolox_cpp::utils::draw_objects(frame, objects, this->class_names_);
-        if (this->params_.imshow_isshow)
+        yolox_cpp::utils::draw_objects(img->image, objects, this->class_names_);
+        cv::imshow("yolox", img->image);
+        if (cv::waitKey(1) == 27)
         {
-            cv::imshow("yolox", frame);
-            auto key = cv::waitKey(1);
-            if (key == 27)
-            {
-                rclcpp::shutdown();
-            }
+            rclcpp::shutdown();
         }
+    }
 
-        if (this->params_.use_bbox_ex_msgs)
+    if (this->params_.use_bbox_ex_msgs)
+    {
+        if (!this->pub_bboxes_)
         {
-            if (this->pub_bboxes_ == nullptr)
-            {
-                RCLCPP_ERROR(this->get_logger(), "pub_bboxes_ is nullptr");
-                return;
-            }
-            auto boxes = objects_to_bboxes(frame, objects, img->header);
-            this->pub_bboxes_->publish(boxes);
+            RCLCPP_ERROR(this->get_logger(), "pub_bboxes_ is nullptr");
+            return;
+        }
+        auto boxes = objects_to_bboxes(img->image, objects, img->header);  // Fix here
+        this->pub_bboxes_->publish(boxes);
+    }
+    else
+    {
+        if (!this->pub_detection2d_)
+        {
+            RCLCPP_ERROR(this->get_logger(), "pub_detection2d_ is nullptr");
+            return;
+        }
+        vision_msgs::msg::Detection2DArray detections = objects_to_detection2d(objects, img->header);
+        if (!detections.detections.empty())
+        {
+            tr_messages::msg::DetWithImg detwithimg;
+            detwithimg.image = *ptr;  // Copy unavoidable due to const shared ptr
+            detwithimg.detection_info.detections = detections.detections;
+
+            this->pub_detection2d_->publish(detwithimg);
         }
         else
         {
-            if (this->pub_detection2d_ == nullptr)
-            {
-                RCLCPP_ERROR(this->get_logger(), "pub_detection2d_ is nullptr");
-                return;
-            }
-            vision_msgs::msg::Detection2DArray detections = objects_to_detection2d(objects, img->header);
-            if(detections.detections.size() != 0){
-                tr_messages::msg::DetWithImg detwithimg;
-                detwithimg.image = *ptr;
-                detwithimg.detection_info.detections = detections.detections;
-
-                this->pub_detection2d_->publish(detwithimg);
-            } else {
-                RCLCPP_INFO(this->get_logger(), "no detections so not publishing");
-            }
-            
-        }
-
-        if (this->params_.publish_resized_image) {
-            sensor_msgs::msg::Image::SharedPtr pub_img =
-                cv_bridge::CvImage(img->header, "bgr8", frame).toImageMsg();
-            this->pub_image_.publish(pub_img);
+            RCLCPP_INFO(this->get_logger(), "no detections so not publishing");
         }
     }
+}
+
 
     bboxes_ex_msgs::msg::BoundingBoxes YoloXNode::objects_to_bboxes(
         const cv::Mat &frame, const std::vector<yolox_cpp::Object> &objects, const std_msgs::msg::Header &header)
