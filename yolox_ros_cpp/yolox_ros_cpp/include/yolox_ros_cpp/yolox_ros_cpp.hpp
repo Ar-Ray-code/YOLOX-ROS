@@ -22,6 +22,8 @@
 #include "yolox_cpp/utils.hpp"
 #include "yolox_param/yolox_param.hpp"
 
+#include "tr_messages/msg/det_with_img.hpp"
+
 namespace yolox_ros_cpp{
     class YoloXNode : public rclcpp::Node
     {
@@ -45,7 +47,7 @@ namespace yolox_ros_cpp{
         image_transport::Subscriber sub_image_;
 
         rclcpp::Publisher<bboxes_ex_msgs::msg::BoundingBoxes>::SharedPtr pub_bboxes_;
-        rclcpp::Publisher<vision_msgs::msg::Detection2DArray>::SharedPtr pub_detection2d_;
+        rclcpp::Publisher<tr_messages::msg::DetWithImg>::SharedPtr pub_detection2d_;
         image_transport::Publisher pub_image_;
     };
 }

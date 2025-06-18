@@ -12,6 +12,9 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif()
 
 find_package(ament_cmake_auto REQUIRED)
+find_package(tr_messages REQUIRED)
+
+
 ament_auto_find_build_dependencies()
 
 if(NOT yolox_cpp_FOUND)
@@ -37,3 +40,5 @@ ament_auto_package(
   INSTALL_TO_SHARE
   launch
 )
+
+ament_target_dependencies(yolox_ros_cpp tr_messages)

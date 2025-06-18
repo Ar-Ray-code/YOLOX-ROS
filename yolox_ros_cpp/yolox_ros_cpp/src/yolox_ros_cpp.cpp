@@ -101,7 +101,7 @@ namespace yolox_ros_cpp
                 this->params_.publish_boundingbox_topic_name,
                 10);
         } else {
-            this->pub_detection2d_ = this->create_publisher<vision_msgs::msg::Detection2DArray>(
+            this->pub_detection2d_ = this->create_publisher<tr_messages::msg::DetWithImg>(
                 this->params_.publish_boundingbox_topic_name,
                 10);
         }
@@ -152,7 +152,16 @@ namespace yolox_ros_cpp
                 return;
             }
             vision_msgs::msg::Detection2DArray detections = objects_to_detection2d(objects, img->header);
-            this->pub_detection2d_->publish(detections);
+            if(detections.detections.size() != 0){
+                tr_messages::msg::DetWithImg detwithimg;
+                detwithimg.image = *ptr;
+                detwithimg.detection_info.detections = detections.detections;
+
+                this->pub_detection2d_->publish(detwithimg);
+            } else {
+                RCLCPP_INFO(this->get_logger(), "no detections so not publishing");
+            }
+            
         }
 
         if (this->params_.publish_resized_image) {
