@@ -28,7 +28,7 @@ function convert {
     /usr/src/tensorrt/bin/trtexec \
         --onnx=$SCRIPT_DIR/../onnx/$MODEL.onnx \
         --saveEngine=$SCRIPT_DIR/$MODEL.trt \
-        --fp16 --verbose
+        --best --verbose --builderOptimizationLevel=5
 }
 
 convert $1
