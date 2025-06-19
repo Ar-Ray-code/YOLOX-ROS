@@ -116,6 +116,7 @@ this->sub_image_ = image_transport::create_subscription(
 
     void YoloXNode::colorImageCallback(const sensor_msgs::msg::Image::ConstSharedPtr &ptr)
 {
+    auto now_noninf = std::chrono::system_clock::now();
     auto img = cv_bridge::toCvShare(ptr, "bgr8");
 
     auto now = std::chrono::system_clock::now();
@@ -123,7 +124,6 @@ this->sub_image_ = image_transport::create_subscription(
     auto end = std::chrono::system_clock::now();
 
     auto elapsed = std::chrono::duration_cast<std::chrono::microseconds>(end - now);
-    RCLCPP_INFO(this->get_logger(), "Inference time: %5ld us", elapsed.count());
 
     if (this->params_.imshow_isshow)
     {
@@ -166,6 +166,9 @@ this->sub_image_ = image_transport::create_subscription(
             RCLCPP_INFO(this->get_logger(), "no detections so not publishing");
         }
     }
+    auto end_noninf = std::chrono::system_clock::now();
+    auto elapsed_noninf = std::chrono::duration_cast<std::chrono::microseconds>(end_noninf - now_noninf);
+    RCLCPP_INFO(this->get_logger(), "Inference time: %5ld us Non Inference time: %5ld", elapsed.count(), elapsed_noninf.count() - elapsed.count());
 }
 
 

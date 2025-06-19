@@ -90,14 +90,6 @@ def generate_launch_description():
         executable='component_container',
         composable_node_descriptions=[
             ComposableNode(
-                package='usb_cam',
-                plugin='usb_cam::UsbCamNode',
-                name='usb_cam_node',
-                parameters=[{
-                    'video_device': LaunchConfiguration('video_device'),
-                    'brightness': 100
-                }]),
-            ComposableNode(
                 package='yolox_ros_cpp',
                 plugin='yolox_ros_cpp::YoloXNode',
                 name='yolox_ros_cpp',

@@ -95,12 +95,17 @@ namespace yolox_cpp
     std::vector<Object> YoloXTensorRT::inference(const cv::Mat &frame)
     {
         // preprocess
+        auto now = std::chrono::system_clock::now();
         auto pr_img = static_resize(frame);
+        auto end = std::chrono::system_clock::now();
+        auto elapsed_inf = std::chrono::duration_cast<std::chrono::microseconds>(end - now);
+        printf("resize time: %5ld us\n", elapsed_inf.count());
         blobFromImage(pr_img, input_blob_.data());
-
+        
         // inference
         this->doInference(input_blob_.data(), output_blob_.data());
 
+        
         // postprocess
         const float scale = std::min(
             static_cast<float>(this->input_w_) / static_cast<float>(frame.cols),
