@@ -4,8 +4,11 @@
 ### before you build 
 `sudo apt install ros-humble-generate-parameter-library`
 
+### building
+colcon build --cmake-args -DYOLOX_USE_TENSORRT=ON
+
 ### running
-`ros2 launch yolox_ros_cpp yolox_tensorrt.launch.py model_path:=src/TR-YOLOX-ROS/weights/tensorrt/armor_sim_s.trt src_image_topic_name:=/camera/image publish_boundingbox_topic_name:=/detections imshow_isshow:=false`
+`ros2 launch yolox_ros_cpp yolox_tensorrt.launch.py`
 
 
 ![](https://img.shields.io/github/stars/Ar-Ray-code/YOLOX-ROS)
