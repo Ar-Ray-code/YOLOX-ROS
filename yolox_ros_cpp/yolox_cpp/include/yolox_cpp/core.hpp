@@ -76,21 +76,20 @@ namespace yolox_cpp
         // for NCHW
         void blobFromImage(const cv::Mat &img, float *blob_data)
         {
-            const size_t channels = 3;
-            const size_t img_h = img.rows;
-            const size_t img_w = img.cols;
-            const size_t img_hw = img_h * img_w;
-            float *blob_data_ch0 = blob_data;
-            float *blob_data_ch1 = blob_data + img_hw;
-            float *blob_data_ch2 = blob_data + img_hw * 2;
-            // HWC -> CHW
-                for (size_t i = 0; i < img_hw; ++i)
-                {
-                    const size_t src_idx = i * channels;
-                    blob_data_ch0[i] = static_cast<float>(img.data[src_idx + 0]);
-                    blob_data_ch1[i] = static_cast<float>(img.data[src_idx + 1]);
-                    blob_data_ch2[i] = static_cast<float>(img.data[src_idx + 2]);
-                }
+            cv::Scalar mean = cv::Scalar(0, 0, 0);
+            cv::Scalar std_inv = cv::Scalar(1.0, 1.0, 1.0); // No normalization
+
+            cv::Mat blob = cv::dnn::blobFromImage(
+                img,
+                1.0,        // dummy scalefactor (will apply manually below)
+                cv::Size(), // use original size
+                mean,       // mean subtraction
+                true,       // swapRB = true
+                false       // crop = false
+            );
+
+            // Copy to output buffer
+            std::memcpy(blob_data, blob.ptr<float>(), sizeof(float) * 3 * img.rows * img.cols);
         }
 
         // for NHWC

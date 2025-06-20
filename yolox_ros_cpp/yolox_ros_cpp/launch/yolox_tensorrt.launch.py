@@ -14,7 +14,7 @@ def generate_launch_description():
         ),
         DeclareLaunchArgument(
             'model_path',
-            default_value='./src/YOLOX-ROS/weights/tensorrt/yolox_tiny.trt',
+            default_value='/home/triton/Documents/cv-dev/TR-Autonomy-2024-2025/src/TR-YOLOX-ROS/weights/tensorrt/armor_tiny.trt',
             description='yolox model path.'
         ),
         DeclareLaunchArgument(
@@ -59,7 +59,7 @@ def generate_launch_description():
         ),
         DeclareLaunchArgument(
             'src_image_topic_name',
-            default_value='/image_raw',
+            default_value='/camera/image',
             description='topic name for source image'
         ),
         DeclareLaunchArgument(
@@ -69,7 +69,7 @@ def generate_launch_description():
         ),
         DeclareLaunchArgument(
             'publish_boundingbox_topic_name',
-            default_value='/yolox/bounding_boxes',
+            default_value='/detections',
             description='topic name for publishing bounding box message.'
         ),
         DeclareLaunchArgument(
