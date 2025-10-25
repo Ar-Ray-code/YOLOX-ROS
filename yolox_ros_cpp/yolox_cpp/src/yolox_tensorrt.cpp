@@ -1,4 +1,8 @@
 #include "yolox_cpp/yolox_tensorrt.hpp"
+#include <vector_types.h>
+
+extern "C" void launchGPUResizeAndBlobFromImage(uchar3* image_data, float* output, int r_width, int r_height,
+                                   int input_width, int input_height, float w_ratio, float h_ratio, cudaStream_t stream);
 
 namespace yolox_cpp
 {
@@ -92,47 +96,68 @@ namespace yolox_cpp
         CHECK(cudaFree(inference_buffers_[this->outputIndex_]));
     }
 
-    std::vector<Object> YoloXTensorRT::inference(const cv::Mat &frame)
+    std::vector<yolox_cpp::Object> YoloXTensorRT::inference(const cv::Mat &frame, uchar3* d_image, float* d_output, 
+                                                            cudaStream_t copy_stream_, cudaStream_t resize_stream_)
     {
-        // preprocess
-        auto now = std::chrono::system_clock::now();
-        auto pr_img = static_resize(frame);
-        auto end = std::chrono::system_clock::now();
-        auto elapsed_inf = std::chrono::duration_cast<std::chrono::microseconds>(end - now);
-        printf("resize time: %5ld us\n", elapsed_inf.count());
-        blobFromImage(pr_img, input_blob_.data());
-        
-        // inference
-        this->doInference(input_blob_.data(), output_blob_.data());
+        auto t0 = std::chrono::high_resolution_clock::now();
 
-        
-        // postprocess
+        cudaMemcpy2DAsync(
+            d_image,                       
+            frame.cols * sizeof(uchar3),  
+            frame.data,                 
+            frame.step,                    
+            frame.cols * sizeof(uchar3),   
+            frame.rows,                   
+            cudaMemcpyHostToDevice,
+            copy_stream_
+        );
+
+        auto t1 = std::chrono::high_resolution_clock::now();
+        auto elapsed_us = std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
+        printf("Copy Time: %5ld us\n", elapsed_us);
+
+        float w_r = static_cast<float>(frame.cols) / this->input_w_;
+        float h_r = static_cast<float>(frame.rows) / this->input_h_;
+
+        t0 = std::chrono::high_resolution_clock::now();
+        launchGPUResizeAndBlobFromImage(d_image, d_output,
+                                        this->input_w_, this->input_h_,
+                                        frame.cols, frame.rows,
+                                        w_r, h_r,
+                                        resize_stream_);
+        cudaStreamSynchronize(resize_stream_);
+        t1 = std::chrono::high_resolution_clock::now();
+        elapsed_us = std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
+        printf("resize time on GPU: %5ld us\n", elapsed_us);
+
+        t0 = std::chrono::high_resolution_clock::now();
+        this->doInference(d_output, output_blob_.data(), copy_stream_);
+        t1 = std::chrono::high_resolution_clock::now();
+        elapsed_us = std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
+        printf("Inference time on GPU: %5ld us\n", elapsed_us);
+
         const float scale = std::min(
-            static_cast<float>(this->input_w_) / static_cast<float>(frame.cols),
-            static_cast<float>(this->input_h_) / static_cast<float>(frame.rows)
+            static_cast<float>(this->input_w_) / frame.cols,
+            static_cast<float>(this->input_h_) / frame.rows
         );
 
         std::vector<Object> objects;
-        decode_outputs(
-            output_blob_.data(), this->grid_strides_, objects,
-            this->bbox_conf_thresh_, scale, frame.cols, frame.rows);
+        t0 = std::chrono::high_resolution_clock::now();
+        decode_outputs(output_blob_.data(), this->grid_strides_, objects,
+                    this->bbox_conf_thresh_, scale, frame.cols, frame.rows);
+        t1 = std::chrono::high_resolution_clock::now();
+        elapsed_us = std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
+        printf("Post time: %5ld us\n", elapsed_us);
 
         return objects;
     }
 
-    void YoloXTensorRT::doInference(const float *input, float *output)
-    {
-        // Create stream
-        cudaStream_t stream;
-        CHECK(cudaStreamCreate(&stream));
 
+    void YoloXTensorRT::doInference(const float *input, float *output, cudaStream_t copy_stream_)
+    {
         // DMA input batch data to device, infer on the batch asynchronously, and DMA output back to host
-        CHECK(
-            cudaMemcpyAsync(
-                this->inference_buffers_[this->inputIndex_],
-                input,
-                3 * this->input_h_ * this->input_w_ * sizeof(float),
-                cudaMemcpyHostToDevice, stream));
+        // Change to Device to Device copy
+        this->inference_buffers_[this->inputIndex_] = const_cast<float*>(input);
 
         bool success = context_->executeV2(this->inference_buffers_);
         if (!success)
@@ -143,12 +168,9 @@ namespace yolox_cpp
                 output,
                 this->inference_buffers_[this->outputIndex_],
                 this->output_size_ * sizeof(float),
-                cudaMemcpyDeviceToHost, stream));
+                cudaMemcpyDeviceToHost, copy_stream_));
 
-        CHECK(cudaStreamSynchronize(stream));
-
-        // Release stream
-        CHECK(cudaStreamDestroy(stream));
+        CHECK(cudaStreamSynchronize(copy_stream_));
     }
 
 } // namespace yolox_cpp

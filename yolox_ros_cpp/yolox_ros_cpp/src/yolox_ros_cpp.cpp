@@ -12,12 +12,28 @@ namespace yolox_ros_cpp
 
     void YoloXNode::onInit()
     {
+        this->init = true;
+        this->d_image_ = nullptr;
+        this->d_output_ = nullptr;
+        cudaStreamCreate(&this->copy_stream_);
+        cudaStreamCreate(&this->resize_stream_);
+        rclcpp::on_shutdown([this]() {
+            cudaStreamDestroy(this->copy_stream_);
+            cudaStreamDestroy(this->resize_stream_);
+            cudaFree(this->d_image_);
+            cudaFree(this->d_output_);
+            this->copy_stream_ = nullptr;
+            this->resize_stream_ = nullptr;
+        });
         this->init_timer_->cancel();
         this->param_listener_ = std::make_shared<yolox_parameters::ParamListener>(
             this->get_node_parameters_interface());
-
         this->params_ = this->param_listener_->get_params();
-
+        this->callback_group_reentrant_ =
+            this->create_callback_group(rclcpp::CallbackGroupType::Reentrant);
+        this->sub_options_ = std::make_shared<rclcpp::SubscriptionOptions>();
+        this->sub_options_->callback_group = callback_group_reentrant_;
+        this->sub_options_->use_intra_process_comm = rclcpp::IntraProcessSetting::Enable; 
         if (this->params_.imshow_isshow)
         {
             cv::namedWindow("yolox", cv::WINDOW_AUTOSIZE);
@@ -91,13 +107,13 @@ namespace yolox_ros_cpp
         }
         RCLCPP_INFO(this->get_logger(), "model loaded");
 
-        rclcpp::QoS qos_profile(1);  // Queue depth of 1
+        rclcpp::QoS qos_profile(5);  // Queue depth of 5 for multithreading
 this->sub_image_ = image_transport::create_subscription(
             this, this->params_.src_image_topic_name,
             std::bind(&YoloXNode::colorImageCallback, this, std::placeholders::_1),
             "raw",
-            qos_profile.get_rmw_qos_profile());
-
+            qos_profile.get_rmw_qos_profile(),
+            *this->sub_options_);
 
         if (this->params_.use_bbox_ex_msgs) {
             this->pub_bboxes_ = this->create_publisher<bboxes_ex_msgs::msg::BoundingBoxes>(
@@ -120,9 +136,17 @@ this->sub_image_ = image_transport::create_subscription(
     auto img = cv_bridge::toCvShare(ptr, "bgr8");
 
     auto now = std::chrono::system_clock::now();
-    auto objects = this->yolox_->inference(img->image);  // Use img->image
+    // Initialization
+    if (this->init) {
+        size_t image_bytes = sizeof(uchar3) * img->image.cols * img->image.rows;
+        cudaMallocManaged(reinterpret_cast<void**>(&this->d_image_), image_bytes);
+        size_t output_bytes = sizeof(float) * 416 * 416 * 3;
+        cudaMallocManaged(reinterpret_cast<void**>(&this->d_output_), output_bytes);
+        this->init = false;
+    }
+    auto objects = this->yolox_->inference(img->image, this->d_image_, this->d_output_, 
+                                            this->copy_stream_, this->resize_stream_);  // Use img->image
     auto end = std::chrono::system_clock::now();
-
     auto elapsed = std::chrono::duration_cast<std::chrono::microseconds>(end - now);
 
     if (this->params_.imshow_isshow)
@@ -156,9 +180,8 @@ this->sub_image_ = image_transport::create_subscription(
         if (!detections.detections.empty())
         {
             tr_messages::msg::DetWithImg detwithimg;
-            detwithimg.image = *ptr;  // Copy unavoidable due to const shared ptr
+            // detwithimg.image = *ptr;  // Copy unavoidable due to const shared ptr
             detwithimg.detection_info.detections = detections.detections;
-
             this->pub_detection2d_->publish(detwithimg);
         }
         else
@@ -170,7 +193,6 @@ this->sub_image_ = image_transport::create_subscription(
     auto elapsed_noninf = std::chrono::duration_cast<std::chrono::microseconds>(end_noninf - now_noninf);
     RCLCPP_INFO(this->get_logger(), "Inference time: %5ld us Non Inference time: %5ld", elapsed.count(), elapsed_noninf.count() - elapsed.count());
 }
-
 
     bboxes_ex_msgs::msg::BoundingBoxes YoloXNode::objects_to_bboxes(
         const cv::Mat &frame, const std::vector<yolox_cpp::Object> &objects, const std_msgs::msg::Header &header)

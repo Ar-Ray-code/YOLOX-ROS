@@ -39,7 +39,8 @@ namespace yolox_cpp
               num_classes_(num_classes), p6_(p6), model_version_(model_version)
         {
         }
-        virtual std::vector<Object> inference(const cv::Mat &frame) = 0;
+        virtual std::vector<Object> inference(const cv::Mat &frame, uchar3* d_image, float* d_output, 
+                                                cudaStream_t copy_stream_, cudaStream_t resize_stream_) = 0;
 
     protected:
         int input_w_;

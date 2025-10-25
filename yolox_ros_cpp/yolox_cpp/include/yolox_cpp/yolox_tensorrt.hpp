@@ -8,6 +8,7 @@
 #include <iostream>
 #include <fstream>
 #include <opencv2/opencv.hpp>
+#include <opencv2/core/cuda.hpp>
 
 #include <cuda_runtime_api.h>
 #include <NvInfer.h>
@@ -37,10 +38,10 @@ namespace yolox_cpp{
                           float nms_th=0.45, float conf_th=0.3, const std::string &model_version="0.1.1rc0",
                           int num_classes=80, bool p6=false);
             ~YoloXTensorRT();
-            std::vector<Object> inference(const cv::Mat& frame) override;
-
+            std::vector<Object> inference(const cv::Mat &frame, uchar3* d_image, float* d_output, 
+                                            cudaStream_t copy_stream_, cudaStream_t resize_stream_);
         private:
-            void doInference(const float* input, float* output);
+            void doInference(const float* input, float* output, cudaStream_t copy_stream_);
 
             int DEVICE_ = 0;
             Logger gLogger_;

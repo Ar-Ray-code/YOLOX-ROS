@@ -11,6 +11,11 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
+set(CMAKE_BUILD_TYPE Release)
+set(CMAKE_CUDA_FLAGS_RELEASE "-O3 --use_fast_math -DNDEBUG")
+set(CMAKE_CUDA_ARCHITECTURES 87)
+project(yolox_cpp CXX CUDA)
+
 find_package(ament_cmake_auto REQUIRED)
 ament_auto_find_build_dependencies()
 
@@ -46,15 +51,15 @@ endif()
 
 if(YOLOX_USE_TENSORRT)
   find_package(CUDA REQUIRED)
+  enable_language(CUDA) 
   if (NOT CUDA_TOOLKIT_ROOT_DIR)
     set(CUDA_TOOLKIT_ROOT_DIR /usr/local/cuda)
   endif()
   find_path(TENSORRT_INCLUDE_DIR NvInfer.h
     HINTS ${TENSORRT_ROOT} ${CUDA_TOOLKIT_ROOT_DIR}
     PATH_SUFFIXES include)
-
   set(ENABLE_TENSORRT ON)
-  set(TARGET_SRC ${TARGET_SRC} src/yolox_tensorrt.cpp)
+  set(TARGET_SRC ${TARGET_SRC} src/yolox_tensorrt.cpp src/cuda_utils.cu)
   set(TARGET_LIBS ${TARGET_LIBS} nvinfer nvinfer_plugin)
   set(TARGET_DPENDENCIES ${TARGET_DPENDENCIES} CUDA)
 endif()
@@ -85,6 +90,11 @@ configure_file(
 )
 
 ament_auto_add_library(yolox_cpp SHARED ${TARGET_SRC})
+target_include_directories(yolox_cpp PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>
+)
+
 ament_target_dependencies(yolox_cpp ${TARGET_DPENDENCIES})
 ament_export_dependencies(${TARGET_DPENDENCIES})
 target_link_libraries(yolox_cpp ${TARGET_LIBS})

@@ -2,6 +2,7 @@ import launch
 from launch.actions import DeclareLaunchArgument
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import ComposableNodeContainer
+from launch.actions import SetEnvironmentVariable
 from launch_ros.descriptions import ComposableNode
 
 def generate_launch_description():
@@ -14,7 +15,7 @@ def generate_launch_description():
         ),
         DeclareLaunchArgument(
             'model_path',
-            default_value='/home/triton/Documents/cv-dev/TR-Autonomy-2024-2025/src/TR-YOLOX-ROS/weights/tensorrt/armor_tiny.trt',
+            default_value='/home/triton/Documents/cv-dev/TR-Autonomy-2024-2025/src/TR-YOLOX-ROS/weights/tensorrt/modelInt8_clocks.engine',
             description='yolox model path.'
         ),
         DeclareLaunchArgument(
@@ -83,6 +84,10 @@ def generate_launch_description():
             description='use BoundingBoxArray message type.'
         ),
     ]
+    SetEnvironmentVariable(
+            name='RCLCPP_EXECUTOR_THREAD_COUNT',
+            value='2'
+        ),
     container = ComposableNodeContainer(
         name='yolox_container',
         namespace='',

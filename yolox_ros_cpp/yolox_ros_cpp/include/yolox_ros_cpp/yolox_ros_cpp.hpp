@@ -32,16 +32,25 @@ namespace yolox_ros_cpp{
     private:
         void onInit();
         void colorImageCallback(const sensor_msgs::msg::Image::ConstSharedPtr &);
-
         static bboxes_ex_msgs::msg::BoundingBoxes objects_to_bboxes(const cv::Mat &, const std::vector<yolox_cpp::Object> &, const std_msgs::msg::Header &);
         static vision_msgs::msg::Detection2DArray objects_to_detection2d(const std::vector<yolox_cpp::Object> &, const std_msgs::msg::Header &);
-
     protected:
         std::shared_ptr<yolox_parameters::ParamListener> param_listener_;
         yolox_parameters::Params params_;
     private:
+        bool init;
+
+        cudaStream_t copy_stream_;
+        cudaStream_t resize_stream_;
+
+        uchar3* d_image_; 
+        float* d_output_;
+
         std::unique_ptr<yolox_cpp::AbcYoloX> yolox_;
         std::vector<std::string> class_names_;
+
+        rclcpp::CallbackGroup::SharedPtr callback_group_reentrant_;
+        std::shared_ptr<rclcpp::SubscriptionOptions> sub_options_;
 
         rclcpp::TimerBase::SharedPtr init_timer_;
         image_transport::Subscriber sub_image_;
