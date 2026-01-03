@@ -16,8 +16,8 @@
 | --------------- | -------- |
 | TensorRT            |  ✅   |
 | OpenVINO            |  ✅   |
-| ONNRuntime CUDA     |  ✅   |
-| ONNRuntime MIGraphX |  ✅   |
+| ONNXRuntime CUDA     |  ✅   |
+| ONNXRuntime MIGraphX |  ✅   |
 | TFLite              |  ✅   |
 
 
