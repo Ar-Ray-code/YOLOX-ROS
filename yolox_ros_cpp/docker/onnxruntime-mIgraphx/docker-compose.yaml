@@ -1,0 +1,22 @@
+version: '3.4'
+services:
+    yolox_ros_onnxruntime_migraphx:
+        container_name: yolox_onnxruntime_migraphx
+        build:
+            context: .
+            args:
+                - BASE_TAB=latest
+        network_mode: host
+        devices:
+        - "/dev/kfd:/dev/kfd"
+        - "/dev/dri:/dev/dri"
+        - "/dev/video4:/dev/video4"
+
+        environment:
+            - DISPLAY=$DISPLAY
+        volumes:
+            - $HOME/ros2_ws:/root/ros2_ws
+            - /tmp/.X11-unix:/tmp/.X11-unix
+        working_dir: /root/ros2_ws
+        tty: true
+        command: bash

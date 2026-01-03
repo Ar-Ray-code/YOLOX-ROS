@@ -67,7 +67,7 @@ namespace yolox_ros_cpp
                 this->params_.model_path,
                 this->params_.onnxruntime_intra_op_num_threads,
                 this->params_.onnxruntime_inter_op_num_threads,
-                this->params_.onnxruntime_use_cuda, this->params_.onnxruntime_device_id,
+                this->params_.onnxruntime_use_gpu, this->params_.onnxruntime_device_id,
                 this->params_.onnxruntime_use_parallel,
                 this->params_.nms, this->params_.conf, this->params_.model_version,
                 this->params_.num_classes, this->params_.p6);

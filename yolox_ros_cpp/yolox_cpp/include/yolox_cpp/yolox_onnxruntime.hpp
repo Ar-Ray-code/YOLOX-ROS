@@ -1,12 +1,16 @@
 #ifndef _YOLOX_CPP_YOLOX_ONNX_HPP
 #define _YOLOX_CPP_YOLOX_ONNX_HPP
 
+#include <algorithm>
+#include <cstdlib>
+#include <filesystem>
+#include <iostream>
 #include <iterator>
 #include <memory>
+#include <opencv2/opencv.hpp>
+#include <stdexcept>
 #include <string>
 #include <vector>
-#include <iostream>
-#include <opencv2/opencv.hpp>
 
 #include <onnxruntime/onnxruntime_cxx_api.h>
 
@@ -18,7 +22,7 @@ namespace yolox_cpp{
         public:
             YoloXONNXRuntime(const file_name_t &path_to_model,
                              int intra_op_num_threads, int inter_op_num_threads=1,
-                             bool use_cuda=true, int device_id=0, bool use_parallel=false,
+                             bool use_gpu=true, int device_id=0, bool use_parallel=false,
                              float nms_th=0.45, float conf_th=0.3, const std::string &model_version="0.1.1rc0",
                              int num_classes=80, bool p6=false);
             std::vector<Object> inference(const cv::Mat& frame) override;
@@ -26,7 +30,7 @@ namespace yolox_cpp{
         private:
             int intra_op_num_threads_ = 1;
             int inter_op_num_threads_ = 1;
-            bool use_cuda_ = true;
+            bool use_gpu_ = true;
             int device_id_ = 0;
             bool use_parallel_ = false;
 

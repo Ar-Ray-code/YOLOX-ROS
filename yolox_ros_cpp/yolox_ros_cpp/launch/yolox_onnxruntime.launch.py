@@ -52,7 +52,7 @@ def generate_launch_description():
             description='yolox model version.'
         ),
         DeclareLaunchArgument(
-            'onnxruntime_use_cuda',
+            'onnxruntime_use_gpu',
             default_value='true',
             description='onnxruntime use cuda.'
         ),
@@ -141,7 +141,7 @@ def generate_launch_description():
                     'num_classes': LaunchConfiguration('num_classes'),
                     'model_type': 'onnxruntime',
                     'model_version': LaunchConfiguration('model_version'),
-                    'onnxruntime_use_cuda': LaunchConfiguration('onnxruntime_use_cuda'),
+                    'onnxruntime_use_gpu': LaunchConfiguration('onnxruntime_use_gpu'),
                     'onnxruntime_device_id': LaunchConfiguration('onnxruntime_device_id'),
                     'onnxruntime_use_parallel': LaunchConfiguration('onnxruntime_use_parallel'),
                     'onnxruntime_inter_op_num_threads': LaunchConfiguration('onnxruntime_inter_op_num_threads'),

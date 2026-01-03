@@ -1,30 +1,30 @@
-ARG BASE_TAG=12.6.1-cudnn-devel-ubuntu24.04
-FROM nvidia/cuda:${BASE_TAG}
+ARG BASE_TAG=latest
+FROM rocm/dev-ubuntu-24.04:${BASE_TAG}
 
 ENV TZ=Asia/Tokyo
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 ENV DEBIAN_FRONTEND=noninteractive
 
-ENV PATH /usr/local/nvidia/bin:/usr/local/cuda/bin:${PATH}
-
 RUN apt update && apt install -y locales git cmake wget curl gnupg2 lsb-release python3-numpy python3-setuptools python3-wheel && \
     locale-gen en_US en_US.UTF-8 && \
-    update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8 && \
-    apt -y clean && \
-    rm -rf /var/lib/apt/lists/*
+    update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8
 ENV LANG=en_US.UTF-8
 
-RUN git clone --depth 1 --recursive https://github.com/microsoft/onnxruntime -b v1.19.2 && \
-    cd onnxruntime && \
-    ./build.sh --cudnn_home /usr/lib/x86_64-linux-gnu/ \
-               --cuda_home /usr/local/cuda \
-               --use_gpu \
-               --config RelWithDebInfo \
-               --build_shared_lib \
-               --allow_running_as_root \
-               --skip_tests && \
-    cd build/Linux/RelWithDebInfo && \
-    make install
+
+RUN apt update && apt install -y build-essential ca-certificates python3-dev \
+                    migraphx migraphx-dev half && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN git clone --recursive https://github.com/microsoft/onnxruntime /tmp/onnxruntime && \
+    cd /tmp/onnxruntime && \
+    ./build.sh --config Release --build_shared_lib --parallel \
+      --use_migraphx --migraphx_home /opt/rocm \
+      --update --build --skip_tests --allow_running_as_root && \
+    cd build/Linux/Release && \
+    cmake --install . --prefix /opt/onnxruntime-migraphx && \
+    echo /opt/onnxruntime-migraphx/lib > /etc/ld.so.conf.d/onnxruntime.conf && \
+    ldconfig && \
+    rm -rf /tmp/onnxruntime
 
 RUN curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg && \
     echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/ros2.list > /dev/null && \
