@@ -10,7 +10,7 @@ services:
         devices:
         - "/dev/kfd:/dev/kfd"
         - "/dev/dri:/dev/dri"
-        - "/dev/video4:/dev/video4"
+        # - "/dev/video0:/dev/video0"
 
         environment:
             - DISPLAY=$DISPLAY
