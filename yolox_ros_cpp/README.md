@@ -232,7 +232,7 @@ ros2 launch yolox_ros_cpp yolox_tflite.launch.py
 - `class_labels_path`: ""
 - `num_classes`: 80
 - `model_version`: 0.1.1rc0
-- `onnxruntime_use_cuda`: true
+- `onnxruntime_use_gpu`: true
 - `onnxruntime_use_parallel`: false
 - `onnxruntime_device_id`: 0
 - `onnxruntime_inter_op_num_threads`: 1

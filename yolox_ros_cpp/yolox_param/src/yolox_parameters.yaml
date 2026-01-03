@@ -14,7 +14,7 @@ yolox_parameters:
   num_classes:
     type: int
     description: "Number of classes."
-    default_value: 1
+    default_value: 80
   is_nchw:
     type: bool
     description: "Enable or disable NCHW."
@@ -42,7 +42,7 @@ yolox_parameters:
     validation: {
       one_of<>: [["AUTO", "CPU", "GPU", "NPU", "MYRIAD"]]
     }
-  onnxruntime_use_cuda:
+  onnxruntime_use_gpu:
     type: bool
     description: "Enable or disable CUDA."
     default_value: true

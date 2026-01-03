@@ -15,10 +15,11 @@
 
 | Base            | ROS2 C++ |
 | --------------- | -------- |
-| TensorRT (CUDA) |  ✅       |
-| OpenVINO        |  ✅       |
-| ONNX Runtime    |  ✅       |
-| TFLite          |  ✅       |
+| TensorRT            |  ✅   |
+| OpenVINO            |  ✅   |
+| ONNRuntime CUDA     |  ✅   |
+| ONNRuntime MIGraphX |  ✅   |
+| TFLite              |  ✅   |
 
 
 ## Installation & Demo (C++)
@@ -45,7 +46,6 @@ Check [this URL](./yolox_ros_cpp/README.md).
 
 <br>
 
-##
 
 ## Reference
 
