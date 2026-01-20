@@ -7,6 +7,7 @@ YOLOX_outputs/
 *.trt
 *.engine
 *.tflite
+*.hef
 YOLOX/
 YOLOX_outputs/
 install/

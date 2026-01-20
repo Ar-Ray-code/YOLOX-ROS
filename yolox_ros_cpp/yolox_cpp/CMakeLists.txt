@@ -20,6 +20,7 @@ option(YOLOX_USE_ONNXRUNTIME "Use ONNXRuntime"  OFF)
 option(ONNXRUNTIME_CUDA      "Use ONNXRuntime CUDA Execution Provider"  OFF)
 option(ONNXRUNTIME_MIGRAPHX  "Use ONNXRuntime MIGraphX Execution Provider"  OFF)
 option(YOLOX_USE_TFLITE      "Use tflite"  OFF)
+option(YOLOX_USE_HAILORT     "Use Hailort"  OFF)
 option(JETSON                "Use Jetson"  OFF)
 
 if(JETSON)
@@ -27,7 +28,7 @@ if(JETSON)
   set(YOLOX_USE_TENSORRT ON)
 endif()
 
-if(NOT YOLOX_USE_OPENVINO AND NOT YOLOX_USE_TENSORRT AND NOT YOLOX_USE_ONNXRUNTIME AND NOT YOLOX_USE_TFLITE)
+if(NOT YOLOX_USE_OPENVINO AND NOT YOLOX_USE_TENSORRT AND NOT YOLOX_USE_ONNXRUNTIME AND NOT YOLOX_USE_TFLITE AND NOT YOLOX_USE_HAILORT)
   message(FATAL_ERROR "YOLOX_USE_OPENVINO, YOLOX_USE_TENSORRT, YOLOX_USE_ONNXRUNTIME, YOLOX_USE_TFLITE must be ON at least one")
   return()
 endif()
@@ -38,6 +39,7 @@ set(ENABLE_ONNXRUNTIME OFF)
 set(ENABLE_ONNXRUNTIME_CUDA OFF)
 set(ENABLE_ONNXRUNTIME_MIGRAPHX OFF)
 set(ENABLE_TFLITE OFF)
+set(ENABLE_HAILORT OFF)
 
 if(YOLOX_USE_OPENVINO)
   find_package(OpenVINO REQUIRED)
@@ -94,6 +96,15 @@ if(YOLOX_USE_ONNXRUNTIME)
   set(TARGET_LIBS ${TARGET_LIBS} onnxruntime)
 endif()
 
+# hailort
+if(YOLOX_USE_HAILORT)
+  find_package(HailoRT EXACT REQUIRED)
+  set(ENABLE_HAILORT ON)
+  set(TARGET_SRC src/yolox_hailort.cpp)
+  set(TARGET_LIBS ${TARGET_LIBS} HailoRT::libhailort)
+  set(TARGET_DPENDENCIES ${TARGET_DPENDENCIES} HailoRT)
+endif()
+
 configure_file(
   "${PROJECT_SOURCE_DIR}/include/yolox_cpp/config.h.in"
   "${PROJECT_SOURCE_DIR}/include/yolox_cpp/config.h"
@@ -110,6 +121,7 @@ if (YOLOX_USE_TFLITE)
   ament_export_include_directories(${TFLITE_INCLUDES})
   install(DIRECTORY ${TFLITE_LIB_PATH}/ DESTINATION lib)
 endif()
+
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)

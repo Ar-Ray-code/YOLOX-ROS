@@ -123,6 +123,16 @@ colcon build --symlink-install \
     -DFLATBUFFERS_INCLUDE_DIR=${WORKSPACE}/tflite_build/flatbuffers/include
 ```
 
+
+### HailoRT
+
+```bash
+# build with hailort
+source /opt/ros/humble/setup.bash
+colcon build --cmake-args -DYOLOX_USE_HAILORT=ON
+```
+
+
 <br>
 
 ## Run
@@ -177,6 +187,12 @@ ros2 launch yolox_ros_cpp yolox_tflite.launch.py
 #     model_version:=0.1.0 \
 #     num_classes:=80 \
 #     is_nchw:=false
+```
+
+### HailoRT
+
+```bash
+ros2 launch yolox_ros_cpp yolox_hailort.launch.py
 ```
 
 ### Parameter
@@ -275,3 +291,7 @@ ros2 launch yolox_ros_cpp yolox_tflite.launch.py
 Reference from YOLOX demo code.
 - https://github.com/Megvii-BaseDetection/YOLOX/blob/5183a6716404bae497deb142d2c340a45ffdb175/demo/OpenVINO/cpp/yolox_openvino.cpp
 - https://github.com/Megvii-BaseDetection/YOLOX/tree/5183a6716404bae497deb142d2c340a45ffdb175/demo/TensorRT/cpp
+
+HailoRT
+- https://github.com/tier4/hailort-yoloXP
+- https://github.com/hailo-ai/hailort

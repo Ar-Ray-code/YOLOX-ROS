@@ -7,5 +7,6 @@
 #cmakedefine ENABLE_ONNXRUNTIME_CUDA
 #cmakedefine ENABLE_ONNXRUNTIME_MIGRAPHX
 #cmakedefine ENABLE_TFLITE
+#cmakedefine ENABLE_HAILORT
 
 #endif // _YOLOX_CPP_CONFIG_H_

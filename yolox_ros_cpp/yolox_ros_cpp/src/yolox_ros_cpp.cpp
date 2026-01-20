@@ -89,6 +89,17 @@ namespace yolox_ros_cpp
             rclcpp::shutdown();
 #endif
         }
+        else if (this->params_.model_type == "hailort")
+        {
+#ifdef ENABLE_HAILORT
+            RCLCPP_INFO(this->get_logger(), "Model Type is hailort");
+            this->yolox_ = std::make_unique<yolox_cpp::YoloXHailoRT>(
+                this->params_.model_path, this->params_.nms, this->params_.conf, this->params_.num_classes);
+#else
+            RCLCPP_ERROR(this->get_logger(), "yolox_cpp is not built with hailort");
+            rclcpp::shutdown();
+#endif
+        }
         RCLCPP_INFO(this->get_logger(), "model loaded");
 
         this->sub_image_ = image_transport::create_subscription(

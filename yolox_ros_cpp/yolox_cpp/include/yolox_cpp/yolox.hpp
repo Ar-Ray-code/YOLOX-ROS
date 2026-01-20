@@ -19,4 +19,9 @@
     #include "yolox_tflite.hpp"
 #endif
 
+#ifdef ENABLE_HAILORT
+    #include "yolox_hailort.hpp"
+#endif
+
+
 #endif
