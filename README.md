@@ -4,7 +4,7 @@
 
 [![ci_jazzy](https://github.com/Ar-Ray-code/YOLOX-ROS/actions/workflows/ci_jazzy.yml/badge.svg)](https://github.com/Ar-Ray-code/YOLOX-ROS/actions/workflows/ci_jazzy.yml)
 
-[YOLOX](https://github.com/Megvii-BaseDetection/YOLOX) + ROS2 Iron demo
+[YOLOX](https://github.com/Megvii-BaseDetection/YOLOX) + ROS2 Jazzy demo
 
 ![yolox_s_result](https://github.com/Ar-Ray-code/RenderTexture2ROS2Image/blob/main/images_for_readme/unity-demo.gif?raw=true)
 

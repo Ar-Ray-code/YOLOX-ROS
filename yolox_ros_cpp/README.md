@@ -1,7 +1,7 @@
 # YOLOX-ROS-CPP
 
 ## Requirements
-- ROS2 Iron
+- ROS2 Jazzy
   - ros-jazzy-generate-parameter-library
   - ros-jazzy-vision-msgs
   - ros-jazzy-usb-cam
